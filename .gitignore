@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node / React
+node_modules/
+dist/
+
+# Variables privadas
+.env
+.env.*
+!.env.example
+
+# Archivos locales
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
