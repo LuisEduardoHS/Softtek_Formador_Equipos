@@ -1,14 +1,16 @@
 from fastapi import FastAPI
-from app.api.routes import engine
+from app.api.routes import auth
+from app.db.database import engine, Base
 from app.models import usuario
 
+# Crear las tablas en MySQL automáticamente si no existen
 usuario.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title= "Plataforma de Formación de Equipos AI")
+app = FastAPI(title="API Universitaria - Módulo Auth")
 
-app.incluide_router(auth.router)
-app.incluide_router(perfiles.router)
+# Registrar las rutas de autenticación
+app.include_router(auth.router)
 
 @app.get("/")
-def root():
-    return {"mensaje": "API funcionando correctamente"}
+def read_root():
+    return {"mensaje": "API Backend funcionando correctamente"}

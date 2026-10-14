@@ -1,4 +1,4 @@
-from pydanic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr
 
 class UsuarioRegistro(BaseModel):
     nombre: str
