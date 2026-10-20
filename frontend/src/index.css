@@ -1,1 +1,169 @@
 @import "tailwindcss";
+
+/* Modo oscuro por clase (.dark en <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------
+   Tokens de diseño
+   Los colores semánticos apuntan a variables CSS para que el modo
+   oscuro solo tenga que redefinir los valores en .dark.
+------------------------------------------------------------------- */
+:root {
+  --canvas: #f8fafc;        /* 60 % fondo general */
+  --surface: #ffffff;       /* tarjetas */
+  --surface-2: #f1f5f9;     /* rellenos sutiles */
+  --ink: #0f172a;           /* 30 % estructura y texto */
+  --ink-2: #64748b;         /* texto secundario */
+  --line: #e2e8f0;          /* bordes */
+
+  --primary: #2563eb;       /* 10 % acento y CTA */
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+
+  --success: #10b981;
+  --success-ink: #047857;
+  --success-soft: #ecfdf5;
+  --success-line: #a7f3d0;
+
+  --warn: #f59e0b;
+  --warn-ink: #b45309;
+  --warn-soft: #fffbeb;
+  --warn-line: #fde68a;
+
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+
+  --ai-soft: #eff6ff;
+  --ai-line: #bfdbfe;
+  --ai-ink: #1d4ed8;
+
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #273449;
+  --ink: #f1f5f9;
+  --ink-2: #94a3b8;
+  --line: #334155;
+
+  --primary: #2563eb;
+  --primary-hover: #3b82f6;
+  --primary-soft: #1e3a8a33;
+
+  --success-ink: #34d399;
+  --success-soft: #064e3b55;
+  --success-line: #065f46;
+
+  --warn-ink: #fbbf24;
+  --warn-soft: #78350f44;
+  --warn-line: #92400e;
+
+  --danger-soft: #7f1d1d44;
+
+  --ai-soft: #17255488;
+  --ai-line: #1e40af;
+  --ai-ink: #93c5fd;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-line: var(--line);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-success-soft: var(--success-soft);
+  --color-success-line: var(--success-line);
+
+  --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-ai-soft: var(--ai-soft);
+  --color-ai-line: var(--ai-line);
+  --color-ai-ink: var(--ai-ink);
+}
+
+@theme {
+  /* Escala tipográfica: tamaño / interlineado */
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.025em;
+  --text-h1: 1.75rem;
+  --text-h1--line-height: 2.25rem;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: 1.25rem;
+  --text-h2--line-height: 1.75rem;
+  --text-h3: 1rem;
+  --text-h3--line-height: 1.5rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+
+  /* Sombras: dos niveles */
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.05), 0 1px 3px rgb(15 23 42 / 0.04);
+  --shadow-pop: 0 12px 32px -8px rgb(15 23 42 / 0.16), 0 2px 6px rgb(15 23 42 / 0.05);
+
+  /* Animaciones */
+  --animate-fade-up: fade-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade-in: fade-in 0.2s ease-out both;
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pop: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+  }
+  body {
+    @apply bg-canvas font-sans text-body text-ink antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
