@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
 import { Bell, FolderKanban, Home, Plus, UserRound, Users } from "lucide-react"
 import Avatar from "../ui/Avatar"
-import { currentUser, notifications } from "../../data/mockData"
+import { notifications } from "../../data/mockData"
 
 const NAV = [
   { to: "/inicio", label: "Inicio", icon: Home },
@@ -12,6 +12,15 @@ const NAV = [
 ]
 
 const unread = notifications.filter((n) => !n.leida).length
+
+function getSessionUser() {
+  try {
+    return JSON.parse(localStorage.getItem("usuario") || "{}")
+  } catch (error) {
+    console.error("No se pudo leer el usuario de la sesión:", error)
+    return {}
+  }
+}
 
 export function Logo({ to = "/inicio", className = "" }) {
   return (
@@ -39,6 +48,10 @@ function Badge({ count }) {
 }
 
 export default function AppLayout() {
+  const usuario = getSessionUser()
+  const nombre = usuario.nombre || "Usuario"
+  const detalle = usuario.carrera || usuario.correo || ""
+
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
       <a href="#contenido" className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
@@ -82,10 +95,10 @@ export default function AppLayout() {
           to="/perfil"
           className="mt-auto flex items-center gap-3 rounded-xl border border-line p-3 transition-colors hover:bg-surface-2"
         >
-          <Avatar name={currentUser.nombre} size="sm" />
+          <Avatar name={nombre} size="sm" />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-ink">{currentUser.nombre}</span>
-            <span className="block truncate text-xs text-ink-2">{currentUser.carrera}</span>
+            <span className="block truncate text-sm font-semibold text-ink">{nombre}</span>
+            {detalle && <span className="block truncate text-xs text-ink-2">{detalle}</span>}
           </span>
         </Link>
       </aside>
@@ -94,7 +107,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-surface/90 px-4 backdrop-blur lg:hidden">
         <Logo />
         <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
-          <Avatar name={currentUser.nombre} size="sm" />
+          <Avatar name={nombre} size="sm" />
         </Link>
       </header>
 

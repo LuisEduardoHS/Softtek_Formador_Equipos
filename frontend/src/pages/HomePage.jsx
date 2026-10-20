@@ -20,8 +20,8 @@ import {
   obtenerEquipos,
   obtenerInvitaciones,
   responderInvitacion,
+  obtenerPerfil,
 } from "../services/api"
-import { pendingInviteIds, studentById } from "../data/mockData"
 import { coverage, firstName } from "../lib/projects"
 
 function greeting() {
@@ -247,7 +247,7 @@ function PendingInvitations() {
             <InvitationItem
               key={i.id}
               invitation={i}
-              person={studentById(i.deId)}
+              person={i.remitente || { nombre: "Usuario" }}
               busy={busy === i.id}
               onRespond={(estado) => respond(i, estado)}
               compact
@@ -316,16 +316,18 @@ function MyTeams() {
 /* -------------------------------- Página -------------------------------- */
 
 export default function HomePage() {
-  // Recuperar datos del usuario autenticado guardados en el login
+  const perfilQuery = useAsync(obtenerPerfil)
   const usuarioGuardado = JSON.parse(localStorage.getItem("usuario") || "{}")
-  const nombreUsuario = usuarioGuardado.nombre || "Estudiante"
+  
+  const nombreReal = usuarioGuardado.nombre || perfilQuery.data?.nombre || "Estudiante"
+  const progresoReal = perfilQuery.data?.perfilCompleto || 20
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
       <header className="mb-6 flex animate-fade-up flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-h1 font-bold text-ink">
-            {greeting()}, {firstName(nombreUsuario)}
+            {greeting()}, {firstName(nombreReal)}
           </h1>
           <p className="mt-1 text-ink-2">Esto es lo que encontramos para ti hoy en la plataforma.</p>
         </div>
@@ -337,7 +339,7 @@ export default function HomePage() {
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-10">
           <div className="animate-fade-up [animation-delay:60ms]">
-            <ProfileProgress value={80} />
+            <ProfileProgress value={progresoReal} />
           </div>
 
           <section aria-labelledby="rec-title" className="animate-fade-up [animation-delay:120ms]">

@@ -5,6 +5,7 @@ import GlowBackground from "../components/layout/GlowBackground"
 import AuthCard from "../components/auth/AuthCard"
 import { Logo } from "../components/layout/AppLayout"
 import { LocalProcessing } from "../components/ui/AIBadge"
+import { iniciarSesion, registrarUsuario } from "../services/api"
 
 export default function AuthPage() {
   const navigate = useNavigate()
@@ -17,31 +18,36 @@ export default function AuthPage() {
     setErrorMsg("")
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // Mapea 'email' al parámetro 'correo' que requiere la API de FastAPI
-        body: JSON.stringify({
-          correo: email,
-          password: password,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        // Almacena la sesión en localStorage y redirige al panel inicial
-        localStorage.setItem("usuario", JSON.stringify(data.usuario))
-        navigate("/inicio")
-      } else {
-        // Despliega el error retornado por la API (ej: "Correo o contraseña incorrectos.")
-        setErrorMsg(data.detail || "Error al iniciar sesión.")
-      }
+      const data = await iniciarSesion({ correo: email, password })
+      localStorage.setItem("usuario", JSON.stringify(data.usuario))
+      navigate("/inicio")
     } catch (error) {
       console.error("Error de conexión:", error)
-      setErrorMsg("No se pudo conectar con el servidor backend.")
+      setErrorMsg(error.message || "No se pudo conectar con el servidor backend.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const signUp = async ({ nombre, correo, carrera, estado_geografico, municipio, password }) => {
+    setLoading(true)
+    setErrorMsg("")
+
+    try {
+      const data = await registrarUsuario({
+        nombre,
+        correo,
+        carrera,
+        estado_geografico,
+        municipio,
+        password,
+      })
+
+      localStorage.setItem("usuario", JSON.stringify(data.usuario))
+      navigate("/profile")
+    } catch (error) {
+      console.error("Error al registrar usuario:", error)
+      setErrorMsg(error.message || "No se pudo crear la cuenta.")
     } finally {
       setLoading(false)
     }
@@ -67,8 +73,8 @@ export default function AuthPage() {
         <AuthCard
           loading={loading}
           onSignIn={signIn}
+          onSignUp={signUp}
           onGoogle={() => console.log("OAuth de Google en desarrollo")}
-          onSignUp={() => navigate("/profile")}
         />
         <LocalProcessing />
       </main>

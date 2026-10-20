@@ -8,10 +8,10 @@ import ProjectCard from "../components/project/ProjectCard"
 import { SearchBar } from "../components/search/StudentSearch"
 import useAsync from "../hooks/useAsync"
 import { obtenerProyectos } from "../services/api"
-import { currentUser, projectSuggestions } from "../data/mockData"
 
 export default function ProjectsPage() {
   const { status, data, reload } = useAsync(obtenerProyectos)
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
   const [tab, setTab] = useState("explorar")
   const [q, setQ] = useState("")
   const [tipo, setTipo] = useState("todos")
@@ -19,9 +19,10 @@ export default function ProjectsPage() {
 
   const { explorar, mios } = useMemo(() => {
     const all = data ?? []
-    const esMio = (p) => p.creadorId === currentUser.id || p.roles.some((r) => r.cubiertoPor === currentUser.id)
+    const tieneUsuario = usuarioLocal.id_usuario !== undefined && usuarioLocal.id_usuario !== null
+    const esMio = (p) => tieneUsuario && String(p.creadorId) === String(usuarioLocal.id_usuario)
     return { explorar: all.filter((p) => !esMio(p)), mios: all.filter(esMio) }
-  }, [data])
+  }, [data, usuarioLocal.id_usuario])
 
   const base = tab === "explorar" ? explorar : mios
   const t = q.trim().toLowerCase()
@@ -29,11 +30,7 @@ export default function ProjectsPage() {
     (p) =>
       (!t || p.titulo.toLowerCase().includes(t) || p.roles.some((r) => r.nombre.toLowerCase().includes(t))) &&
       (tipo === "todos" || p.tipo === tipo) &&
-      (tab === "mios" || !soloAbiertos || p.roles.some((r) => !r.cubiertoPor)),
-  )
-  // En Explorar, primero los que la IA sugiere
-  const sorted = [...list].sort(
-    (a, b) => Number(projectSuggestions.some((s) => s.projectId === b.id)) - Number(projectSuggestions.some((s) => s.projectId === a.id)),
+      (tab === "mios" || !soloAbiertos || p.roles.length === 0 || p.roles.some((r) => !r.cubiertoPor)),
   )
 
   return (
@@ -88,7 +85,7 @@ export default function ProjectsPage() {
         </div>
       ) : status === "error" ? (
         <ErrorState message="No pudimos cargar los proyectos." onRetry={reload} />
-      ) : sorted.length === 0 ? (
+      ) : list.length === 0 ? (
         base.length === 0 && tab === "mios" ? (
           <EmptyState
             icon={FolderOpen}
@@ -108,13 +105,9 @@ export default function ProjectsPage() {
         )
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {sorted.map((p, i) => (
+          {list.map((p, i) => (
             <li key={p.id} className="animate-fade-up" style={{ animationDelay: `${i * 50}ms` }}>
-              <ProjectCard
-                project={p}
-                suggestion={tab === "explorar" ? projectSuggestions.find((s) => s.projectId === p.id) : undefined}
-                className="h-full"
-              />
+              <ProjectCard project={p} className="h-full" />
             </li>
           ))}
         </ul>

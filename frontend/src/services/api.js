@@ -23,6 +23,29 @@ async function request(path, { method = "GET", body } = {}) {
 // RUTAS CONECTADAS (Ya funcionan en FastAPI con MySQL)
 // ============================================================================
 
+/* ---------------------------- Autenticación ---------------------------- */
+
+export function registrarUsuario({ nombre, correo, carrera, estado_geografico, municipio, password }) {
+  return request("/auth/registro", {
+    method: "POST",
+    body: {
+      nombre,
+      correo,
+      carrera,
+      estado_geografico,
+      municipio,
+      password,
+    },
+  })
+}
+
+export function iniciarSesion({ correo, password }) {
+  return request("/auth/login", {
+    method: "POST",
+    body: { correo, password },
+  })
+}
+
 /* ---------------------------- Perfil ---------------------------- */
 
 export async function obtenerPerfil() {
@@ -37,14 +60,68 @@ export async function obtenerPerfil() {
 
 /* --------------------------- Proyectos -------------------------- */
 
+function mapEventoAProyecto(evento) {
+  const detalles = evento.detalles_especificos ?? {}
+  const requisitos = evento.requisitos_ia ?? {}
+  const rolesEvento = Array.isArray(detalles.roles)
+    ? detalles.roles
+    : Array.isArray(requisitos.roles)
+      ? requisitos.roles
+      : []
+
+  return {
+    id: String(evento.id_evento),
+    titulo: evento.titulo,
+    descripcion: evento.descripcion_libre ?? "",
+    tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
+    materia: detalles.materia ?? "",
+    creadorId: String(evento.creador_id),
+    integrantes: Number(detalles.integrantes) || 1,
+    fechaLimite: detalles.fechaLimite || null,
+    creado: evento.fecha_creacion?.slice(0, 10) ?? "",
+    estado: evento.estado,
+    roles: rolesEvento.map((rol, index) => ({
+      id: String(rol.id ?? index),
+      nombre: typeof rol.nombre === "string" ? rol.nombre : "Rol sin nombre",
+      habilidades: Array.isArray(rol.habilidades) ? rol.habilidades : [],
+      indispensable: Boolean(rol.indispensable),
+      cubiertoPor: rol.cubiertoPor ?? null,
+    })),
+  }
+}
+
 export function obtenerProyectos() {
-  // Llama a tu endpoint existente GET /eventos/
-  return request("/eventos/");
+  return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
+}
+
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles }) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const creadorId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(creadorId) || creadorId <= 0) {
+    throw new Error("Inicia sesión para poder publicar un proyecto.")
+  }
+
+  return request("/eventos/", {
+    method: "POST",
+    body: {
+      creador_id: creadorId,
+      titulo,
+      categoria_principal: tipo === "personal" ? "Personal" : "Academico",
+      descripcion_libre: descripcion,
+      detalles_especificos: {
+        tipo,
+        materia,
+        integrantes,
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+    },
+  }).then(mapEventoAProyecto)
 }
 
 export async function obtenerProyecto(id) {
-  // Llama a tu endpoint existente GET /eventos/{id} (Asegúrate de crearlo en auth.py si no lo tienes)
-  return request(`/eventos/${id}`);
+  return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
 // ============================================================================

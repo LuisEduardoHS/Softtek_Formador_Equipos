@@ -49,7 +49,8 @@ def registrar_usuario(user: UsuarioRegistro, db: Session = Depends(get_db)):
         "usuario": {
             "id_usuario": nuevo_usuario.id_usuario,
             "nombre": nuevo_usuario.nombre,
-            "correo": nuevo_usuario.correo
+            "correo": nuevo_usuario.correo,
+            "carrera": nuevo_usuario.carrera
         }
     }
 
@@ -71,6 +72,7 @@ def login_usuario(user: UsuarioLogin, db: Session = Depends(get_db)):
         "usuario": {
             "id_usuario": db_user.id_usuario,
             "nombre": db_user.nombre,
-            "correo": db_user.correo
+            "correo": db_user.correo,
+            "carrera": db_user.carrera
         }
     }
