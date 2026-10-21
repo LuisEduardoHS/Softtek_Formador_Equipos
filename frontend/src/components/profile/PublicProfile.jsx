@@ -50,17 +50,28 @@ export default function PublicProfile({ student, preview = false, actions }) {
           {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
         </div>
 
+        {student.bio && (
+          <section className="mt-6">
+            <h3 className="mb-2 text-label font-semibold tracking-wide text-ink-2 uppercase">Acerca de mí</h3>
+            <p className="whitespace-pre-wrap text-sm text-ink">{student.bio}</p>
+          </section>
+        )}
+
         <div className="mt-8 grid gap-8 md:grid-cols-2">
           <div className="space-y-8">
             <Block title="Fortalezas">
               {vis.fortalezas ? (
-                <ul className="flex flex-wrap gap-1.5">
-                  {student.fortalezas.map((f) => (
-                    <li key={f.nombre}>
-                      <SkillChip level={f.nivel}>{f.nombre}</SkillChip>
-                    </li>
-                  ))}
-                </ul>
+                student.fortalezas.length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {student.fortalezas.map((f) => (
+                      <li key={f.nombre}>
+                        <SkillChip level={f.nivel}>{f.nombre}</SkillChip>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-ink-2">Aún no agrega fortalezas a su perfil.</p>
+                )
               ) : (
                 <Hidden>Oculto para otras personas</Hidden>
               )}
@@ -68,20 +79,24 @@ export default function PublicProfile({ student, preview = false, actions }) {
 
             <Block title="Intereses">
               {vis.intereses ? (
-                <ul className="flex flex-wrap gap-1.5">
-                  {(student.intereses ?? []).map((i) => (
-                    <li key={i}>
-                      <SkillChip variant={esOtro && intereses.has(i) ? "match" : "neutral"}>{i}</SkillChip>
-                    </li>
-                  ))}
-                </ul>
+                (student.intereses ?? []).length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {(student.intereses ?? []).map((i) => (
+                      <li key={i}>
+                        <SkillChip variant={esOtro && intereses.has(i) ? "match" : "neutral"}>{i}</SkillChip>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-ink-2">Aún no agrega intereses a su perfil.</p>
+                )
               ) : (
                 <Hidden>Oculto para otras personas</Hidden>
               )}
               {esOtro && vis.intereses && <p className="mt-2 text-xs text-ink-2">En verde, los intereses que compartes.</p>}
             </Block>
 
-            {preview && (
+            {(preview || vis.reforzar) && (
               <Block title="Quiero reforzar">
                 {vis.reforzar ? (
                   <ul className="flex flex-wrap gap-1.5">
@@ -103,7 +118,11 @@ export default function PublicProfile({ student, preview = false, actions }) {
           <div className="space-y-8">
             <Block title="Disponibilidad">
               {vis.disponibilidad ? (
-                <AvailabilityGrid value={student.disponibilidad} compare={esOtro ? currentUser.disponibilidad : undefined} size="sm" />
+                student.disponibilidad.length > 0 ? (
+                  <AvailabilityGrid value={student.disponibilidad} compare={esOtro ? currentUser.disponibilidad : undefined} size="sm" />
+                ) : (
+                  <p className="text-sm text-ink-2">Aún no indica su disponibilidad.</p>
+                )
               ) : (
                 <Hidden>Oculta para otras personas</Hidden>
               )}

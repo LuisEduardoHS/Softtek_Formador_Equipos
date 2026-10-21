@@ -15,6 +15,7 @@ import TeamPage from "./pages/TeamPage"
 import InvitationsPage from "./pages/InvitationsPage"
 import NotificationsPage from "./pages/NotificationsPage"
 import ProfilePage from "./pages/ProfilePage"
+import StudentsPage from "./pages/StudentsPage"
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/match" element={<MatchPage />} />
         <Route path="/meeting" element={<MeetingPage />} />
         <Route path="/proyectos" element={<ProjectsPage />} />
+        <Route path="/estudiantes" element={<StudentsPage />} />
         <Route path="/proyectos/nuevo" element={<CreateProjectPage />} />
         <Route path="/proyectos/:id" element={<ProjectDetailPage />} />
         <Route path="/equipos" element={<TeamsPage />} />
