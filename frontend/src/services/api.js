@@ -1,177 +1,185 @@
 /**
- * Capa de servicios.
- *
- * Por ahora todas las funciones devuelven datos simulados con una latencia
- * artificial. Cada una indica con `TODO(backend)` el endpoint sugerido de
- * FastAPI que debe reemplazarla. Para conectar el backend:
- *   1. Define VITE_API_URL en .env (p. ej. http://localhost:8000)
- *   2. Sustituye el cuerpo simulado por `return request("/ruta", {...})`
+ * Capa de servicios conectada a FastAPI (MySQL).
  */
-import {
-  currentUser,
-  invitations,
-  projectSuggestions,
-  projects,
-  recommendations,
-  students,
-  teams,
-} from "../data/mockData"
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000"
 
-// Cliente HTTP listo para usarse cuando exista el backend.
-// eslint-disable-next-line no-unused-vars
+// Cliente HTTP conectado a tu backend local
 async function request(path, { method = "GET", body } = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   })
-  if (!res.ok) throw new Error(`Error ${res.status} en ${path}`)
-  return res.json()
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Error ${res.status} en ${path}`);
+  }
+  return res.json();
 }
 
-// Simulación: latencia y, para la demo, fallos forzados con ?estado=error
-const delay = (ms = 600) => new Promise((r) => setTimeout(r, ms))
-const demoState = () => new URLSearchParams(window.location.search).get("estado")
-async function mock(data, ms) {
-  await delay(ms)
-  if (demoState() === "error") throw new Error("No pudimos conectar con el servidor.")
-  return structuredClone(data)
+// ============================================================================
+// RUTAS CONECTADAS (Ya funcionan en FastAPI con MySQL)
+// ============================================================================
+
+/* ---------------------------- Autenticación ---------------------------- */
+
+export function registrarUsuario({ nombre, correo, carrera, estado_geografico, municipio, password }) {
+  return request("/auth/registro", {
+    method: "POST",
+    body: {
+      nombre,
+      correo,
+      carrera,
+      estado_geografico,
+      municipio,
+      password,
+    },
+  })
+}
+
+export function iniciarSesion({ correo, password }) {
+  return request("/auth/login", {
+    method: "POST",
+    body: { correo, password },
+  })
 }
 
 /* ---------------------------- Perfil ---------------------------- */
 
-export function obtenerPerfil() {
-  // TODO(backend): GET /perfil/me
-  return mock(currentUser, 400)
-}
-
-/**
- * Envía los textos libres del onboarding y devuelve el perfil estructurado.
- * TODO(backend): POST /ia/interpretar-perfil  { fortalezas, reforzar, intereses }
- *   → Llama + embeddings Nomic → { fortalezas:[{nombre,nivel}], reforzar:[], intereses:[] }
- */
-export function interpretarPerfil(textos) {
-  void textos
-  return mock(
-    {
-      fortalezas: currentUser.fortalezas,
-      reforzar: currentUser.reforzar,
-      intereses: currentUser.intereses,
-    },
-    2200,
-  )
+export async function obtenerPerfil() {
+  // Leemos el usuario activo del LocalStorage que se guardó en el Login
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}");
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.");
+  }
+  // Llamamos a tu endpoint existente GET /perfil/{id}
+  return request(`/perfil/${usuarioLocal.id_usuario}`);
 }
 
 /* --------------------------- Proyectos -------------------------- */
 
+function mapEventoAProyecto(evento) {
+  const detalles = evento.detalles_especificos ?? {}
+  const requisitos = evento.requisitos_ia ?? {}
+  const rolesEvento = Array.isArray(detalles.roles)
+    ? detalles.roles
+    : Array.isArray(requisitos.roles)
+      ? requisitos.roles
+      : []
+
+  return {
+    id: String(evento.id_evento),
+    titulo: evento.titulo,
+    descripcion: evento.descripcion_libre ?? "",
+    tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
+    materia: detalles.materia ?? "",
+    creadorId: String(evento.creador_id),
+    integrantes: Number(detalles.integrantes) || 1,
+    fechaLimite: detalles.fechaLimite || null,
+    creado: evento.fecha_creacion?.slice(0, 10) ?? "",
+    estado: evento.estado,
+    roles: rolesEvento.map((rol, index) => ({
+      id: String(rol.id ?? index),
+      nombre: typeof rol.nombre === "string" ? rol.nombre : "Rol sin nombre",
+      habilidades: Array.isArray(rol.habilidades) ? rol.habilidades : [],
+      indispensable: Boolean(rol.indispensable),
+      cubiertoPor: rol.cubiertoPor ?? null,
+    })),
+  }
+}
+
 export function obtenerProyectos() {
-  // TODO(backend): GET /proyectos
-  return mock(projects)
+  return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
 }
 
-/** TODO(backend): GET /proyectos/{id} */
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles }) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const creadorId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(creadorId) || creadorId <= 0) {
+    throw new Error("Inicia sesión para poder publicar un proyecto.")
+  }
+
+  return request("/eventos/", {
+    method: "POST",
+    body: {
+      creador_id: creadorId,
+      titulo,
+      categoria_principal: tipo === "personal" ? "Personal" : "Academico",
+      descripcion_libre: descripcion,
+      detalles_especificos: {
+        tipo,
+        materia,
+        integrantes,
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+    },
+  }).then(mapEventoAProyecto)
+}
+
 export async function obtenerProyecto(id) {
-  const project = projects.find((p) => p.id === id)
-  const data = await mock(project ?? null, 600)
-  if (!data) throw Object.assign(new Error("Proyecto no encontrado"), { status: 404 })
-  return data
+  return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
-/** TODO(backend): POST /proyectos/{id}/solicitudes  { rol_id, mensaje } */
+// ============================================================================
+// RUTAS PENDIENTES DE DESARROLLAR EN FASTAPI
+// (Mantenemos retornos vacíos o estructurados para que no truene React)
+// ============================================================================
+
+export function interpretarPerfil(textos) {
+  // TODO(backend): POST /ia/interpretar-perfil
+  return Promise.resolve({ fortalezas: [], reforzar: [], intereses: [] });
+}
+
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  return mock({ id: `s${Date.now()}`, projectId, rolId, mensaje, estado: "pendiente" }, 700)
+  // TODO(backend): POST /proyectos/{id}/solicitudes
+  return Promise.resolve({ id: `s${Date.now()}`, estado: "pendiente" });
 }
 
-/**
- * TODO(backend): POST /ia/interpretar-proyecto  { titulo, descripcion, integrantes }
- *   → { roles: [{ nombre, habilidades[], indispensable }] }
- */
 export function interpretarProyecto(proyecto) {
-  void proyecto
-  return mock(
-    {
-      roles: [
-        { nombre: "Programación backend", habilidades: ["Backend", "Bases de datos"], indispensable: true },
-        { nombre: "Diseño de interfaces", habilidades: ["Diseño de interfaces", "Figma"], indispensable: true },
-        { nombre: "Bases de datos", habilidades: ["SQL", "Modelado de datos"], indispensable: false },
-        { nombre: "Gestión de proyectos", habilidades: ["Gestión de proyectos", "Scrum"], indispensable: false },
-      ],
-    },
-    2000,
-  )
+  // TODO(backend): POST /ia/interpretar-proyecto
+  return Promise.resolve({ roles: [] });
 }
 
-/* ------------------------ Recomendaciones ----------------------- */
-
-/**
- * TODO(backend): GET /recomendaciones?proyecto_id=
- *   → compañeros y proyectos sugeridos con { nivel, aporta, bloquesComunes, porQue }
- * Con ?estado=vacio se simula el arranque en frío (sin recomendaciones).
- */
 export function obtenerRecomendaciones() {
-  const vacio = demoState() === "vacio"
-  return mock(
-    {
-      companeros: vacio ? [] : recommendations,
-      proyectos: vacio ? [] : projectSuggestions,
-    },
-    900,
-  )
+  // TODO(backend): GET /recomendaciones (Requiere FastAPI + Ollama)
+  return Promise.resolve({ companeros: [], proyectos: [] });
 }
 
-/**
- * Candidatos para los roles pendientes de un proyecto propio.
- * TODO(backend): GET /proyectos/{id}/candidatos
- */
 export function obtenerCandidatos(projectId) {
-  return mock(demoState() === "vacio" ? [] : recommendations.filter((r) => r.projectId === projectId), 1100)
+  // TODO(backend): GET /proyectos/{id}/candidatos
+  return Promise.resolve([]);
 }
 
-/** TODO(backend): POST /recomendaciones/{id}/retroalimentacion  { util: bool, motivo? } */
 export function enviarRetroalimentacion(recomendacionId, datos) {
-  void recomendacionId, datos
-  return mock({ ok: true }, 250)
+  // TODO(backend): POST /recomendaciones/{id}/retroalimentacion
+  return Promise.resolve({ ok: true });
 }
-
-/* ------------------------- Invitaciones ------------------------- */
 
 export function obtenerInvitaciones() {
   // TODO(backend): GET /invitaciones
-  return mock(demoState() === "vacio" ? [] : invitations, 700)
+  return Promise.resolve([]);
 }
 
-/** TODO(backend): POST /invitaciones  { para_id, proyecto_id, rol, mensaje } */
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
-  return mock({ id: `i${Date.now()}`, tipo: "enviada", deId: currentUser.id, paraId, projectId, rol, mensaje, estado: "pendiente" }, 700)
+  // TODO(backend): POST /invitaciones
+  return Promise.resolve({ id: `i${Date.now()}`, estado: "pendiente" });
 }
 
-/** TODO(backend): PATCH /invitaciones/{id}  { estado: "aceptada" | "rechazada" } */
 export function responderInvitacion(id, estado) {
-  return mock({ id, estado }, 500)
+  // TODO(backend): PATCH /invitaciones/{id}
+  return Promise.resolve({ id, estado });
 }
-
-/* ---------------------------- Equipos --------------------------- */
 
 export function obtenerEquipos() {
   // TODO(backend): GET /equipos/mios
-  return mock(demoState() === "vacio" ? [] : teams, 800)
+  return Promise.resolve([]);
 }
 
-/* ---------------------------- Búsqueda -------------------------- */
-
-/** TODO(backend): GET /estudiantes?q=&carrera=&habilidad=&disponibilidad=&semestre= */
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
-  const t = q.trim().toLowerCase()
-  const res = students.filter(
-    (s) =>
-      (!t || s.nombre.toLowerCase().includes(t) || s.fortalezas.some((f) => f.nombre.toLowerCase().includes(t))) &&
-      (!carrera || s.carrera === carrera) &&
-      (!habilidad || s.fortalezas.some((f) => f.nombre === habilidad)) &&
-      (!disponibilidad || s.disponibilidad.some((b) => b.endsWith(disponibilidad))) &&
-      (!semestre || s.semestre === Number(semestre)),
-  )
-  return mock(res, 450)
+  // TODO(backend): GET /estudiantes?q=...
+  return Promise.resolve([]);
 }

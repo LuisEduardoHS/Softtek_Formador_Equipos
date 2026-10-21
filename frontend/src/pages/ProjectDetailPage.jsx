@@ -22,7 +22,13 @@ import { coverage, formatDate } from "../lib/projects"
 /* ------------------------------ Encabezado ------------------------------ */
 
 function ProjectHeader({ project, action }) {
-  const creador = studentById(project.creadorId)
+  const creador = studentById(project.creadorId) ?? {
+    id: String(project.creadorId),
+    nombre: `Usuario ${project.creadorId}`,
+    carrera: "",
+  }
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const esActual = usuarioLocal.id_usuario !== undefined && String(creador.id) === String(usuarioLocal.id_usuario)
   return (
     <Card className="animate-fade-up p-5 sm:p-7">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -34,7 +40,7 @@ function ProjectHeader({ project, action }) {
           <h1 className="text-h1 font-bold text-ink">{project.titulo}</h1>
           <div className="mt-3 flex items-center gap-2 text-sm text-ink-2">
             <Avatar name={creador.nombre} size="xs" />
-            Creado por <span className="font-medium text-ink">{creador.id === currentUser.id ? "ti" : creador.nombre}</span>
+            Creado por <span className="font-medium text-ink">{esActual ? "ti" : creador.nombre}</span>
             · {formatDate(project.creado, { day: "numeric", month: "long" })}
           </div>
           <p className="mt-4 max-w-2xl text-ink">{project.descripcion}</p>
@@ -318,8 +324,10 @@ function ProjectDetailPage({ id }) {
     )
   }
 
-  const esDueno = project.creadorId === currentUser.id
-  const esIntegrante = project.roles.some((r) => r.cubiertoPor === currentUser.id)
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioId = usuarioLocal.id_usuario
+  const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
+  const esIntegrante = usuarioId !== undefined && project.roles.some((r) => String(r.cubiertoPor) === String(usuarioId))
   const team = teams.find((t) => t.projectId === project.id)
   const suggestion = projectSuggestions.find((s) => s.projectId === project.id)
   const { cubiertos, total, pendientes } = coverage(project)
