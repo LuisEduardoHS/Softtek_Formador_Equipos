@@ -8,10 +8,11 @@ import ProjectCard from "../components/project/ProjectCard"
 import { SearchBar } from "../components/search/StudentSearch"
 import useAsync from "../hooks/useAsync"
 import { obtenerProyectos } from "../services/api"
+import { getSessionUser } from "../lib/session"
 
 export default function ProjectsPage() {
   const { status, data, reload } = useAsync(obtenerProyectos)
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = getSessionUser()
   const [tab, setTab] = useState("explorar")
   const [q, setQ] = useState("")
   const [tipo, setTipo] = useState("todos")

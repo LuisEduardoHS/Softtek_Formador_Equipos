@@ -3,27 +3,16 @@ import { Bell, FolderKanban, Home, LogOut, Plus, UserRound, Users, UsersRound } 
 import { useNavigate } from "react-router-dom"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
-import { notifications } from "../../data/mockData"
+import { getSessionUser } from "../../lib/session"
 
 const NAV = [
   { to: "/inicio", label: "Inicio", icon: Home },
   { to: "/proyectos", label: "Proyectos", icon: FolderKanban },
   { to: "/estudiantes", label: "Estudiantes", short: "Personas", icon: UsersRound },
   { to: "/equipos", label: "Mis equipos", short: "Equipos", icon: Users },
-  { to: "/notificaciones", label: "Notificaciones", short: "Avisos", icon: Bell, badge: true },
+  { to: "/notificaciones", label: "Notificaciones", short: "Avisos", icon: Bell },
   { to: "/perfil", label: "Perfil", icon: UserRound },
 ]
-
-const unread = notifications.filter((n) => !n.leida).length
-
-function getSessionUser() {
-  try {
-    return JSON.parse(localStorage.getItem("usuario") || "{}")
-  } catch (error) {
-    console.error("No se pudo leer el usuario de la sesión:", error)
-    return {}
-  }
-}
 
 export function Logo({ to = "/inicio", className = "" }) {
   return (
@@ -37,16 +26,6 @@ export function Logo({ to = "/inicio", className = "" }) {
       </span>
       Complementa
     </Link>
-  )
-}
-
-function Badge({ count }) {
-  if (!count) return null
-  return (
-    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
-      {count}
-      <span className="sr-only"> sin leer</span>
-    </span>
   )
 }
 
@@ -78,7 +57,7 @@ export default function AppLayout() {
         </Link>
         <nav aria-label="Principal">
           <ul className="space-y-1">
-            {NAV.map(({ to, label, icon: Icon, badge }) => (
+            {NAV.map(({ to, label, icon: Icon }) => (
               <li key={to}>
                 <NavLink
                   to={to}
@@ -92,7 +71,6 @@ export default function AppLayout() {
                     <>
                       <Icon aria-hidden="true" className={`size-5 ${isActive ? "text-primary" : ""}`} />
                       <span className="flex-1">{label}</span>
-                      {badge && <Badge count={unread} />}
                     </>
                   )}
                 </NavLink>
@@ -172,7 +150,7 @@ export default function AppLayout() {
   )
 }
 
-function BottomItem({ to, label, short, icon: Icon, badge }) {
+function BottomItem({ to, label, short, icon: Icon }) {
   return (
     <li>
       <NavLink
@@ -185,11 +163,6 @@ function BottomItem({ to, label, short, icon: Icon, badge }) {
       >
         <span className="relative">
           <Icon aria-hidden="true" className="size-5" />
-          {badge && unread > 0 && (
-            <span className="absolute -top-1.5 -right-2.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white ring-2 ring-surface">
-              {unread}
-            </span>
-          )}
         </span>
         {short ?? label}
       </NavLink>

@@ -27,26 +27,28 @@ export default function InvitationItem({ invitation, person, project, onRespond,
   const { tipo, estado, rol, mensaje } = invitation
   const recibida = tipo === "recibida"
   const canRespond = recibida && estado === "pendiente" && onRespond
+  const nombrePersona = person?.nombre || "Usuario"
+  const tituloProyecto = project?.titulo || invitation.proyecto?.titulo || "proyecto"
 
   return (
     <li className="flex animate-fade-up flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-colors">
       <div className="flex items-start gap-3">
-        <Avatar name={person.nombre} size="sm" />
+        <Avatar name={nombrePersona} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-sm text-ink">
             {recibida ? (
               <>
-                <span className="font-semibold">{person.nombre}</span> te invitó a{" "}
-                <span className="font-semibold">{project.titulo}</span>
+                <span className="font-semibold">{nombrePersona}</span> te invitó a{" "}
+                <span className="font-semibold">{tituloProyecto}</span>
               </>
             ) : (
               <>
-                Invitaste a <span className="font-semibold">{person.nombre}</span> a{" "}
-                <span className="font-semibold">{project.titulo}</span>
+                Invitaste a <span className="font-semibold">{nombrePersona}</span> a{" "}
+                <span className="font-semibold">{tituloProyecto}</span>
               </>
             )}
           </p>
-          <p className="mt-0.5 text-xs text-ink-2">Rol: {rol}</p>
+          {rol && <p className="mt-0.5 text-xs text-ink-2">Rol: {rol}</p>}
         </div>
         {!canRespond && <StatusBadge estado={estado} />}
       </div>

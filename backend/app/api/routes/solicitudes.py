@@ -4,32 +4,58 @@ from app.db.database import get_db
 from app.models.solicitud import SolicitudEquipo
 from app.models.participante import ParticipanteEvento
 from app.models.evento import Evento
-from app.models.usuario import Usuario
+from app.models.usuario import PerfilUsuario, Usuario
 from app.schemas.solicitud import SolicitudCreate, SolicitudUpdate
 
 router = APIRouter()
 
 @router.get("/invitaciones/{id_usuario}")
 def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
-    # Buscar solicitudes pendientes dirigidas al usuario
     solicitudes = db.query(SolicitudEquipo).filter(
-        SolicitudEquipo.id_destinatario == id_usuario,
-        SolicitudEquipo.estado == 'Pendiente'
-    ).all()
+        (SolicitudEquipo.id_destinatario == id_usuario)
+        | (SolicitudEquipo.id_remitente == id_usuario)
+    ).order_by(SolicitudEquipo.fecha_envio.desc()).all()
     
     resultado = []
     for sol in solicitudes:
-        remitente = db.query(Usuario).filter(Usuario.id_usuario == sol.id_remitente).first()
-        
+        evento = db.query(Evento).filter(Evento.id_evento == sol.id_evento).first()
+        otra_persona_id = (
+            sol.id_remitente if sol.id_destinatario == id_usuario else sol.id_destinatario
+        )
+        otra_persona = db.query(Usuario).filter(
+            Usuario.id_usuario == otra_persona_id
+        ).first()
+        if not evento or not otra_persona:
+            continue
+
+        recibida = sol.id_destinatario == id_usuario
+        mensaje = sol.mensaje_explicacion or ""
+        marcador_rol = "\n\nRol propuesto: "
+        rol = mensaje.rsplit(marcador_rol, 1)[1] if marcador_rol in mensaje else "Participante"
+        if marcador_rol in mensaje:
+            mensaje = mensaje.rsplit(marcador_rol, 1)[0]
+
         resultado.append({
             "id": sol.id_solicitud,
-            "tipo": "recibida",
+            "tipo": "recibida" if recibida else "enviada",
             "deId": sol.id_remitente,
             "paraId": sol.id_destinatario,
             "projectId": sol.id_evento,
-            "mensaje": sol.mensaje_explicacion,
-            "estado": "pendiente",
-            "remitente": {"nombre": remitente.nombre if remitente else "Usuario"}
+            "mensaje": mensaje,
+            "rol": rol,
+            "estado": (sol.estado or "Pendiente").casefold(),
+            "fecha": sol.fecha_envio.isoformat() if sol.fecha_envio else None,
+            "remitente": (
+                {"id": sol.id_remitente, "nombre": otra_persona.nombre}
+                if recibida
+                else None
+            ),
+            "destinatario": (
+                {"id": sol.id_destinatario, "nombre": otra_persona.nombre}
+                if not recibida
+                else None
+            ),
+            "proyecto": {"id": evento.id_evento, "titulo": evento.titulo},
         })
     return resultado
 
@@ -82,33 +108,154 @@ def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Sess
     db_sol = db.query(SolicitudEquipo).filter(SolicitudEquipo.id_solicitud == id_solicitud).first()
     if not db_sol:
         raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+
+    estado_normalizado = sol_update.estado.strip().casefold()
+    if estado_normalizado not in {"aceptada", "rechazada"}:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="La respuesta debe ser aceptada o rechazada.",
+        )
+    if (db_sol.estado or "").casefold() != "pendiente":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Esta invitación ya fue respondida.",
+        )
+
+    estado_guardado = estado_normalizado.capitalize()
+    db_sol.estado = estado_guardado
     
-    estado_normalizado = sol_update.estado.capitalize() # Asegura que sea "Aceptada" o "Rechazada"
-    db_sol.estado = estado_normalizado
-    
-    # LÓGICA CLAVE: Si acepta, lo metemos a la tabla de participantes
-    if estado_normalizado == "Aceptada":
+    if estado_normalizado == "aceptada":
+        miembro_existente = db.query(ParticipanteEvento).filter(
+            ParticipanteEvento.id_evento == db_sol.id_evento,
+            ParticipanteEvento.id_usuario == db_sol.id_destinatario,
+        ).first()
+        if miembro_existente:
+            db.commit()
+            return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
+
+        mensaje = db_sol.mensaje_explicacion or ""
+        marcador_rol = "\n\nRol propuesto: "
+        rol = mensaje.rsplit(marcador_rol, 1)[1].strip() if marcador_rol in mensaje else "Participante"
         nuevo_participante = ParticipanteEvento(
             id_evento=db_sol.id_evento,
-            id_usuario=db_sol.id_destinatario
+            id_usuario=db_sol.id_destinatario,
+            rol=rol[:50] or "Participante",
         )
         db.add(nuevo_participante)
 
     db.commit()
-    return {"id": db_sol.id_solicitud, "estado": db_sol.estado.lower()}
+    return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
 
 @router.get("/equipos/{id_usuario}")
 def obtener_equipos(id_usuario: int, db: Session = Depends(get_db)):
-    # Los equipos ahora se leen directo de la tabla de participantes reales
-    participaciones = db.query(ParticipanteEvento).filter(
-        ParticipanteEvento.id_usuario == id_usuario
-    ).all()
+    usuario_actual = db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
+    if not usuario_actual:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+
+    eventos_usuario = db.query(Evento).outerjoin(
+        ParticipanteEvento, ParticipanteEvento.id_evento == Evento.id_evento
+    ).filter(
+        (Evento.creador_id == id_usuario)
+        | (ParticipanteEvento.id_usuario == id_usuario)
+    ).distinct().order_by(Evento.fecha_creacion.desc()).all()
 
     resultado = []
-    for part in participaciones:
+    for evento in eventos_usuario:
+        participaciones = db.query(ParticipanteEvento).filter(
+            ParticipanteEvento.id_evento == evento.id_evento
+        ).all()
+        miembros_ids = {participacion.id_usuario for participacion in participaciones}
+        miembros_ids.add(evento.creador_id)
+        usuarios = db.query(Usuario, PerfilUsuario).outerjoin(
+            PerfilUsuario, PerfilUsuario.usuario_id == Usuario.id_usuario
+        ).filter(Usuario.id_usuario.in_(miembros_ids)).all()
+        participaciones_por_usuario = {
+            participacion.id_usuario: participacion for participacion in participaciones
+        }
+
+        miembros = []
+        for usuario, perfil in usuarios:
+            datos = (perfil.datos_crudos or {}) if perfil else {}
+            if not isinstance(datos, dict):
+                datos = {}
+            visibilidad = datos.get("visibilidad") or {}
+            if not isinstance(visibilidad, dict):
+                visibilidad = {}
+            fortalezas = datos.get("fortalezas", datos.get("habilidades", []))
+            if not visibilidad.get("fortalezas", True) or datos.get("pausado", False):
+                fortalezas = []
+            if not isinstance(fortalezas, list):
+                fortalezas = []
+            fortalezas = [
+                {"nombre": fortaleza} if isinstance(fortaleza, str) else fortaleza
+                for fortaleza in fortalezas
+                if isinstance(fortaleza, str) or (
+                    isinstance(fortaleza, dict) and isinstance(fortaleza.get("nombre"), str)
+                )
+            ]
+            participacion = participaciones_por_usuario.get(usuario.id_usuario)
+            miembros.append({
+                "id": usuario.id_usuario,
+                "nombre": usuario.nombre,
+                "carrera": usuario.carrera,
+                "correo": usuario.correo if visibilidad.get("correo", False) else None,
+                "semestre": datos.get("semestre"),
+                "fortalezas": fortalezas,
+                "rol": participacion.rol if participacion else "Creador",
+            })
+
+        detalles = evento.detalles_especificos or {}
+        requisitos = evento.requisitos_ia or {}
+        detalles = detalles if isinstance(detalles, dict) else {}
+        requisitos = requisitos if isinstance(requisitos, dict) else {}
+        roles_evento = detalles.get("roles")
+        if not isinstance(roles_evento, list):
+            roles_evento = requisitos.get("roles", [])
+        roles_evento = roles_evento if isinstance(roles_evento, list) else []
+        roles = []
+        for index, rol in enumerate(roles_evento):
+            if not isinstance(rol, dict):
+                continue
+            nombre_rol = rol.get("nombre", "Rol sin nombre")
+            miembro_asignado = next(
+                (
+                    miembro for miembro in miembros
+                    if miembro["rol"].casefold() == str(nombre_rol).casefold()
+                ),
+                None,
+            )
+            roles.append({
+                **rol,
+                "id": str(rol.get("id", index)),
+                "cubiertoPor": (
+                    str(miembro_asignado["id"]) if miembro_asignado else rol.get("cubiertoPor")
+                ),
+            })
+
+        proyecto = {
+            "id_evento": evento.id_evento,
+            "creador_id": evento.creador_id,
+            "categoria_principal": evento.categoria_principal,
+            "titulo": evento.titulo,
+            "descripcion_libre": evento.descripcion_libre,
+            "detalles_especificos": {**detalles, "roles": roles},
+            "requisitos_ia": requisitos,
+            "embedding_requisitos": evento.embedding_requisitos or {},
+            "estado": evento.estado,
+            "fecha_creacion": evento.fecha_creacion.isoformat() if evento.fecha_creacion else None,
+        }
         resultado.append({
-            "id": part.id_participacion,
-            "projectId": part.id_evento,
-            "rol": part.rol
+            "id": str(evento.id_evento),
+            "projectId": str(evento.id_evento),
+            "nombre": evento.titulo,
+            "rol": next(
+                (
+                    participacion.rol for participacion in participaciones
+                    if participacion.id_usuario == id_usuario
+                ),
+                "Creador" if evento.creador_id == id_usuario else "Participante",
+            ),
+            "miembros": miembros,
+            "proyecto": proyecto,
         })
     return resultado

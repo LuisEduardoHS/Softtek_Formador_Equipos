@@ -14,6 +14,7 @@ import { Logo } from "../components/layout/AppLayout"
 import ProfileSetupForm from "../components/profile/ProfileSetupForm"
 import { guardarPerfil, interpretarPerfil } from "../services/api"
 import { DIAS, DIAS_LABEL, FRANJAS, FRANJAS_LABEL } from "../data/mockData"
+import { getSessionUser } from "../lib/session"
 
 const STEPS = ["Cuéntanos de ti", "Tu disponibilidad", "Revisa tu perfil"]
 
@@ -285,7 +286,7 @@ export default function ProfileSetupPage() {
   }
 
   const confirm = async () => {
-    const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+    const usuarioLocal = getSessionUser()
     const datosPerfil = {
       ...perfil,
       nombre: textos.nombre.trim(),
