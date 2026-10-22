@@ -4,8 +4,7 @@ import Card from "../ui/Card"
 import Input from "../ui/Input"
 import Button from "../ui/Button"
 
-// Validación visual del dominio institucional (ajustar al dominio real)
-const DOMINIO = /@[\w.-]+\.edu(\.mx)?$/i
+const EMAIL_VALIDATION = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function PasswordToggle({ show, onToggle, label }) {
   return (
@@ -32,7 +31,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
     const email = String(formData.get("email") ?? "").trim()
     const password = String(formData.get("password") ?? "")
     const errs = {}
-    if (!DOMINIO.test(email)) errs.email = "Usa tu correo institucional (termina en .edu.mx)."
+    if (!EMAIL_VALIDATION.test(email)) errs.email = "Ingresa un correo válido."
     if (password.length < 8) errs.password = "La contraseña debe tener al menos 8 caracteres."
     setErrors(errs)
     if (Object.keys(errs).length) return
@@ -52,7 +51,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
 
     const errs = {}
     if (!nombre) errs.nombre = "Escribe tu nombre completo."
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Ingresa un correo válido."
+    if (!EMAIL_VALIDATION.test(email)) errs.email = "Ingresa un correo válido."
     if (!carrera) errs.carrera = "Selecciona o escribe tu carrera."
     if (password.length < 8) errs.password = "La contraseña debe tener al menos 8 caracteres."
     if (password !== confirmPassword) errs.confirmPassword = "Las contraseñas no coinciden."
@@ -94,7 +93,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="nombre.apellido@universidad.edu.mx"
+              placeholder="nombre@ejemplo.com"
               error={errors.email}
               required
             />
@@ -147,11 +146,11 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
         {!isSignUp && (
           <>
             <Input
-              label="Correo institucional"
+              label="Correo electrónico"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="nombre.apellido@universidad.edu.mx"
+              placeholder="nombre@ejemplo.com"
               error={errors.email}
               required
             />

@@ -3,6 +3,7 @@ import { Bell, FolderKanban, Home, LogOut, Plus, UserRound, Users, UsersRound } 
 import { useNavigate } from "react-router-dom"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
+import { getSessionUser } from "../../lib/session"
 
 const NAV = [
   { to: "/inicio", label: "Inicio", icon: Home },
@@ -12,15 +13,6 @@ const NAV = [
   { to: "/notificaciones", label: "Notificaciones", short: "Avisos", icon: Bell },
   { to: "/perfil", label: "Perfil", icon: UserRound },
 ]
-
-function getSessionUser() {
-  try {
-    return JSON.parse(localStorage.getItem("usuario") || "{}")
-  } catch (error) {
-    console.error("No se pudo leer el usuario de la sesión:", error)
-    return {}
-  }
-}
 
 export function Logo({ to = "/inicio", className = "" }) {
   return (

@@ -3,7 +3,6 @@ import { ChevronRight } from "lucide-react"
 import { AvatarGroup } from "../ui/Avatar"
 import SkillChip from "../ui/SkillChip"
 import { coverage } from "../../lib/projects"
-import { studentById } from "../../data/mockData"
 
 // Barra segmentada de cobertura: cubiertos (verde) vs. faltantes (ámbar).
 export function CoverageBar({ cubiertos, total }) {
@@ -38,7 +37,7 @@ export function CoverageBar({ cubiertos, total }) {
 
 export default function TeamSummaryCard({ team, project }) {
   const { cubiertos, total, pendientes } = coverage(project)
-  const miembros = project.roles.filter((r) => r.cubiertoPor).map((r) => studentById(r.cubiertoPor).nombre)
+  const miembros = team.miembros.map((member) => member.nombre)
 
   return (
     <Link

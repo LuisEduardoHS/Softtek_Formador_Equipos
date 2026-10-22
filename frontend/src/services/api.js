@@ -264,13 +264,37 @@ export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
 }
 
 export function responderInvitacion(id, estado) {
-  // TODO(backend): PATCH /invitaciones/{id}
-  return Promise.resolve({ id, estado });
+  return request(`/invitaciones/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: { estado },
+  })
 }
 
 export function obtenerEquipos() {
-  // TODO(backend): GET /equipos/mios
-  return Promise.resolve([]);
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/equipos/${encodeURIComponent(usuarioLocal.id_usuario)}`).then((equipos) =>
+    equipos.map((equipo) => ({
+      ...equipo,
+      proyecto: mapEventoAProyecto(equipo.proyecto),
+      miembros: equipo.miembros.map((miembro) => ({
+        ...miembro,
+        id: String(miembro.id),
+        fortalezas: Array.isArray(miembro.fortalezas) ? miembro.fortalezas : [],
+      })),
+    })),
+  )
+}
+
+export async function obtenerEquipo(id) {
+  const equipos = await obtenerEquipos()
+  const equipo = equipos.find((item) => item.id === String(id))
+  if (!equipo) {
+    throw new Error("No encontramos este equipo.")
+  }
+  return equipo
 }
 
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
