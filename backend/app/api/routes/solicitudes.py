@@ -5,9 +5,35 @@ from app.models.solicitud import SolicitudEquipo
 from app.models.participante import ParticipanteEvento
 from app.models.evento import Evento
 from app.models.usuario import PerfilUsuario, Usuario
-from app.schemas.solicitud import SolicitudCreate, SolicitudUpdate
+from app.schemas.solicitud import SolicitudCreate, SolicitudUnirse, SolicitudUpdate
 
 router = APIRouter()
+MARCADOR_SOLICITUD_UNIRSE = "[SOLICITUD_UNIRSE]"
+
+
+def _es_solicitud_unirse(solicitud):
+    return (solicitud.mensaje_explicacion or "").startswith(MARCADOR_SOLICITUD_UNIRSE)
+
+
+def _detalles_solicitud(solicitud):
+    mensaje = solicitud.mensaje_explicacion or ""
+    tipo_solicitud = "unirse" if _es_solicitud_unirse(solicitud) else "invitacion"
+    rol = "Participante"
+
+    if tipo_solicitud == "unirse":
+        contenido = mensaje[len(MARCADOR_SOLICITUD_UNIRSE):].lstrip("\n")
+        if contenido.startswith("Rol solicitado: "):
+            rol, _, contenido = contenido.partition("\n\n")
+            rol = rol.removeprefix("Rol solicitado: ").strip()
+            mensaje = contenido
+        else:
+            mensaje = contenido
+    else:
+        marcador_rol = "\n\nRol propuesto: "
+        if marcador_rol in mensaje:
+            mensaje, rol = mensaje.rsplit(marcador_rol, 1)
+
+    return tipo_solicitud, rol, mensaje
 
 @router.get("/invitaciones/{id_usuario}")
 def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
@@ -29,11 +55,7 @@ def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
             continue
 
         recibida = sol.id_destinatario == id_usuario
-        mensaje = sol.mensaje_explicacion or ""
-        marcador_rol = "\n\nRol propuesto: "
-        rol = mensaje.rsplit(marcador_rol, 1)[1] if marcador_rol in mensaje else "Participante"
-        if marcador_rol in mensaje:
-            mensaje = mensaje.rsplit(marcador_rol, 1)[0]
+        tipo_solicitud, rol, mensaje = _detalles_solicitud(sol)
 
         resultado.append({
             "id": sol.id_solicitud,
@@ -43,6 +65,7 @@ def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
             "projectId": sol.id_evento,
             "mensaje": mensaje,
             "rol": rol,
+            "tipoSolicitud": tipo_solicitud,
             "estado": (sol.estado or "Pendiente").casefold(),
             "fecha": sol.fecha_envio.isoformat() if sol.fecha_envio else None,
             "remitente": (
@@ -58,6 +81,75 @@ def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
             "proyecto": {"id": evento.id_evento, "titulo": evento.titulo},
         })
     return resultado
+
+
+@router.post("/eventos/{id_evento}/solicitudes")
+def solicitar_unirse(
+    id_evento: int,
+    solicitud: SolicitudUnirse,
+    solicitante_id: int,
+    db: Session = Depends(get_db),
+):
+    evento = db.query(Evento).filter(Evento.id_evento == id_evento).first()
+    if not evento or (evento.estado or "").casefold() != "abierto":
+        raise HTTPException(status_code=404, detail="El evento no está disponible.")
+    if evento.creador_id == solicitante_id:
+        raise HTTPException(status_code=400, detail="No puedes solicitar unirte a tu propio evento.")
+
+    solicitante = db.query(Usuario).filter(Usuario.id_usuario == solicitante_id).first()
+    if not solicitante:
+        raise HTTPException(status_code=404, detail="No encontramos tu cuenta.")
+
+    participante = db.query(ParticipanteEvento).filter(
+        ParticipanteEvento.id_evento == id_evento,
+        ParticipanteEvento.id_usuario == solicitante_id,
+    ).first()
+    if participante:
+        raise HTTPException(status_code=409, detail="Ya formas parte de este equipo.")
+
+    detalles = evento.detalles_especificos or {}
+    requisitos = evento.requisitos_ia or {}
+    roles = detalles.get("roles") if isinstance(detalles, dict) else None
+    if not isinstance(roles, list):
+        roles = requisitos.get("roles", []) if isinstance(requisitos, dict) else []
+    rol = next(
+        (
+            item for index, item in enumerate(roles)
+            if isinstance(item, dict)
+            and str(item.get("id", index)) == str(solicitud.rol_esperado)
+        ),
+        None,
+    )
+    if not rol:
+        raise HTTPException(status_code=400, detail="El rol seleccionado no existe en este evento.")
+    if rol.get("cubiertoPor"):
+        raise HTTPException(status_code=409, detail="Ese rol ya está cubierto.")
+
+    solicitud_existente = db.query(SolicitudEquipo).filter(
+        SolicitudEquipo.id_evento == id_evento,
+        SolicitudEquipo.id_remitente == solicitante_id,
+        SolicitudEquipo.id_destinatario == evento.creador_id,
+        SolicitudEquipo.estado.ilike("pendiente"),
+    ).first()
+    if solicitud_existente:
+        raise HTTPException(status_code=409, detail="Ya tienes una solicitud pendiente para este evento.")
+
+    mensaje = (
+        f"{MARCADOR_SOLICITUD_UNIRSE}\n"
+        f"Rol solicitado: {rol.get('nombre', 'Participante')}\n\n"
+        f"{(solicitud.mensaje_explicacion or '').strip()}"
+    )
+    nueva_solicitud = SolicitudEquipo(
+        id_evento=id_evento,
+        id_remitente=solicitante_id,
+        id_destinatario=evento.creador_id,
+        mensaje_explicacion=mensaje,
+        estado="Pendiente",
+    )
+    db.add(nueva_solicitud)
+    db.commit()
+    db.refresh(nueva_solicitud)
+    return {"id": nueva_solicitud.id_solicitud, "estado": "pendiente"}
 
 @router.post("/invitaciones/")
 def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_db)):
@@ -124,21 +216,21 @@ def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Sess
     estado_guardado = estado_normalizado.capitalize()
     db_sol.estado = estado_guardado
     
+    es_solicitud_unirse = _es_solicitud_unirse(db_sol)
     if estado_normalizado == "aceptada":
+        id_usuario_aceptado = db_sol.id_remitente if es_solicitud_unirse else db_sol.id_destinatario
         miembro_existente = db.query(ParticipanteEvento).filter(
             ParticipanteEvento.id_evento == db_sol.id_evento,
-            ParticipanteEvento.id_usuario == db_sol.id_destinatario,
+            ParticipanteEvento.id_usuario == id_usuario_aceptado,
         ).first()
         if miembro_existente:
             db.commit()
             return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
 
-        mensaje = db_sol.mensaje_explicacion or ""
-        marcador_rol = "\n\nRol propuesto: "
-        rol = mensaje.rsplit(marcador_rol, 1)[1].strip() if marcador_rol in mensaje else "Participante"
+        _, rol, _ = _detalles_solicitud(db_sol)
         nuevo_participante = ParticipanteEvento(
             id_evento=db_sol.id_evento,
-            id_usuario=db_sol.id_destinatario,
+            id_usuario=id_usuario_aceptado,
             rol=rol[:50] or "Participante",
         )
         db.add(nuevo_participante)

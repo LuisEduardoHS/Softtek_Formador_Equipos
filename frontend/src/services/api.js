@@ -148,6 +148,7 @@ function mapEventoAProyecto(evento) {
     tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
     materia: detalles.materia ?? "",
     creadorId: String(evento.creador_id),
+    creadorNombre: evento.creador_nombre ?? null,
     integrantes: Number(detalles.integrantes) || 1,
     fechaLimite: detalles.fechaLimite || null,
     creado: evento.fecha_creacion?.slice(0, 10) ?? "",
@@ -196,6 +197,33 @@ export async function obtenerProyecto(id) {
   return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
+export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles }) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+    throw new Error("Inicia sesión para editar este proyecto.")
+  }
+
+  const categoria = tipo === "personal" ? "Personal" : "Academico"
+  const params = new URLSearchParams({ usuario_id: String(usuarioId) })
+  return request(`/eventos/${encodeURIComponent(id)}?${params.toString()}`, {
+    method: "PUT",
+    body: {
+      categoria_principal: categoria,
+      descripcion_libre: descripcion,
+      integrantes: Number(integrantes),
+      detalles_especificos: {
+        tipo,
+        materia: tipo === "personal" ? "" : materia,
+        integrantes: Number(integrantes),
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+    },
+  }).then(mapEventoAProyecto)
+}
+
 // ============================================================================
 // RUTAS PENDIENTES DE DESARROLLAR EN FASTAPI
 // (Mantenemos retornos vacíos o estructurados para que no truene React)
@@ -207,8 +235,15 @@ export function interpretarPerfil(textos) {
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  // TODO(backend): POST /proyectos/{id}/solicitudes
-  return Promise.resolve({ id: `s${Date.now()}`, estado: "pendiente" });
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("Inicia sesión para solicitar unirte a un evento.")
+  }
+  const params = new URLSearchParams({ solicitante_id: String(usuarioLocal.id_usuario) })
+  return request(`/eventos/${encodeURIComponent(projectId)}/solicitudes?${params.toString()}`, {
+    method: "POST",
+    body: { rol_esperado: String(rolId), mensaje_explicacion: mensaje },
+  })
 }
 
 export function interpretarProyecto(proyecto) {

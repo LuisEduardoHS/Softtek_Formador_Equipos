@@ -9,3 +9,7 @@ class SolicitudCreate(BaseModel):
 
 class SolicitudUpdate(BaseModel):
     estado: str  # "Aceptada" o "Rechazada"
+
+class SolicitudUnirse(BaseModel):
+    rol_esperado: str
+    mensaje_explicacion: Optional[str] = None
