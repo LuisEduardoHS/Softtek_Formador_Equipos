@@ -5,7 +5,6 @@ import { EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import TeamSummaryCard from "../components/team/TeamSummaryCard"
 import useAsync from "../hooks/useAsync"
 import { obtenerEquipos } from "../services/api"
-import { projectById } from "../data/mockData"
 
 export default function TeamsPage() {
   const { status, data, reload } = useAsync(obtenerEquipos)
@@ -50,7 +49,7 @@ export default function TeamsPage() {
         <ul className="grid gap-4 md:grid-cols-2">
           {data.map((t, i) => (
             <li key={t.id} className="animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
-              <TeamSummaryCard team={t} project={projectById(t.projectId)} />
+              <TeamSummaryCard team={t} project={t.proyecto} />
             </li>
           ))}
         </ul>

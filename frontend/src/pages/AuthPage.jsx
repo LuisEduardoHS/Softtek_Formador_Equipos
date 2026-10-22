@@ -7,7 +7,7 @@ import { Logo } from "../components/layout/AppLayout"
 import { LocalProcessing } from "../components/ui/AIBadge"
 import { iniciarSesion, registrarUsuario } from "../services/api"
 
-export default function AuthPage() {
+export default function AuthPage({ initialMode = "login" }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
@@ -72,9 +72,9 @@ export default function AuthPage() {
         )}
         <AuthCard
           loading={loading}
+          initialMode={initialMode}
           onSignIn={signIn}
           onSignUp={signUp}
-          onGoogle={() => console.log("OAuth de Google en desarrollo")}
         />
         <LocalProcessing />
       </main>

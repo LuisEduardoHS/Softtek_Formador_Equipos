@@ -1,28 +1,24 @@
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { ArrowRight, Compass, Inbox, Plus, UserPen, Users } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
-import SkillChip from "../components/ui/SkillChip"
 import { LocalProcessing } from "../components/ui/AIBadge"
 import { CardSkeleton, EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
 import Carousel, { CarouselItem } from "../components/ui/Carousel"
-import RecommendationCard from "../components/recommendation/RecommendationCard"
-import ProjectCard, { RoleDots } from "../components/project/ProjectCard"
 import InvitationItem from "../components/invite/InvitationItem"
-import InviteModal from "../components/invite/InviteModal"
 import TeamSummaryCard from "../components/team/TeamSummaryCard"
 import StudentSearch from "../components/search/StudentSearch"
 import useAsync from "../hooks/useAsync"
 import {
-  enviarRetroalimentacion,
   obtenerEquipos,
   obtenerInvitaciones,
   responderInvitacion,
   obtenerPerfil,
 } from "../services/api"
-import { coverage, firstName } from "../lib/projects"
+import { firstName } from "../lib/projects"
+import { getSessionUser } from "../lib/session"
 
 function greeting() {
   const h = new Date().getHours()
@@ -215,8 +211,8 @@ function PendingInvitations() {
   const respond = async (invitation, estado) => {
     setBusy(invitation.id)
     try {
-      await responderInvitacion(invitation.id, estado)
-      inv.setData((list) => list.map((i) => (i.id === invitation.id ? { ...i, estado } : i)))
+      const result = await responderInvitacion(invitation.id, estado)
+      inv.setData((list) => list.map((i) => (i.id === invitation.id ? { ...i, estado: result.estado } : i)))
       toast(estado === "aceptada" ? `¡Te uniste al proyecto!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
     } catch {
       toast("No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
@@ -247,7 +243,8 @@ function PendingInvitations() {
             <InvitationItem
               key={i.id}
               invitation={i}
-              person={i.remitente || { nombre: "Usuario" }}
+              person={i.remitente}
+              project={i.proyecto}
               busy={busy === i.id}
               onRespond={(estado) => respond(i, estado)}
               compact
@@ -292,7 +289,7 @@ function MyTeams() {
     body = (
       <div className="space-y-2">
         {teams.data.map((t) => (
-          <TeamSummaryCard key={t.id} team={t} />
+          <TeamSummaryCard key={t.id} team={t} project={t.proyecto} />
         ))}
       </div>
     )
@@ -317,7 +314,7 @@ function MyTeams() {
 
 export default function HomePage() {
   const perfilQuery = useAsync(obtenerPerfil)
-  const usuarioGuardado = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioGuardado = getSessionUser()
   
   const nombreReal = usuarioGuardado.nombre || perfilQuery.data?.nombre || "Estudiante"
   const progresoReal = perfilQuery.data?.perfilCompleto || 20

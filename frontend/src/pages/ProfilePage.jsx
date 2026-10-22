@@ -12,6 +12,7 @@ import PublicProfile from "../components/profile/PublicProfile"
 import InviteModal from "../components/invite/InviteModal"
 import { guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
+import { getSessionUser } from "../lib/session"
 
 // Estructura por defecto para evitar errores si la base de datos devuelve nulos en cuentas nuevas
 const PERFIL_DEFAULT = {
@@ -367,7 +368,7 @@ function OtherProfile({ id }) {
 
 export default function ProfilePage() {
   const { id } = useParams()
-  const usuarioGuardado = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioGuardado = getSessionUser()
   const isMe = !id || String(id) === String(usuarioGuardado.id_usuario)
 
   if (isMe) return <MyProfile />

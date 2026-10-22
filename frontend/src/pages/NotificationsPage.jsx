@@ -1,42 +1,37 @@
-import { useState } from "react"
-import { BellOff, CheckCheck } from "lucide-react"
-import Button from "../components/ui/Button"
-import { EmptyState } from "../components/ui/Feedback"
+import { BellOff } from "lucide-react"
+import { EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import NotificationItem from "../components/notification/NotificationItem"
-import { notifications as initial } from "../data/mockData"
+import useAsync from "../hooks/useAsync"
+import { obtenerNotificaciones } from "../services/api"
 
 const GROUPS = [
-  ["ia", "Oportunidades de la IA"],
+  ["ia", "Recomendaciones"],
   ["invitaciones", "Invitaciones"],
   ["equipo", "Actualizaciones de equipo"],
 ]
 
-// TODO(backend): GET /notificaciones y PATCH /notificaciones/{id} { leida: true }
 export default function NotificationsPage() {
-  const [items, setItems] = useState(() => (new URLSearchParams(window.location.search).get("estado") === "vacio" ? [] : initial))
-  const unread = items.filter((n) => !n.leida).length
-
-  const markRead = (id) => setItems((list) => list.map((n) => (id == null || n.id === id ? { ...n, leida: true } : n)))
+  const notifications = useAsync(obtenerNotificaciones)
+  const items = notifications.data ?? []
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-8 sm:py-10">
       <header className="mb-8 flex animate-fade-up flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-h1 font-bold">Notificaciones</h1>
-          <p className="mt-1 text-ink-2" aria-live="polite">
-            {unread ? `Tienes ${unread} sin leer.` : "Estás al día."}
-          </p>
+          <p className="mt-1 text-ink-2">Invitaciones, recomendaciones y actividad real de tus equipos.</p>
         </div>
-        {unread > 0 && (
-          <Button variant="secondary" size="sm" onClick={() => markRead(null)}>
-            <CheckCheck aria-hidden="true" className="size-4" /> Marcar todo como leído
-          </Button>
-        )}
       </header>
 
-      {items.length === 0 ? (
+      {notifications.loading ? (
+        <div className="space-y-3" aria-busy="true">
+          {[0, 1, 2].map((item) => <Skeleton key={item} className="h-28 w-full rounded-xl" />)}
+        </div>
+      ) : notifications.status === "error" ? (
+        <ErrorState message="No pudimos cargar tus notificaciones reales." onRetry={notifications.reload} />
+      ) : items.length === 0 ? (
         <EmptyState icon={BellOff} title="Sin notificaciones">
-          Te avisaremos cuando la IA encuentre una oportunidad o alguien responda a tus invitaciones.
+          Cuando recibas una invitación, haya una coincidencia para tus proyectos o alguien se una a tu equipo, aparecerá aquí.
         </EmptyState>
       ) : (
         <div className="space-y-8">
@@ -50,7 +45,7 @@ export default function NotificationsPage() {
                 </h2>
                 <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
                   {list.map((n) => (
-                    <NotificationItem key={n.id} notification={n} onOpen={() => markRead(n.id)} />
+                    <NotificationItem key={n.id} notification={n} />
                   ))}
                 </ul>
               </section>

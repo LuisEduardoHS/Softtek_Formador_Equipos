@@ -10,7 +10,7 @@ export default function useAsync(fn) {
 
   useEffect(() => {
     let alive = true
-    fn().then(
+    Promise.resolve().then(fn).then(
       (data) => alive && setState({ status: "success", data, error: null }),
       (error) => alive && setState({ status: "error", data: null, error }),
     )

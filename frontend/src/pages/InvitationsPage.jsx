@@ -6,7 +6,6 @@ import { useToast } from "../components/ui/Toast"
 import InvitationItem from "../components/invite/InvitationItem"
 import useAsync from "../hooks/useAsync"
 import { obtenerInvitaciones, responderInvitacion } from "../services/api"
-import { projectById, studentById } from "../data/mockData"
 
 const FILTROS = [
   ["todas", "Todas"],
@@ -26,9 +25,9 @@ export default function InvitationsPage() {
   const respond = async (i, estado) => {
     setBusy(i.id)
     try {
-      await responderInvitacion(i.id, estado)
-      inv.setData((list) => list.map((x) => (x.id === i.id ? { ...x, estado } : x)))
-      toast(estado === "aceptada" ? `¡Te uniste a «${projectById(i.projectId).titulo}»!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
+      const result = await responderInvitacion(i.id, estado)
+      inv.setData((list) => list.map((x) => (x.id === i.id ? { ...x, estado: result.estado } : x)))
+      toast(estado === "aceptada" ? `¡Te uniste a «${i.proyecto?.titulo || "tu equipo"}»!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
     } catch {
       toast("No pudimos registrar tu respuesta.", "error")
     } finally {
@@ -97,8 +96,8 @@ export default function InvitationsPage() {
             <InvitationItem
               key={i.id}
               invitation={i}
-              person={studentById(i.tipo === "recibida" ? i.deId : i.paraId)}
-              project={projectById(i.projectId)}
+              person={i.tipo === "recibida" ? i.remitente : i.destinatario}
+              project={i.proyecto}
               busy={busy === i.id}
               onRespond={(estado) => respond(i, estado)}
             />

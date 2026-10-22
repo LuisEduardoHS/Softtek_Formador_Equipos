@@ -6,6 +6,7 @@ from app.api.routes.eventos import router as eventos_router
 from app.db.database import engine, Base
 from app.models import usuario, evento
 from app.api.routes import solicitudes
+from app.api.routes import notificaciones
 
 # Crear las tablas en MySQL automáticamente si no existen
 Base.metadata.create_all(bind=engine)
@@ -36,6 +37,7 @@ app.include_router(auth_router)
 app.include_router(perfil_router)
 app.include_router(eventos_router)
 app.include_router(solicitudes.router,tags=["Invitaciones y Equipos"])
+app.include_router(notificaciones.router)
 
 @app.get("/")
 def read_root():

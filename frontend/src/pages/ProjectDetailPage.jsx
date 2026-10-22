@@ -18,6 +18,7 @@ import useAsync from "../hooks/useAsync"
 import { enviarRetroalimentacion, obtenerCandidatos, obtenerProyecto, solicitarUnirse } from "../services/api"
 import { currentUser, invitations, projectSuggestions, studentById, teams } from "../data/mockData"
 import { coverage, formatDate } from "../lib/projects"
+import { getSessionUser } from "../lib/session"
 
 /* ------------------------------ Encabezado ------------------------------ */
 
@@ -27,7 +28,7 @@ function ProjectHeader({ project, action }) {
     nombre: `Usuario ${project.creadorId}`,
     carrera: "",
   }
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = getSessionUser()
   const esActual = usuarioLocal.id_usuario !== undefined && String(creador.id) === String(usuarioLocal.id_usuario)
   return (
     <Card className="animate-fade-up p-5 sm:p-7">
@@ -324,7 +325,7 @@ function ProjectDetailPage({ id }) {
     )
   }
 
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = getSessionUser()
   const usuarioId = usuarioLocal.id_usuario
   const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
   const esIntegrante = usuarioId !== undefined && project.roles.some((r) => String(r.cubiertoPor) === String(usuarioId))
