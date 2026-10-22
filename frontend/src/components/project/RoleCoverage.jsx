@@ -13,7 +13,13 @@ export default function RoleCoverage({ roles, invitedByRole = {}, highlightRolId
   return (
     <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {roles.map((r, i) => {
-        const member = r.cubiertoPor && studentById(r.cubiertoPor)
+        const member = r.cubiertoPor
+          ? studentById(String(r.cubiertoPor)) ?? {
+              id: String(r.cubiertoPor),
+              nombre: "Integrante",
+              carrera: "",
+            }
+          : null
         const invited = invitedByRole[r.id]
         return (
           <li

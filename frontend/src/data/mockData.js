@@ -303,14 +303,6 @@ export const invitations = [
 export const pendingInviteIds = (projectId) =>
   new Set(invitations.filter((i) => i.tipo === "enviada" && i.estado === "pendiente" && i.projectId === projectId).map((i) => i.paraId))
 
-export const notifications = [
-  { id: "n1", grupo: "ia", texto: "Encontramos un proyecto donde tu Python podría ser útil: «Sensor de calidad del aire».", fecha: "Hace 2 h", leida: false, accion: { label: "Ver proyecto", to: "/proyectos/p2" } },
-  { id: "n2", grupo: "invitaciones", texto: "Camila Ortega aceptó tu invitación a «App de seguimiento de hábitos».", fecha: "Hace 5 h", leida: false, accion: { label: "Ver equipo", to: "/equipos/t1" } },
-  { id: "n3", grupo: "invitaciones", texto: "Jorge Salinas te invitó a «Tablero de movilidad sostenible del campus».", fecha: "Ayer", leida: false, accion: { label: "Responder", to: "/invitaciones" } },
-  { id: "n4", grupo: "ia", texto: "Hay 2 personas nuevas que podrían cubrir Programación backend en tu proyecto.", fecha: "Ayer", leida: true, accion: { label: "Ver coincidencias", to: "/match" } },
-  { id: "n5", grupo: "equipo", texto: "Se cubrió el rol «Diseño de interfaces» en Tutorías Pares.", fecha: "Hace 3 días", leida: true, accion: { label: "Ver equipo", to: "/equipos/t2" } },
-]
-
 export const campusStats = { estudiantes: 1240, equipos: 186, carreras: 23 }
 
 export const testimonials = [

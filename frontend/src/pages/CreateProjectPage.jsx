@@ -9,7 +9,7 @@ import AIBadge, { LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { Field, Segmented } from "../components/ui/Controls"
 import { useToast } from "../components/ui/Toast"
-import { interpretarProyecto } from "../services/api"
+import { crearProyecto, interpretarProyecto } from "../services/api"
 import { inputCls } from "../lib/ui"
 
 const STEPS = ["Describe tu proyecto", "Roles necesarios"]
@@ -270,6 +270,8 @@ export default function CreateProjectPage() {
   const [analyzedFor, setAnalyzedFor] = useState(null)
   const [errors, setErrors] = useState({})
   const [published, setPublished] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [createdProjectId, setCreatedProjectId] = useState(null)
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -291,10 +293,19 @@ export default function CreateProjectPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const publish = () => {
-    // TODO(backend): POST /proyectos con { ...form, roles }
-    setPublished(true)
-    toast("¡Proyecto publicado! Ya estamos buscando candidatos.")
+  const publish = async () => {
+    setPublishing(true)
+    try {
+      const proyecto = await crearProyecto({ ...form, roles })
+      setCreatedProjectId(proyecto.id)
+      setPublished(true)
+      toast("¡Proyecto guardado en la base de datos!")
+    } catch (error) {
+      console.error("Error al publicar proyecto:", error)
+      toast(error.message || "No pudimos publicar el proyecto.", "error")
+    } finally {
+      setPublishing(false)
+    }
   }
 
   const validRoles = roles?.filter((r) => r.nombre.trim()).length > 0
@@ -310,8 +321,7 @@ export default function CreateProjectPage() {
           La IA ya está buscando personas que cubran los {roles.length} roles. Te avisaremos en cuanto haya candidatos.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
-          {/* TODO(backend): navegar al id real del proyecto creado */}
-          <Button size="lg" onClick={() => navigate("/proyectos/p1")}>
+          <Button size="lg" onClick={() => navigate(`/proyectos/${createdProjectId}`)}>
             Ver candidatos <ArrowRight aria-hidden="true" className="size-4" />
           </Button>
           <Button size="lg" variant="secondary" as={Link} to="/inicio">
@@ -356,8 +366,8 @@ export default function CreateProjectPage() {
               Continuar <ArrowRight aria-hidden="true" className="size-4" />
             </Button>
           ) : (
-            <Button onClick={publish} disabled={!validRoles} className="min-w-36">
-              <CircleCheck aria-hidden="true" className="size-4" /> Publicar
+            <Button onClick={publish} disabled={!validRoles || publishing} className="min-w-36">
+              <CircleCheck aria-hidden="true" className="size-4" /> {publishing ? "Publicando…" : "Publicar"}
             </Button>
           )}
         </div>

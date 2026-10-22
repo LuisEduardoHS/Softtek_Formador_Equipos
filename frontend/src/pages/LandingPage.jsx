@@ -105,7 +105,7 @@ function Comparison() {
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const getStarted = () => navigate("/auth")
+  const getStarted = () => navigate("/registro")
 
   return (
     <div className="min-h-dvh bg-canvas">

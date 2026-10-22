@@ -12,8 +12,9 @@ import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
 import { Logo } from "../components/layout/AppLayout"
 import ProfileSetupForm from "../components/profile/ProfileSetupForm"
-import { interpretarPerfil } from "../services/api"
+import { guardarPerfil, interpretarPerfil } from "../services/api"
 import { DIAS, DIAS_LABEL, FRANJAS, FRANJAS_LABEL } from "../data/mockData"
+import { getSessionUser } from "../lib/session"
 
 const STEPS = ["Cuéntanos de ti", "Tu disponibilidad", "Revisa tu perfil"]
 
@@ -253,6 +254,7 @@ export default function ProfileSetupPage() {
   const [analyzedFor, setAnalyzedFor] = useState(null)
   const [errors, setErrors] = useState({})
   const [done, setDone] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const go = (n) => {
     setStep(n)
@@ -283,10 +285,33 @@ export default function ProfileSetupPage() {
     go(step + 1)
   }
 
-  const confirm = () => {
-    // TODO(backend): PUT /perfil/me con { ...perfil, disponibilidad }
-    toast("Perfil guardado")
-    setDone(true)
+  const confirm = async () => {
+    const usuarioLocal = getSessionUser()
+    const datosPerfil = {
+      ...perfil,
+      nombre: textos.nombre.trim(),
+      carrera: usuarioLocal.carrera || "",
+      disponibilidad,
+      visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
+      pausado: false,
+    }
+
+    setSaving(true)
+    try {
+      const guardado = await guardarPerfil(datosPerfil)
+      localStorage.setItem("usuario", JSON.stringify({
+        ...usuarioLocal,
+        nombre: guardado.nombre,
+        carrera: guardado.carrera,
+      }))
+      toast("Perfil guardado")
+      setDone(true)
+    } catch (error) {
+      console.error("No se pudo guardar el perfil:", error)
+      toast(error.message || "No se pudo guardar tu perfil.", "error")
+    } finally {
+      setSaving(false)
+    }
   }
 
   const updateTextos = (v) => {
@@ -360,8 +385,8 @@ export default function ProfileSetupPage() {
                 Continuar <ArrowRight aria-hidden="true" className="size-4" />
               </Button>
             ) : (
-              <Button onClick={confirm} disabled={!perfil || perfil.fortalezas.length === 0} className="min-w-36">
-                <Check aria-hidden="true" className="size-4" /> Confirmar perfil
+              <Button onClick={confirm} disabled={saving || !perfil || perfil.fortalezas.length === 0} className="min-w-36">
+                <Check aria-hidden="true" className="size-4" /> {saving ? "Guardando…" : "Confirmar perfil"}
               </Button>
             )}
           </div>

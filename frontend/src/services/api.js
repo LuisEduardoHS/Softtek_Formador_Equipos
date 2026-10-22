@@ -1,177 +1,309 @@
 /**
- * Capa de servicios.
- *
- * Por ahora todas las funciones devuelven datos simulados con una latencia
- * artificial. Cada una indica con `TODO(backend)` el endpoint sugerido de
- * FastAPI que debe reemplazarla. Para conectar el backend:
- *   1. Define VITE_API_URL en .env (p. ej. http://localhost:8000)
- *   2. Sustituye el cuerpo simulado por `return request("/ruta", {...})`
+ * Capa de servicios conectada a FastAPI (MySQL).
  */
-import {
-  currentUser,
-  invitations,
-  projectSuggestions,
-  projects,
-  recommendations,
-  students,
-  teams,
-} from "../data/mockData"
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000"
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000"
 
-// Cliente HTTP listo para usarse cuando exista el backend.
-// eslint-disable-next-line no-unused-vars
+// Cliente HTTP conectado a tu backend local
 async function request(path, { method = "GET", body } = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   })
-  if (!res.ok) throw new Error(`Error ${res.status} en ${path}`)
-  return res.json()
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Error ${res.status} en ${path}`);
+  }
+  return res.json();
 }
 
-// Simulación: latencia y, para la demo, fallos forzados con ?estado=error
-const delay = (ms = 600) => new Promise((r) => setTimeout(r, ms))
-const demoState = () => new URLSearchParams(window.location.search).get("estado")
-async function mock(data, ms) {
-  await delay(ms)
-  if (demoState() === "error") throw new Error("No pudimos conectar con el servidor.")
-  return structuredClone(data)
+// ============================================================================
+// RUTAS CONECTADAS (Ya funcionan en FastAPI con MySQL)
+// ============================================================================
+
+/* ---------------------------- Autenticación ---------------------------- */
+
+export function registrarUsuario({ nombre, correo, carrera, estado_geografico, municipio, password }) {
+  return request("/auth/registro", {
+    method: "POST",
+    body: {
+      nombre,
+      correo,
+      carrera,
+      estado_geografico,
+      municipio,
+      password,
+    },
+  })
+}
+
+export function iniciarSesion({ correo, password }) {
+  return request("/auth/login", {
+    method: "POST",
+    body: { correo, password },
+  })
 }
 
 /* ---------------------------- Perfil ---------------------------- */
 
-export function obtenerPerfil() {
-  // TODO(backend): GET /perfil/me
-  return mock(currentUser, 400)
+export async function obtenerPerfil() {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}");
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.");
+  }
+  const perfil = await request(`/perfil/${encodeURIComponent(usuarioLocal.id_usuario)}`)
+  return mapPerfil(perfil)
 }
 
-/**
- * Envía los textos libres del onboarding y devuelve el perfil estructurado.
- * TODO(backend): POST /ia/interpretar-perfil  { fortalezas, reforzar, intereses }
- *   → Llama + embeddings Nomic → { fortalezas:[{nombre,nivel}], reforzar:[], intereses:[] }
- */
-export function interpretarPerfil(textos) {
-  void textos
-  return mock(
-    {
-      fortalezas: currentUser.fortalezas,
-      reforzar: currentUser.reforzar,
-      intereses: currentUser.intereses,
+function mapPerfil(perfil) {
+  const datos = perfil.datos_crudos ?? {}
+  const fortalezas = Array.isArray(datos.fortalezas)
+    ? datos.fortalezas
+      .map((fortaleza) =>
+        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: "intermedio" } : fortaleza,
+      )
+      .filter((fortaleza) => fortaleza && typeof fortaleza.nombre === "string")
+    : Array.isArray(datos.habilidades)
+      ? datos.habilidades.map((nombre) => ({ nombre, nivel: "intermedio" }))
+      : []
+
+  return {
+    ...datos,
+    id: String(perfil.usuario_id),
+    usuario_id: perfil.usuario_id,
+    nombre: perfil.nombre,
+    correo: perfil.correo ?? "",
+    carrera: perfil.carrera,
+    estado_geografico: perfil.estado_geografico ?? "",
+    municipio: perfil.municipio ?? "",
+    semestre: Number(datos.semestre) || 1,
+    fortalezas,
+    reforzar: Array.isArray(datos.reforzar) ? datos.reforzar : [],
+    intereses: Array.isArray(datos.intereses) ? datos.intereses : [],
+    disponibilidad: Array.isArray(datos.disponibilidad) ? datos.disponibilidad : [],
+    visibilidad: {
+      fortalezas: true,
+      intereses: true,
+      disponibilidad: true,
+      reforzar: false,
+      correo: false,
+      ...(datos.visibilidad ?? {}),
     },
-    2200,
+    pausado: Boolean(datos.pausado),
+  }
+}
+
+export async function obtenerPerfilUsuario(id) {
+  const perfil = await request(`/perfil/publico/${encodeURIComponent(id)}`)
+  return mapPerfil(perfil)
+}
+
+export async function guardarPerfil(perfil) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+
+  const datos_crudos = Object.fromEntries(
+    Object.entries(perfil).filter(([key]) =>
+      !["id", "usuario_id", "correo", "estado_geografico", "municipio"].includes(key),
+    ),
   )
+  const actualizado = await request(`/perfil/${usuarioLocal.id_usuario}`, {
+    method: "PUT",
+    body: {
+      nombre: perfil.nombre,
+      carrera: perfil.carrera,
+      datos_crudos,
+    },
+  })
+  return mapPerfil(actualizado)
+}
+
+export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit) })
+  if (q.trim()) params.set("q", q.trim())
+  if (excludeId) params.set("exclude_id", String(excludeId))
+  const perfiles = await request(`/perfil/estudiantes/?${params.toString()}`)
+  return perfiles.map(mapPerfil)
 }
 
 /* --------------------------- Proyectos -------------------------- */
 
+function mapEventoAProyecto(evento) {
+  const detalles = evento.detalles_especificos ?? {}
+  const requisitos = evento.requisitos_ia ?? {}
+  const rolesEvento = Array.isArray(detalles.roles)
+    ? detalles.roles
+    : Array.isArray(requisitos.roles)
+      ? requisitos.roles
+      : []
+
+  return {
+    id: String(evento.id_evento),
+    titulo: evento.titulo,
+    descripcion: evento.descripcion_libre ?? "",
+    tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
+    materia: detalles.materia ?? "",
+    creadorId: String(evento.creador_id),
+    integrantes: Number(detalles.integrantes) || 1,
+    fechaLimite: detalles.fechaLimite || null,
+    creado: evento.fecha_creacion?.slice(0, 10) ?? "",
+    estado: evento.estado,
+    roles: rolesEvento.map((rol, index) => ({
+      id: String(rol.id ?? index),
+      nombre: typeof rol.nombre === "string" ? rol.nombre : "Rol sin nombre",
+      habilidades: Array.isArray(rol.habilidades) ? rol.habilidades : [],
+      indispensable: Boolean(rol.indispensable),
+      cubiertoPor: rol.cubiertoPor ?? null,
+    })),
+  }
+}
+
 export function obtenerProyectos() {
-  // TODO(backend): GET /proyectos
-  return mock(projects)
+  return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
 }
 
-/** TODO(backend): GET /proyectos/{id} */
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles }) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const creadorId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(creadorId) || creadorId <= 0) {
+    throw new Error("Inicia sesión para poder publicar un proyecto.")
+  }
+
+  return request("/eventos/", {
+    method: "POST",
+    body: {
+      creador_id: creadorId,
+      titulo,
+      categoria_principal: tipo === "personal" ? "Personal" : "Academico",
+      descripcion_libre: descripcion,
+      detalles_especificos: {
+        tipo,
+        materia,
+        integrantes,
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+    },
+  }).then(mapEventoAProyecto)
+}
+
 export async function obtenerProyecto(id) {
-  const project = projects.find((p) => p.id === id)
-  const data = await mock(project ?? null, 600)
-  if (!data) throw Object.assign(new Error("Proyecto no encontrado"), { status: 404 })
-  return data
+  return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
-/** TODO(backend): POST /proyectos/{id}/solicitudes  { rol_id, mensaje } */
+// ============================================================================
+// RUTAS PENDIENTES DE DESARROLLAR EN FASTAPI
+// (Mantenemos retornos vacíos o estructurados para que no truene React)
+// ============================================================================
+
+export function interpretarPerfil(textos) {
+  // TODO(backend): POST /ia/interpretar-perfil
+  return Promise.resolve({ fortalezas: [], reforzar: [], intereses: [] });
+}
+
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  return mock({ id: `s${Date.now()}`, projectId, rolId, mensaje, estado: "pendiente" }, 700)
+  // TODO(backend): POST /proyectos/{id}/solicitudes
+  return Promise.resolve({ id: `s${Date.now()}`, estado: "pendiente" });
 }
 
-/**
- * TODO(backend): POST /ia/interpretar-proyecto  { titulo, descripcion, integrantes }
- *   → { roles: [{ nombre, habilidades[], indispensable }] }
- */
 export function interpretarProyecto(proyecto) {
-  void proyecto
-  return mock(
-    {
-      roles: [
-        { nombre: "Programación backend", habilidades: ["Backend", "Bases de datos"], indispensable: true },
-        { nombre: "Diseño de interfaces", habilidades: ["Diseño de interfaces", "Figma"], indispensable: true },
-        { nombre: "Bases de datos", habilidades: ["SQL", "Modelado de datos"], indispensable: false },
-        { nombre: "Gestión de proyectos", habilidades: ["Gestión de proyectos", "Scrum"], indispensable: false },
-      ],
-    },
-    2000,
-  )
+  // TODO(backend): POST /ia/interpretar-proyecto
+  return Promise.resolve({ roles: [] });
 }
 
-/* ------------------------ Recomendaciones ----------------------- */
-
-/**
- * TODO(backend): GET /recomendaciones?proyecto_id=
- *   → compañeros y proyectos sugeridos con { nivel, aporta, bloquesComunes, porQue }
- * Con ?estado=vacio se simula el arranque en frío (sin recomendaciones).
- */
 export function obtenerRecomendaciones() {
-  const vacio = demoState() === "vacio"
-  return mock(
-    {
-      companeros: vacio ? [] : recommendations,
-      proyectos: vacio ? [] : projectSuggestions,
-    },
-    900,
-  )
+  // TODO(backend): GET /recomendaciones (Requiere FastAPI + Ollama)
+  return Promise.resolve({ companeros: [], proyectos: [] });
 }
 
-/**
- * Candidatos para los roles pendientes de un proyecto propio.
- * TODO(backend): GET /proyectos/{id}/candidatos
- */
 export function obtenerCandidatos(projectId) {
-  return mock(demoState() === "vacio" ? [] : recommendations.filter((r) => r.projectId === projectId), 1100)
+  // TODO(backend): GET /proyectos/{id}/candidatos
+  return Promise.resolve([]);
 }
 
-/** TODO(backend): POST /recomendaciones/{id}/retroalimentacion  { util: bool, motivo? } */
 export function enviarRetroalimentacion(recomendacionId, datos) {
-  void recomendacionId, datos
-  return mock({ ok: true }, 250)
+  // TODO(backend): POST /recomendaciones/{id}/retroalimentacion
+  return Promise.resolve({ ok: true });
 }
-
-/* ------------------------- Invitaciones ------------------------- */
 
 export function obtenerInvitaciones() {
-  // TODO(backend): GET /invitaciones
-  return mock(demoState() === "vacio" ? [] : invitations, 700)
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/invitaciones/${encodeURIComponent(usuarioLocal.id_usuario)}`)
 }
 
-/** TODO(backend): POST /invitaciones  { para_id, proyecto_id, rol, mensaje } */
+export function obtenerNotificaciones() {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/notificaciones/${encodeURIComponent(usuarioLocal.id_usuario)}`)
+}
+
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
-  return mock({ id: `i${Date.now()}`, tipo: "enviada", deId: currentUser.id, paraId, projectId, rol, mensaje, estado: "pendiente" }, 700)
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  const body = {
+    id_destinatario: Number(paraId),
+    id_evento: Number(projectId),
+    mensaje_explicacion: `${mensaje}${rol ? `\n\nRol propuesto: ${rol}` : ""}`,
+  }
+  return request(`/invitaciones/?de_id=${encodeURIComponent(usuarioLocal.id_usuario)}`, {
+    method: "POST",
+    body,
+  })
 }
 
-/** TODO(backend): PATCH /invitaciones/{id}  { estado: "aceptada" | "rechazada" } */
 export function responderInvitacion(id, estado) {
-  return mock({ id, estado }, 500)
+  return request(`/invitaciones/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: { estado },
+  })
 }
-
-/* ---------------------------- Equipos --------------------------- */
 
 export function obtenerEquipos() {
-  // TODO(backend): GET /equipos/mios
-  return mock(demoState() === "vacio" ? [] : teams, 800)
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/equipos/${encodeURIComponent(usuarioLocal.id_usuario)}`).then((equipos) =>
+    equipos.map((equipo) => ({
+      ...equipo,
+      proyecto: mapEventoAProyecto(equipo.proyecto),
+      miembros: equipo.miembros.map((miembro) => ({
+        ...miembro,
+        id: String(miembro.id),
+        fortalezas: Array.isArray(miembro.fortalezas) ? miembro.fortalezas : [],
+      })),
+    })),
+  )
 }
 
-/* ---------------------------- Búsqueda -------------------------- */
+export async function obtenerEquipo(id) {
+  const equipos = await obtenerEquipos()
+  const equipo = equipos.find((item) => item.id === String(id))
+  if (!equipo) {
+    throw new Error("No encontramos este equipo.")
+  }
+  return equipo
+}
 
-/** TODO(backend): GET /estudiantes?q=&carrera=&habilidad=&disponibilidad=&semestre= */
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
-  const t = q.trim().toLowerCase()
-  const res = students.filter(
-    (s) =>
-      (!t || s.nombre.toLowerCase().includes(t) || s.fortalezas.some((f) => f.nombre.toLowerCase().includes(t))) &&
-      (!carrera || s.carrera === carrera) &&
-      (!habilidad || s.fortalezas.some((f) => f.nombre === habilidad)) &&
-      (!disponibilidad || s.disponibilidad.some((b) => b.endsWith(disponibilidad))) &&
-      (!semestre || s.semestre === Number(semestre)),
+  return obtenerEstudiantes({ q }).then((estudiantes) =>
+    estudiantes.filter((estudiante) =>
+      (!carrera || estudiante.carrera === carrera) &&
+      (!habilidad || estudiante.fortalezas.some((fortaleza) => fortaleza.nombre === habilidad)) &&
+      (!disponibilidad || estudiante.disponibilidad.includes(disponibilidad)) &&
+      (!semestre || estudiante.semestre === Number(semestre)),
+    ),
   )
-  return mock(res, 450)
 }

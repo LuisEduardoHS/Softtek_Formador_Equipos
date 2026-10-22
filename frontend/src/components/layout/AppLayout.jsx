@@ -1,17 +1,18 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
-import { Bell, FolderKanban, Home, Plus, UserRound, Users } from "lucide-react"
+import { Bell, FolderKanban, Home, LogOut, Plus, UserRound, Users, UsersRound } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import Avatar from "../ui/Avatar"
-import { currentUser, notifications } from "../../data/mockData"
+import Button from "../ui/Button"
+import { getSessionUser } from "../../lib/session"
 
 const NAV = [
   { to: "/inicio", label: "Inicio", icon: Home },
   { to: "/proyectos", label: "Proyectos", icon: FolderKanban },
+  { to: "/estudiantes", label: "Estudiantes", short: "Personas", icon: UsersRound },
   { to: "/equipos", label: "Mis equipos", short: "Equipos", icon: Users },
-  { to: "/notificaciones", label: "Notificaciones", short: "Avisos", icon: Bell, badge: true },
+  { to: "/notificaciones", label: "Notificaciones", short: "Avisos", icon: Bell },
   { to: "/perfil", label: "Perfil", icon: UserRound },
 ]
-
-const unread = notifications.filter((n) => !n.leida).length
 
 export function Logo({ to = "/inicio", className = "" }) {
   return (
@@ -28,17 +29,17 @@ export function Logo({ to = "/inicio", className = "" }) {
   )
 }
 
-function Badge({ count }) {
-  if (!count) return null
-  return (
-    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
-      {count}
-      <span className="sr-only"> sin leer</span>
-    </span>
-  )
-}
-
 export default function AppLayout() {
+  const navigate = useNavigate()
+  const usuario = getSessionUser()
+  const nombre = usuario.nombre || "Usuario"
+  const detalle = usuario.carrera || usuario.correo || ""
+
+  function cerrarSesion() {
+    localStorage.removeItem("usuario")
+    navigate("/", { replace: true })
+  }
+
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
       <a href="#contenido" className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
@@ -56,7 +57,7 @@ export default function AppLayout() {
         </Link>
         <nav aria-label="Principal">
           <ul className="space-y-1">
-            {NAV.map(({ to, label, icon: Icon, badge }) => (
+            {NAV.map(({ to, label, icon: Icon }) => (
               <li key={to}>
                 <NavLink
                   to={to}
@@ -70,7 +71,6 @@ export default function AppLayout() {
                     <>
                       <Icon aria-hidden="true" className={`size-5 ${isActive ? "text-primary" : ""}`} />
                       <span className="flex-1">{label}</span>
-                      {badge && <Badge count={unread} />}
                     </>
                   )}
                 </NavLink>
@@ -82,20 +82,41 @@ export default function AppLayout() {
           to="/perfil"
           className="mt-auto flex items-center gap-3 rounded-xl border border-line p-3 transition-colors hover:bg-surface-2"
         >
-          <Avatar name={currentUser.nombre} size="sm" />
+          <Avatar name={nombre} size="sm" />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-ink">{currentUser.nombre}</span>
-            <span className="block truncate text-xs text-ink-2">{currentUser.carrera}</span>
+            <span className="block truncate text-sm font-semibold text-ink">{nombre}</span>
+            {detalle && <span className="block truncate text-xs text-ink-2">{detalle}</span>}
           </span>
         </Link>
+        <Button
+          variant="ghost"
+          onClick={cerrarSesion}
+          className="w-full justify-start"
+        >
+          <LogOut aria-hidden="true" className="size-4" />
+          Cerrar sesión
+        </Button>
       </aside>
 
       {/* Encabezado (móvil) */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-surface/90 px-4 backdrop-blur lg:hidden">
         <Logo />
-        <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
-          <Avatar name={currentUser.nombre} size="sm" />
-        </Link>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={cerrarSesion}
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+            className="px-2"
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+            <span>Salir</span>
+          </Button>
+          <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
+            <Avatar name={nombre} size="sm" />
+          </Link>
+        </div>
       </header>
 
       <main id="contenido" className="min-w-0 pb-28 lg:pb-0">
@@ -120,7 +141,7 @@ export default function AppLayout() {
               <Plus aria-hidden="true" className="size-6" />
             </Link>
           </li>
-          {NAV.slice(2, 4).map((item) => (
+          {[NAV[2], NAV[4]].map((item) => (
             <BottomItem key={item.to} {...item} />
           ))}
         </ul>
@@ -129,7 +150,7 @@ export default function AppLayout() {
   )
 }
 
-function BottomItem({ to, label, short, icon: Icon, badge }) {
+function BottomItem({ to, label, short, icon: Icon }) {
   return (
     <li>
       <NavLink
@@ -142,11 +163,6 @@ function BottomItem({ to, label, short, icon: Icon, badge }) {
       >
         <span className="relative">
           <Icon aria-hidden="true" className="size-5" />
-          {badge && unread > 0 && (
-            <span className="absolute -top-1.5 -right-2.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white ring-2 ring-surface">
-              {unread}
-            </span>
-          )}
         </span>
         {short ?? label}
       </NavLink>

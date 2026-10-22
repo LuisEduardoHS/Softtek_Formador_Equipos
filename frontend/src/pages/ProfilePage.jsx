@@ -1,18 +1,31 @@
-import { useId, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useId, useState, useEffect } from "react"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { ArrowLeft, Eye, Lock, PauseCircle, Pencil, RefreshCw, Send, UserX } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import TagEditor from "../components/ui/TagEditor"
 import AvailabilityGrid from "../components/ui/AvailabilityGrid"
-import { EmptyState } from "../components/ui/Feedback"
+import { EmptyState, Skeleton } from "../components/ui/Feedback"
 import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls"
 import { useToast } from "../components/ui/Toast"
 import PublicProfile from "../components/profile/PublicProfile"
 import InviteModal from "../components/invite/InviteModal"
-import { currentUser, pendingInviteIds, projects, studentById } from "../data/mockData"
-import { coverage } from "../lib/projects"
+import { guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
+import { getSessionUser } from "../lib/session"
+
+// Estructura por defecto para evitar errores si la base de datos devuelve nulos en cuentas nuevas
+const PERFIL_DEFAULT = {
+  carrera: "",
+  semestre: 1,
+  fortalezas: [],
+  reforzar: [],
+  intereses: [],
+  disponibilidad: [],
+  grupoExterno: "",
+  visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
+  pausado: false,
+}
 
 /* ------------------------------ Edición ------------------------------ */
 
@@ -31,7 +44,6 @@ function Section({ title, desc, badge, children }) {
   )
 }
 
-// Campos que alimentan a la IA: si cambian, se recalculan las recomendaciones
 const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad"]
 
 function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
@@ -42,9 +54,9 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
   const setFortalezas = (names) =>
     setPerfil((p) => ({
       ...p,
-      fortalezas: names.map((n, i) => ({
+      fortalezas: names.map((n) => ({
         nombre: n,
-        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? (names.length === p.fortalezas.length ? p.fortalezas[i].nivel : "intermedio"),
+        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? "intermedio",
       })),
     }))
 
@@ -54,8 +66,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
         <div className="flex animate-fade-up items-start gap-3 rounded-xl border border-warn-line bg-warn-soft p-4 text-sm">
           <PauseCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-warn-ink" />
           <p>
-            <span className="font-semibold">Tu perfil está en pausa.</span> No aparecerás en recomendaciones de otras personas, pero conservas tus
-            equipos e invitaciones.
+            <span className="font-semibold">Tu perfil está en pausa.</span> No aparecerás en recomendaciones de otras personas, pero conservas tus equipos e invitaciones.
           </p>
         </div>
       )}
@@ -70,14 +81,12 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       <Section title="Información básica">
         <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
           <Field id={ids.c} label="Carrera">
-            <input id={ids.c} value={perfil.carrera} onChange={(e) => set("carrera")(e.target.value)} className={inputCls()} />
+            <input id={ids.c} value={perfil.carrera || ""} onChange={(e) => set("carrera")(e.target.value)} className={inputCls()} />
           </Field>
           <Field id={ids.s} label="Semestre">
-            <select id={ids.s} value={perfil.semestre} onChange={(e) => set("semestre")(Number(e.target.value))} className={`${inputCls()} cursor-pointer`}>
+            <select id={ids.s} value={perfil.semestre || 1} onChange={(e) => set("semestre")(Number(e.target.value))} className={`${inputCls()} cursor-pointer`}>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n}.º
-                </option>
+                <option key={n} value={n}>{n}.º</option>
               ))}
             </select>
           </Field>
@@ -86,7 +95,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
 
       <Section title="Fortalezas" desc="Pulsa una etiqueta para corregirla e indica tu nivel.">
         <TagEditor
-          items={perfil.fortalezas.map((f) => f.nombre)}
+          items={(perfil.fortalezas || []).map((f) => f.nombre)}
           onChange={setFortalezas}
           layout="rows"
           placeholder="Agregar fortaleza"
@@ -100,73 +109,46 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
         />
       </Section>
 
-      <Section
-        title="Quiero reforzar"
-        desc="La IA lo usa para encontrar quién te complementa."
-        badge={
-          <span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2">
-            <Lock aria-hidden="true" className="size-3" /> {perfil.visibilidad.reforzar ? "Visible" : "Privado"}
-          </span>
-        }
-      >
-        <TagEditor items={perfil.reforzar} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
+      <Section title="Quiero reforzar" desc="La IA lo usa para encontrar quién te complementa." badge={<span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2"><Lock className="size-3" /> {perfil.visibilidad?.reforzar ? "Visible" : "Privado"}</span>}>
+        <TagEditor items={perfil.reforzar || []} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
       </Section>
 
       <Section title="Intereses">
-        <TagEditor items={perfil.intereses} onChange={set("intereses")} placeholder="Agregar interés" />
+        <TagEditor items={perfil.intereses || []} onChange={set("intereses")} placeholder="Agregar interés" />
       </Section>
 
       <Section title="Disponibilidad" desc="Toca los bloques en los que sueles estar libre.">
-        <AvailabilityGrid value={perfil.disponibilidad} onChange={set("disponibilidad")} />
+        <AvailabilityGrid value={perfil.disponibilidad || []} onChange={set("disponibilidad")} />
       </Section>
 
       <Section title="Contacto" desc="Solo lo verán los integrantes de tus equipos.">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id={ids.e} label="Correo institucional" hint="Lo tomamos de tu cuenta universitaria.">
-            <input id={ids.e} value={perfil.correo} readOnly className={`${inputCls()} bg-surface-2 text-ink-2`} />
+            <input id={ids.e} value={perfil.correo || ""} readOnly className={`${inputCls()} bg-surface-2 text-ink-2`} />
           </Field>
           <Field id={ids.g} label="Enlace a grupo externo" optional hint="Por ejemplo, tu usuario de Discord o un enlace de WhatsApp.">
-            <input
-              id={ids.g}
-              value={perfil.grupoExterno}
-              onChange={(e) => set("grupoExterno")(e.target.value)}
-              placeholder="https://…"
-              className={inputCls()}
-            />
+            <input id={ids.g} value={perfil.grupoExterno || ""} onChange={(e) => set("grupoExterno")(e.target.value)} placeholder="https://…" className={inputCls()} />
           </Field>
         </div>
       </Section>
 
-      <Section title="Privacidad" desc="Decide qué ven las demás personas. La IA siempre puede usar tu perfil para recomendarte, salvo que lo pauses.">
+      <Section title="Privacidad" desc="Decide qué ven las demás personas.">
         <div className="divide-y divide-line">
-          <Switch label="Mostrar mis fortalezas" checked={perfil.visibilidad.fortalezas} onChange={setVis("fortalezas")} />
-          <Switch label="Mostrar mis intereses" checked={perfil.visibilidad.intereses} onChange={setVis("intereses")} />
-          <Switch label="Mostrar mi disponibilidad" checked={perfil.visibilidad.disponibilidad} onChange={setVis("disponibilidad")} />
-          <Switch
-            label="Mostrar «Quiero reforzar»"
-            description="Privado por defecto. Si lo muestras, otras personas podrán ofrecerte ayuda."
-            checked={perfil.visibilidad.reforzar}
-            onChange={setVis("reforzar")}
-          />
-          <Switch label="Compartir mi correo con mis equipos" checked={perfil.visibilidad.correo} onChange={setVis("correo")} />
-          <Switch
-            label="Pausar mi perfil"
-            description="No aparecerás en recomendaciones mientras esté en pausa."
-            checked={perfil.pausado}
-            onChange={set("pausado")}
-          />
+          <Switch label="Mostrar mis fortalezas" checked={perfil.visibilidad?.fortalezas ?? true} onChange={setVis("fortalezas")} />
+          <Switch label="Mostrar mis intereses" checked={perfil.visibilidad?.intereses ?? true} onChange={setVis("intereses")} />
+          <Switch label="Mostrar mi disponibilidad" checked={perfil.visibilidad?.disponibilidad ?? true} onChange={setVis("disponibilidad")} />
+          <Switch label="Mostrar «Quiero reforzar»" description="Privado por defecto." checked={perfil.visibilidad?.reforzar ?? false} onChange={setVis("reforzar")} />
+          <Switch label="Compartir mi correo con mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
+          <Switch label="Pausar mi perfil" checked={perfil.pausado ?? false} onChange={set("pausado")} />
         </div>
       </Section>
 
-      {/* Barra de guardado: aparece solo con cambios */}
       {dirty && (
         <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 animate-fade-up border-t border-line bg-surface/95 backdrop-blur lg:bottom-0 lg:left-[260px]">
           <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
             <p className="text-sm text-ink-2">Tienes cambios sin guardar</p>
             <div className="flex gap-2">
-              <Button variant="ghost" onClick={onDiscard}>
-                Descartar
-              </Button>
+              <Button variant="ghost" onClick={onDiscard}>Descartar</Button>
               <Button onClick={onSave}>Guardar cambios</Button>
             </div>
           </div>
@@ -180,17 +162,41 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
 
 function MyProfile() {
   const toast = useToast()
-  const [saved, setSaved] = useState(currentUser)
-  const [perfil, setPerfil] = useState(currentUser)
+  const [loading, setLoading] = useState(true)
+  const [saved, setSaved] = useState(null)
+  const [perfil, setPerfil] = useState(null)
   const [mode, setMode] = useState("editar")
+
+  useEffect(() => {
+    obtenerPerfil()
+      .then((data) => {
+        const perfilCompleto = { ...PERFIL_DEFAULT, ...data }
+        setSaved(perfilCompleto)
+        setPerfil(perfilCompleto)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error("Error cargando perfil:", err)
+        toast("No pudimos cargar tu perfil de la base de datos.", "error")
+        setLoading(false)
+      })
+  }, [toast])
+
+  if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
   const dirty = JSON.stringify(perfil) !== JSON.stringify(saved)
   const aiDirty = AI_FIELDS.some((k) => JSON.stringify(perfil[k]) !== JSON.stringify(saved[k]))
 
-  const save = () => {
-    // TODO(backend): PUT /perfil/me
-    setSaved(perfil)
-    toast(aiDirty ? "Perfil guardado. Estamos actualizando tus recomendaciones." : "Perfil guardado")
+  const save = async () => {
+    try {
+      const actualizado = await guardarPerfil(perfil)
+      setSaved(actualizado)
+      setPerfil(actualizado)
+      toast(aiDirty ? "Perfil guardado y recomendaciones actualizadas en MySQL." : "Perfil guardado en base de datos.", "success")
+    } catch (error) {
+      console.error(error)
+      toast(error.message || "Error al guardar el perfil.", "error")
+    }
   }
 
   return (
@@ -205,18 +211,8 @@ function MyProfile() {
           value={mode}
           onChange={setMode}
           options={[
-            [
-              "editar",
-              <span key="e" className="flex items-center gap-1.5">
-                <Pencil aria-hidden="true" className="size-4" /> Editar
-              </span>,
-            ],
-            [
-              "publica",
-              <span key="p" className="flex items-center gap-1.5">
-                <Eye aria-hidden="true" className="size-4" /> Ver como otros me ven
-              </span>,
-            ],
+            ["editar", <span key="e" className="flex items-center gap-1.5"><Pencil className="size-4" /> Editar</span>],
+            ["publica", <span key="p" className="flex items-center gap-1.5"><Eye className="size-4" /> Ver como otros me ven</span>],
           ]}
         />
       </header>
@@ -239,19 +235,67 @@ function MyProfile() {
 
 function OtherProfile({ id }) {
   const navigate = useNavigate()
-  const student = studentById(id)
+  const [student, setStudent] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [inviting, setInviting] = useState(false)
-  // Proyecto propio con roles pendientes donde podría encajar
-  const project = projects.find((p) => p.creadorId === currentUser.id && coverage(p).pendientes.length)
-  const rol =
-    project &&
-    (coverage(project).pendientes.find((r) => r.habilidades.some((h) => student?.fortalezas.some((f) => f.nombre === h))) ?? coverage(project).pendientes[0])
-  const [invited, setInvited] = useState(() => (project ? pendingInviteIds(project.id).has(id) : false))
+  const [projects, setProjects] = useState([])
+  const [projectsLoading, setProjectsLoading] = useState(true)
+  const [projectsError, setProjectsError] = useState(false)
+  const [projectId, setProjectId] = useState("")
+  const [roleId, setRoleId] = useState("")
+  
+  useEffect(() => {
+    obtenerPerfilUsuario(id)
+      .then((data) => {
+        setStudent({ ...PERFIL_DEFAULT, ...data })
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("No se pudo cargar el perfil:", error)
+        setLoading(false)
+      })
+  }, [id])
+
+  useEffect(() => {
+    let usuarioLocal = {}
+    try {
+      usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+    } catch (error) {
+      console.error("No se pudo leer el usuario de la sesión:", error)
+    }
+
+    let active = true
+    obtenerProyectos()
+      .then((allProjects) => {
+        if (!active) return
+        const propios = allProjects.filter(
+          (project) => String(project.creadorId) === String(usuarioLocal.id_usuario),
+        )
+        setProjects(propios)
+        setProjectId(propios[0]?.id ?? "")
+      })
+      .catch((error) => {
+        console.error("No se pudieron cargar tus eventos:", error)
+        if (active) setProjectsError(true)
+      })
+      .finally(() => active && setProjectsLoading(false))
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const selectedProject = projects.find((project) => project.id === projectId)
+  const openRoles = selectedProject?.roles.filter((role) => !role.cubiertoPor) ?? []
+  const availableRoles = openRoles.length > 0 ? openRoles : selectedProject?.roles ?? []
+  const selectedRole = availableRoles.find((role) => role.id === roleId) ?? availableRoles[0]
+
+  if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
   if (!student) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8">
-        <EmptyState icon={UserX} title="No encontramos este perfil" actions={<Button variant="secondary" onClick={() => navigate(-1)}>Volver</Button>}>
+        <EmptyState icon={UserX} title="No encontramos este perfil en la Base de Datos" actions={<Button variant="secondary" onClick={() => navigate(-1)}>Volver</Button>}>
           Puede que la persona haya pausado o eliminado su perfil.
         </EmptyState>
       </div>
@@ -260,34 +304,73 @@ function OtherProfile({ id }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="mb-4 inline-flex min-h-9 cursor-pointer items-center gap-1 text-sm font-medium text-ink-2 hover:text-ink"
-      >
-        <ArrowLeft aria-hidden="true" className="size-4" /> Volver
+      <button type="button" onClick={() => navigate(-1)} className="mb-4 inline-flex min-h-9 items-center gap-1 text-sm font-medium text-ink-2 hover:text-ink">
+        <ArrowLeft className="size-4" /> Volver
       </button>
       <div className="animate-fade-up">
-        <PublicProfile
+        <PublicProfile student={student} />
+        <section className="mt-4 flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 sm:flex-row sm:items-end">
+          <div className="min-w-0 flex-1 space-y-3">
+            <label htmlFor="profile-invite-project" className="block text-sm font-semibold">Invitar a uno de tus eventos</label>
+            {projectsError ? (
+              <p role="alert" className="text-sm text-danger">No pudimos cargar tus eventos.</p>
+            ) : projectsLoading ? (
+              <Skeleton className="h-11 w-full" />
+            ) : projects.length === 0 ? (
+              <div>
+                <p className="text-sm text-ink-2">Primero crea un evento para poder enviar una invitación.</p>
+                <Button variant="secondary" as={Link} to="/proyectos/nuevo" className="mt-2">Crear evento</Button>
+              </div>
+            ) : (
+              <>
+                <select
+                  id="profile-invite-project"
+                  value={projectId}
+                  onChange={(event) => {
+                    setProjectId(event.target.value)
+                    setRoleId("")
+                  }}
+                  className="min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+                >
+                  {projects.map((project) => <option key={project.id} value={project.id}>{project.titulo}</option>)}
+                </select>
+                {availableRoles.length > 0 && (
+                  <select
+                    aria-label="Rol propuesto"
+                    value={selectedRole?.id ?? ""}
+                    onChange={(event) => setRoleId(event.target.value)}
+                    className="min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+                  >
+                    {availableRoles.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
+                  </select>
+                )}
+              </>
+            )}
+          </div>
+          <Button
+            onClick={() => setInviting(true)}
+            disabled={projectsLoading || projectsError || projects.length === 0}
+          >
+            <Send aria-hidden="true" className="size-4" /> Invitar
+          </Button>
+        </section>
+        <InviteModal
+          open={inviting}
+          onClose={() => setInviting(false)}
           student={student}
-          actions={
-            project && (
-              <Button onClick={() => setInviting(true)} disabled={invited}>
-                <Send aria-hidden="true" className="size-4" /> {invited ? "Invitación enviada" : "Invitar a un proyecto"}
-              </Button>
-            )
-          }
+          project={selectedProject}
+          rol={selectedRole ?? { id: "participante", nombre: "Participante" }}
         />
       </div>
-      {project && (
-        <InviteModal open={inviting} onClose={() => setInviting(false)} student={student} project={project} rol={rol} onSent={() => setInvited(true)} />
-      )}
     </div>
   )
 }
 
 export default function ProfilePage() {
   const { id } = useParams()
-  if (!id || id === currentUser.id) return <MyProfile />
+  const usuarioGuardado = getSessionUser()
+  const isMe = !id || String(id) === String(usuarioGuardado.id_usuario)
+
+  if (isMe) return <MyProfile />
   return <OtherProfile key={id} id={id} />
 }
