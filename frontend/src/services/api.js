@@ -49,13 +49,85 @@ export function iniciarSesion({ correo, password }) {
 /* ---------------------------- Perfil ---------------------------- */
 
 export async function obtenerPerfil() {
-  // Leemos el usuario activo del LocalStorage que se guardó en el Login
   const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}");
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.");
   }
-  // Llamamos a tu endpoint existente GET /perfil/{id}
-  return request(`/perfil/${usuarioLocal.id_usuario}`);
+  const perfil = await request(`/perfil/${encodeURIComponent(usuarioLocal.id_usuario)}`)
+  return mapPerfil(perfil)
+}
+
+function mapPerfil(perfil) {
+  const datos = perfil.datos_crudos ?? {}
+  const fortalezas = Array.isArray(datos.fortalezas)
+    ? datos.fortalezas
+      .map((fortaleza) =>
+        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: "intermedio" } : fortaleza,
+      )
+      .filter((fortaleza) => fortaleza && typeof fortaleza.nombre === "string")
+    : Array.isArray(datos.habilidades)
+      ? datos.habilidades.map((nombre) => ({ nombre, nivel: "intermedio" }))
+      : []
+
+  return {
+    ...datos,
+    id: String(perfil.usuario_id),
+    usuario_id: perfil.usuario_id,
+    nombre: perfil.nombre,
+    correo: perfil.correo ?? "",
+    carrera: perfil.carrera,
+    estado_geografico: perfil.estado_geografico ?? "",
+    municipio: perfil.municipio ?? "",
+    semestre: Number(datos.semestre) || 1,
+    fortalezas,
+    reforzar: Array.isArray(datos.reforzar) ? datos.reforzar : [],
+    intereses: Array.isArray(datos.intereses) ? datos.intereses : [],
+    disponibilidad: Array.isArray(datos.disponibilidad) ? datos.disponibilidad : [],
+    visibilidad: {
+      fortalezas: true,
+      intereses: true,
+      disponibilidad: true,
+      reforzar: false,
+      correo: false,
+      ...(datos.visibilidad ?? {}),
+    },
+    pausado: Boolean(datos.pausado),
+  }
+}
+
+export async function obtenerPerfilUsuario(id) {
+  const perfil = await request(`/perfil/publico/${encodeURIComponent(id)}`)
+  return mapPerfil(perfil)
+}
+
+export async function guardarPerfil(perfil) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+
+  const datos_crudos = Object.fromEntries(
+    Object.entries(perfil).filter(([key]) =>
+      !["id", "usuario_id", "correo", "estado_geografico", "municipio"].includes(key),
+    ),
+  )
+  const actualizado = await request(`/perfil/${usuarioLocal.id_usuario}`, {
+    method: "PUT",
+    body: {
+      nombre: perfil.nombre,
+      carrera: perfil.carrera,
+      datos_crudos,
+    },
+  })
+  return mapPerfil(actualizado)
+}
+
+export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit) })
+  if (q.trim()) params.set("q", q.trim())
+  if (excludeId) params.set("exclude_id", String(excludeId))
+  const perfiles = await request(`/perfil/estudiantes/?${params.toString()}`)
+  return perfiles.map(mapPerfil)
 }
 
 /* --------------------------- Proyectos -------------------------- */
@@ -160,13 +232,27 @@ export function enviarRetroalimentacion(recomendacionId, datos) {
 }
 
 export function obtenerInvitaciones() {
-  // TODO(backend): GET /invitaciones
-  return Promise.resolve([]);
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/invitaciones/${encodeURIComponent(usuarioLocal.id_usuario)}`)
 }
 
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
-  // TODO(backend): POST /invitaciones
-  return Promise.resolve({ id: `i${Date.now()}`, estado: "pendiente" });
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  const body = {
+    id_destinatario: Number(paraId),
+    id_evento: Number(projectId),
+    mensaje_explicacion: `${mensaje}${rol ? `\n\nRol propuesto: ${rol}` : ""}`,
+  }
+  return request(`/invitaciones/?de_id=${encodeURIComponent(usuarioLocal.id_usuario)}`, {
+    method: "POST",
+    body,
+  })
 }
 
 export function responderInvitacion(id, estado) {
@@ -180,6 +266,12 @@ export function obtenerEquipos() {
 }
 
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
-  // TODO(backend): GET /estudiantes?q=...
-  return Promise.resolve([]);
+  return obtenerEstudiantes({ q }).then((estudiantes) =>
+    estudiantes.filter((estudiante) =>
+      (!carrera || estudiante.carrera === carrera) &&
+      (!habilidad || estudiante.fortalezas.some((fortaleza) => fortaleza.nombre === habilidad)) &&
+      (!disponibilidad || estudiante.disponibilidad.includes(disponibilidad)) &&
+      (!semestre || estudiante.semestre === Number(semestre)),
+    ),
+  )
 }

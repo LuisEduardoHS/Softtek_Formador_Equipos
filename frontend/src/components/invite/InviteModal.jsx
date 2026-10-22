@@ -27,17 +27,21 @@ function InviteDialog({ open, onClose, student, project, rol, onSent }) {
   const fieldId = useId()
   const [mensaje, setMensaje] = useState(() => mensajeSugerido(student, project, rol))
   const [status, setStatus] = useState("idle") // idle | sending | sent | error
+  const [errorMessage, setErrorMessage] = useState("")
 
   const submit = async (e) => {
     e.preventDefault()
     setStatus("sending")
+    setErrorMessage("")
     try {
       await enviarInvitacion({ paraId: student.id, projectId: project.id, rol: rol.nombre, mensaje })
       setStatus("sent")
       onSent?.(student)
       toast(`Invitación enviada a ${student.nombre}`)
       setTimeout(onClose, 1100)
-    } catch {
+    } catch (error) {
+      console.error("No se pudo enviar la invitación:", error)
+      setErrorMessage(error.message || "No pudimos enviar la invitación. Inténtalo de nuevo.")
       setStatus("error")
     }
   }
@@ -99,7 +103,7 @@ function InviteDialog({ open, onClose, student, project, rol, onSent }) {
 
           {status === "error" && (
             <p role="alert" className="text-sm text-danger">
-              No pudimos enviar la invitación. Revisa tu conexión e inténtalo de nuevo.
+              {errorMessage}
             </p>
           )}
         </form>
