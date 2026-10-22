@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ArrowRight, CircleDashed } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import Button from "../ui/Button"
 import { LocalProcessing } from "../ui/AIBadge"
 import RecommendationCard from "../recommendation/RecommendationCard"
@@ -32,12 +32,6 @@ export default function Hero({ onGetStarted }) {
 
       {/* Ejemplo visual de una recomendación */}
       <div className="relative animate-fade-up [animation-delay:150ms]" role="img" aria-label="Ejemplo de recomendación: Ana Torres cubriría Diseño de interfaces">
-        <div className="absolute -top-4 -left-4 z-10 hidden rounded-xl border border-line bg-surface px-3 py-2 shadow-pop sm:block" aria-hidden="true">
-          <p className="text-xs text-ink-2">Tu proyecto necesita</p>
-          <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-warn-ink">
-            <CircleDashed className="size-3.5" /> {mockMatch.rol.nombre}
-          </p>
-        </div>
         <div className="pointer-events-none mx-auto max-w-sm rotate-[0.6deg] select-none" aria-hidden="true">
           <RecommendationCard student={mockMatch.student} rol={mockMatch.rol} rec={mockMatch.rec} />
         </div>

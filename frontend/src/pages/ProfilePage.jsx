@@ -1,5 +1,5 @@
 import { useId, useState, useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { ArrowLeft, Eye, Lock, PauseCircle, Pencil, RefreshCw, Send, UserX } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
@@ -10,8 +10,7 @@ import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls
 import { useToast } from "../components/ui/Toast"
 import PublicProfile from "../components/profile/PublicProfile"
 import InviteModal from "../components/invite/InviteModal"
-import { obtenerPerfil, obtenerProyectos } from "../services/api"
-import { coverage } from "../lib/projects"
+import { guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 
 // Estructura por defecto para evitar errores si la base de datos devuelve nulos en cuentas nuevas
@@ -54,7 +53,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
   const setFortalezas = (names) =>
     setPerfil((p) => ({
       ...p,
-      fortalezas: names.map((n, i) => ({
+      fortalezas: names.map((n) => ({
         nombre: n,
         nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? "intermedio",
       })),
@@ -180,7 +179,7 @@ function MyProfile() {
         toast("No pudimos cargar tu perfil de la base de datos.", "error")
         setLoading(false)
       })
-  }, [])
+  }, [toast])
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
@@ -188,20 +187,14 @@ function MyProfile() {
   const aiDirty = AI_FIELDS.some((k) => JSON.stringify(perfil[k]) !== JSON.stringify(saved[k]))
 
   const save = async () => {
-    const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
     try {
-      const res = await fetch(`http://127.0.0.1:8000/perfil/${usuarioLocal.id_usuario}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(perfil),
-      })
-      if (!res.ok) throw new Error("Error en la petición a FastAPI")
-      
-      setSaved(perfil)
+      const actualizado = await guardarPerfil(perfil)
+      setSaved(actualizado)
+      setPerfil(actualizado)
       toast(aiDirty ? "Perfil guardado y recomendaciones actualizadas en MySQL." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
-      toast("Error al guardar el perfil. Revisa tu consola.", "error")
+      toast(error.message || "Error al guardar el perfil.", "error")
     }
   }
 
@@ -244,19 +237,57 @@ function OtherProfile({ id }) {
   const [student, setStudent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [inviting, setInviting] = useState(false)
+  const [projects, setProjects] = useState([])
+  const [projectsLoading, setProjectsLoading] = useState(true)
+  const [projectsError, setProjectsError] = useState(false)
+  const [projectId, setProjectId] = useState("")
+  const [roleId, setRoleId] = useState("")
   
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/perfil/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("No encontrado")
-        return res.json()
-      })
+    obtenerPerfilUsuario(id)
       .then((data) => {
         setStudent({ ...PERFIL_DEFAULT, ...data })
         setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch((error) => {
+        console.error("No se pudo cargar el perfil:", error)
+        setLoading(false)
+      })
   }, [id])
+
+  useEffect(() => {
+    let usuarioLocal = {}
+    try {
+      usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+    } catch (error) {
+      console.error("No se pudo leer el usuario de la sesión:", error)
+    }
+
+    let active = true
+    obtenerProyectos()
+      .then((allProjects) => {
+        if (!active) return
+        const propios = allProjects.filter(
+          (project) => String(project.creadorId) === String(usuarioLocal.id_usuario),
+        )
+        setProjects(propios)
+        setProjectId(propios[0]?.id ?? "")
+      })
+      .catch((error) => {
+        console.error("No se pudieron cargar tus eventos:", error)
+        if (active) setProjectsError(true)
+      })
+      .finally(() => active && setProjectsLoading(false))
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const selectedProject = projects.find((project) => project.id === projectId)
+  const openRoles = selectedProject?.roles.filter((role) => !role.cubiertoPor) ?? []
+  const availableRoles = openRoles.length > 0 ? openRoles : selectedProject?.roles ?? []
+  const selectedRole = availableRoles.find((role) => role.id === roleId) ?? availableRoles[0]
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
@@ -277,6 +308,58 @@ function OtherProfile({ id }) {
       </button>
       <div className="animate-fade-up">
         <PublicProfile student={student} />
+        <section className="mt-4 flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 sm:flex-row sm:items-end">
+          <div className="min-w-0 flex-1 space-y-3">
+            <label htmlFor="profile-invite-project" className="block text-sm font-semibold">Invitar a uno de tus eventos</label>
+            {projectsError ? (
+              <p role="alert" className="text-sm text-danger">No pudimos cargar tus eventos.</p>
+            ) : projectsLoading ? (
+              <Skeleton className="h-11 w-full" />
+            ) : projects.length === 0 ? (
+              <div>
+                <p className="text-sm text-ink-2">Primero crea un evento para poder enviar una invitación.</p>
+                <Button variant="secondary" as={Link} to="/proyectos/nuevo" className="mt-2">Crear evento</Button>
+              </div>
+            ) : (
+              <>
+                <select
+                  id="profile-invite-project"
+                  value={projectId}
+                  onChange={(event) => {
+                    setProjectId(event.target.value)
+                    setRoleId("")
+                  }}
+                  className="min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+                >
+                  {projects.map((project) => <option key={project.id} value={project.id}>{project.titulo}</option>)}
+                </select>
+                {availableRoles.length > 0 && (
+                  <select
+                    aria-label="Rol propuesto"
+                    value={selectedRole?.id ?? ""}
+                    onChange={(event) => setRoleId(event.target.value)}
+                    className="min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+                  >
+                    {availableRoles.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
+                  </select>
+                )}
+              </>
+            )}
+          </div>
+          <Button
+            onClick={() => setInviting(true)}
+            disabled={projectsLoading || projectsError || projects.length === 0}
+          >
+            <Send aria-hidden="true" className="size-4" /> Invitar
+          </Button>
+        </section>
+        <InviteModal
+          open={inviting}
+          onClose={() => setInviting(false)}
+          student={student}
+          project={selectedProject}
+          rol={selectedRole ?? { id: "participante", nombre: "Participante" }}
+        />
       </div>
     </div>
   )
