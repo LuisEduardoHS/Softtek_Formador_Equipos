@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Dict, Any
 
 class PerfilUpdate(BaseModel):
@@ -13,6 +13,7 @@ class PerfilUpdate(BaseModel):
     datos_crudos: Optional[Dict[str, Any]] = None
 
 class PerfilOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     usuario_id: int
     nombre: str
     correo: str
@@ -22,10 +23,8 @@ class PerfilOut(BaseModel):
     rol_sistema: Optional[str] = None
     datos_crudos: Dict[str, Any]
     atributos_dinamicos: Dict[str, Any]
-
-    class Config:
-        from_attributes = True
-
+    perfil_estructurado_ia: Optional[Dict[str, Any]] = None
+    perfil_estado_ia: Optional[str] = None
 
 class PerfilPublicoOut(BaseModel):
     usuario_id: int

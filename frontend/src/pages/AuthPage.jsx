@@ -19,6 +19,7 @@ export default function AuthPage({ initialMode = "login" }) {
 
     try {
       const data = await iniciarSesion({ correo: email, password })
+      sessionStorage.setItem("access_token", data.access_token)
       localStorage.setItem("usuario", JSON.stringify(data.usuario))
       navigate("/inicio")
     } catch (error) {
@@ -43,6 +44,7 @@ export default function AuthPage({ initialMode = "login" }) {
         password,
       })
 
+      sessionStorage.setItem("access_token", data.access_token)
       localStorage.setItem("usuario", JSON.stringify(data.usuario))
       navigate("/profile")
     } catch (error) {

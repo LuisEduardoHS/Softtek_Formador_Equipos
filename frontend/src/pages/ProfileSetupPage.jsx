@@ -12,7 +12,7 @@ import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
 import { Logo } from "../components/layout/AppLayout"
 import ProfileSetupForm from "../components/profile/ProfileSetupForm"
-import { guardarPerfil, interpretarPerfil } from "../services/api"
+import { confirmarPerfil, interpretarPerfil } from "../services/api"
 import { DIAS, DIAS_LABEL, FRANJAS, FRANJAS_LABEL } from "../data/mockData"
 import { getSessionUser } from "../lib/session"
 
@@ -115,6 +115,10 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
       <div className="space-y-4" aria-busy="true">
         <AILoading text={`La IA está analizando tu perfil… ${ANALYSIS_MESSAGES[msg]}`} />
         <LocalProcessing />
+        <Button variant="secondary" onClick={() => {
+          setPerfil({ fortalezas: [], reforzar: [], intereses: [], experiencia: [], resumen_publico: "" })
+          setState("ready")
+        }}>Revisar manualmente</Button>
         {[0, 1, 2].map((i) => (
           <div key={i} className="space-y-3 rounded-2xl border border-line bg-surface p-5">
             <Skeleton className="h-5 w-40" />
@@ -131,14 +135,14 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
 
   if (state === "error") {
     return (
-      <ErrorState
-        message="No pudimos analizar tu perfil en este momento. Tus respuestas siguen guardadas."
-        onRetry={() => {
-          setState("loading")
-          setMsg(0)
-          setAttempt((a) => a + 1)
-        }}
-      />
+      <div className="space-y-3">
+        <ErrorState message="No pudimos analizar tu perfil. Tus respuestas siguen guardadas."
+          onRetry={() => { setState("loading"); setMsg(0); setAttempt((a) => a + 1) }} />
+        <Button variant="secondary" onClick={() => {
+          setPerfil({ fortalezas: [], reforzar: [], intereses: [], experiencia: [], resumen_publico: "" })
+          setState("ready")
+        }}>Revisar manualmente</Button>
+      </div>
     )
   }
 
@@ -152,7 +156,7 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
         nombre: n,
         nivel:
           p.fortalezas.find((f) => f.nombre === n)?.nivel ??
-          (names.length === p.fortalezas.length ? p.fortalezas[i].nivel : "intermedio"),
+          (names.length === p.fortalezas.length ? p.fortalezas[i].nivel : null),
       })),
     }))
 
@@ -163,13 +167,13 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
     <div className="space-y-4">
       <div className="flex flex-col gap-2 rounded-xl border border-ai-line bg-ai-soft p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink">
-          <span className="font-semibold text-ai-ink">Así entendimos tu perfil.</span> Revisa, corrige lo que no encaje y confirma. Nada se
+          <span className="font-semibold text-ai-ink">{perfil.origen === "ia_sin_confirmar" ? "Así entendimos tu perfil." : "Revisa tu perfil."}</span> Revisa, corrige lo que no encaje y confirma. Nada se
           publica hasta que lo hagas.
         </p>
         <LocalProcessing className="shrink-0" />
       </div>
 
-      <ReviewBlock title="Fortalezas" desc="Indica tu nivel en cada una. Pulsa una etiqueta para corregirla." badge={<AIBadge label="Interpretado por IA" />}>
+      <ReviewBlock title="Fortalezas" desc="Indica tu nivel en cada una. Pulsa una etiqueta para corregirla." badge={perfil.origen === "ia_sin_confirmar" ? <AIBadge label="Interpretado por IA" /> : null}>
         <TagEditor
           items={fortalezaNames}
           onChange={setFortalezas}
@@ -194,8 +198,18 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
         <TagEditor items={perfil.reforzar} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
       </ReviewBlock>
 
-      <ReviewBlock title="Intereses" desc="Temas en los que te gustaría trabajar." badge={<AIBadge label="Interpretado por IA" />}>
+      <ReviewBlock title="Intereses" desc="Temas en los que te gustaría trabajar." badge={perfil.origen === "ia_sin_confirmar" ? <AIBadge label="Interpretado por IA" /> : null}>
         <TagEditor items={perfil.intereses} onChange={set("intereses")} placeholder="Agregar, p. ej. Fintech" />
+      </ReviewBlock>
+
+      <ReviewBlock title="Experiencia" desc="Conserva solo experiencias que hayas tenido.">
+        <TagEditor items={perfil.experiencia ?? []} onChange={set("experiencia")} placeholder="Agregar experiencia real" />
+      </ReviewBlock>
+
+      <ReviewBlock title="Resumen público" desc="Comprueba que el texto sea fiel a tu perfil.">
+        <textarea rows={3} value={perfil.resumen_publico ?? ""}
+          onChange={(event) => set("resumen_publico")(event.target.value)}
+          className="w-full rounded-lg border border-line bg-surface p-3 text-sm" />
       </ReviewBlock>
 
       <ReviewBlock
@@ -229,11 +243,11 @@ function Done() {
       </span>
       <h1 className="mt-6 text-h1 font-bold">¡Tu perfil está listo!</h1>
       <p className="mt-2 max-w-md text-ink-2">
-        Ya estamos buscando personas y proyectos que complementen lo que sabes hacer. Te avisaremos cuando encontremos algo.
+        Tu perfil confirmado está guardado. Ya puedes explorar personas y proyectos.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <Button size="lg" onClick={() => navigate("/match")}>
-          Ver mi primera coincidencia <ArrowRight aria-hidden="true" className="size-4" />
+          Explorar <ArrowRight aria-hidden="true" className="size-4" />
         </Button>
         <Button size="lg" variant="secondary" onClick={() => navigate("/inicio")}>
           Ir al inicio
@@ -288,9 +302,13 @@ export default function ProfileSetupPage() {
   const confirm = async () => {
     const usuarioLocal = getSessionUser()
     const datosPerfil = {
-      ...perfil,
       nombre: textos.nombre.trim(),
       carrera: usuarioLocal.carrera || "",
+      fortalezas: perfil.fortalezas,
+      reforzar: perfil.reforzar,
+      intereses: perfil.intereses,
+      experiencia: perfil.experiencia ?? [],
+      resumen_publico: perfil.resumen_publico ?? "",
       disponibilidad,
       visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
       pausado: false,
@@ -298,7 +316,7 @@ export default function ProfileSetupPage() {
 
     setSaving(true)
     try {
-      const guardado = await guardarPerfil(datosPerfil)
+      const guardado = await confirmarPerfil(datosPerfil)
       localStorage.setItem("usuario", JSON.stringify({
         ...usuarioLocal,
         nombre: guardado.nombre,

@@ -6,9 +6,11 @@ import { ComplementLevel } from "../recommendation/RecommendationCard"
 import { coverage, formatDate } from "../../lib/projects"
 
 export function TypeBadge({ tipo }) {
+  const labels = { academico: "Académico", personal: "Personal", deportivo: "Deportivo",
+    videojuegos: "Videojuegos", general: "General" }
   return (
     <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-medium text-ink-2">
-      {tipo === "academico" ? "Académico" : "Personal"}
+      {labels[tipo] ?? tipo}
     </span>
   )
 }

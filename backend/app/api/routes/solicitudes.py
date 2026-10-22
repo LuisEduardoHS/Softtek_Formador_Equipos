@@ -6,11 +6,14 @@ from app.models.participante import ParticipanteEvento
 from app.models.evento import Evento
 from app.models.usuario import PerfilUsuario, Usuario
 from app.schemas.solicitud import SolicitudCreate, SolicitudUpdate
+from app.core.security import get_current_user, require_self
 
 router = APIRouter()
 
 @router.get("/invitaciones/{id_usuario}")
-def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
+def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db),
+                         actor: Usuario = Depends(get_current_user)):
+    require_self(id_usuario, actor)
     solicitudes = db.query(SolicitudEquipo).filter(
         (SolicitudEquipo.id_destinatario == id_usuario)
         | (SolicitudEquipo.id_remitente == id_usuario)
@@ -60,7 +63,9 @@ def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db)):
     return resultado
 
 @router.post("/invitaciones/")
-def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_db)):
+def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_db),
+                   actor: Usuario = Depends(get_current_user)):
+    require_self(de_id, actor)
     evento = db.query(Evento).filter(Evento.id_evento == sol.id_evento).first()
     destinatario = db.query(Usuario).filter(Usuario.id_usuario == sol.id_destinatario).first()
     if not evento or evento.creador_id != de_id:
@@ -68,11 +73,18 @@ def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No encontramos un evento tuyo para enviar esta invitación.",
         )
+    if evento.estado != "Abierto":
+        raise HTTPException(status_code=409, detail="El evento no está abierto a invitaciones.")
     if not destinatario:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No encontramos a la persona que quieres invitar.",
         )
+    if destinatario.estado_cuenta != "Activa":
+        raise HTTPException(status_code=409, detail="La cuenta destinataria no está activa.")
+    perfil_destinatario = db.get(PerfilUsuario, destinatario.id_usuario)
+    if perfil_destinatario and (perfil_destinatario.datos_crudos or {}).get("pausado", False):
+        raise HTTPException(status_code=409, detail="El perfil destinatario no está disponible.")
     if sol.id_destinatario == de_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -104,10 +116,12 @@ def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_
     return {"id": nueva_solicitud.id_solicitud, "estado": "pendiente"}
 
 @router.patch("/invitaciones/{id_solicitud}")
-def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Session = Depends(get_db)):
+def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Session = Depends(get_db),
+                        actor: Usuario = Depends(get_current_user)):
     db_sol = db.query(SolicitudEquipo).filter(SolicitudEquipo.id_solicitud == id_solicitud).first()
     if not db_sol:
         raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+    require_self(db_sol.id_destinatario, actor)
 
     estado_normalizado = sol_update.estado.strip().casefold()
     if estado_normalizado not in {"aceptada", "rechazada"}:
@@ -120,6 +134,10 @@ def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Sess
             status_code=status.HTTP_409_CONFLICT,
             detail="Esta invitación ya fue respondida.",
         )
+    if estado_normalizado == "aceptada":
+        evento = db.get(Evento, db_sol.id_evento)
+        if not evento or evento.estado != "Abierto":
+            raise HTTPException(status_code=409, detail="El evento ya no acepta integrantes.")
 
     estado_guardado = estado_normalizado.capitalize()
     db_sol.estado = estado_guardado
@@ -147,7 +165,9 @@ def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Sess
     return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
 
 @router.get("/equipos/{id_usuario}")
-def obtener_equipos(id_usuario: int, db: Session = Depends(get_db)):
+def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
+                    actor: Usuario = Depends(get_current_user)):
+    require_self(id_usuario, actor)
     usuario_actual = db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
     if not usuario_actual:
         raise HTTPException(status_code=404, detail="Usuario no encontrado.")
@@ -240,7 +260,6 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db)):
             "descripcion_libre": evento.descripcion_libre,
             "detalles_especificos": {**detalles, "roles": roles},
             "requisitos_ia": requisitos,
-            "embedding_requisitos": evento.embedding_requisitos or {},
             "estado": evento.estado,
             "fecha_creacion": evento.fecha_creacion.isoformat() if evento.fecha_creacion else None,
         }

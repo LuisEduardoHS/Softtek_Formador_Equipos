@@ -3,18 +3,29 @@
  */
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000"
+const CATEGORIES = { academico: "Academico", personal: "Personal", deportivo: "Deportivo",
+  videojuegos: "Videojuegos", general: "General" }
+const toCategory = (tipo) => CATEGORIES[tipo] ?? "General"
 
 // Cliente HTTP conectado a tu backend local
 async function request(path, { method = "GET", body } = {}) {
+  const token = sessionStorage.getItem("access_token")
   const res = await fetch(`${API_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   })
   
   if (!res.ok) {
+    if (res.status === 401 && !path.startsWith("/auth/")) {
+      sessionStorage.removeItem("access_token")
+      localStorage.removeItem("usuario")
+      window.dispatchEvent(new Event("session-expired"))
+    }
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Error ${res.status} en ${path}`);
+    const error = new Error(typeof errorData.detail === "string" ? errorData.detail : `Error ${res.status} en ${path}`)
+    error.status = res.status
+    throw error
   }
   return res.json();
 }
@@ -46,6 +57,10 @@ export function iniciarSesion({ correo, password }) {
   })
 }
 
+export function verificarSesion() {
+  return request("/auth/me")
+}
+
 /* ---------------------------- Perfil ---------------------------- */
 
 export async function obtenerPerfil() {
@@ -62,11 +77,11 @@ function mapPerfil(perfil) {
   const fortalezas = Array.isArray(datos.fortalezas)
     ? datos.fortalezas
       .map((fortaleza) =>
-        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: "intermedio" } : fortaleza,
+        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: null } : fortaleza,
       )
       .filter((fortaleza) => fortaleza && typeof fortaleza.nombre === "string")
     : Array.isArray(datos.habilidades)
-      ? datos.habilidades.map((nombre) => ({ nombre, nivel: "intermedio" }))
+      ? datos.habilidades.map((nombre) => ({ nombre, nivel: null }))
       : []
 
   return {
@@ -122,6 +137,15 @@ export async function guardarPerfil(perfil) {
   return mapPerfil(actualizado)
 }
 
+export async function confirmarPerfil(perfil) {
+  const confirmado = await request("/perfil/confirmar", { method: "POST", body: perfil })
+  return mapPerfil(confirmado)
+}
+
+export function reintentarEmbeddingPerfil() {
+  return request("/perfil/embedding/reintentar", { method: "POST" })
+}
+
 export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
   const params = new URLSearchParams({ limit: String(limit) })
   if (q.trim()) params.set("q", q.trim())
@@ -139,13 +163,15 @@ function mapEventoAProyecto(evento) {
     ? detalles.roles
     : Array.isArray(requisitos.roles)
       ? requisitos.roles
-      : []
+      : Array.isArray(requisitos.roles_buscados)
+        ? requisitos.roles_buscados.map((nombre) => ({ nombre, habilidades: [], indispensable: false }))
+        : []
 
   return {
     id: String(evento.id_evento),
     titulo: evento.titulo,
     descripcion: evento.descripcion_libre ?? "",
-    tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
+    tipo: detalles.tipo || evento.categoria_principal?.toLowerCase() || "academico",
     materia: detalles.materia ?? "",
     creadorId: String(evento.creador_id),
     integrantes: Number(detalles.integrantes) || 1,
@@ -166,7 +192,7 @@ export function obtenerProyectos() {
   return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
 }
 
-export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles }) {
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles, requirements }) {
   const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
   const creadorId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(creadorId) || creadorId <= 0) {
@@ -178,7 +204,7 @@ export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes,
     body: {
       creador_id: creadorId,
       titulo,
-      categoria_principal: tipo === "personal" ? "Personal" : "Academico",
+      categoria_principal: toCategory(tipo),
       descripcion_libre: descripcion,
       detalles_especificos: {
         tipo,
@@ -187,7 +213,16 @@ export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes,
         fechaLimite: fechaLimite || null,
         roles,
       },
-      requisitos_ia: { roles },
+      requisitos_confirmados: requirements ? {
+        ...requirements,
+        categoria: toCategory(tipo),
+        roles_buscados: roles.map((r) => r.nombre.trim()).filter(Boolean),
+        habilidades_obligatorias: [...new Set([...(requirements.habilidades_obligatorias ?? []),
+          ...roles.filter((r) => r.indispensable).flatMap((r) => r.habilidades)])],
+        habilidades_deseables: [...new Set([...(requirements.habilidades_deseables ?? []),
+          ...roles.filter((r) => !r.indispensable).flatMap((r) => r.habilidades)])],
+      } : null,
+      confirmado_por_creador: Boolean(requirements),
     },
   }).then(mapEventoAProyecto)
 }
@@ -202,8 +237,9 @@ export async function obtenerProyecto(id) {
 // ============================================================================
 
 export function interpretarPerfil(textos) {
-  // TODO(backend): POST /ia/interpretar-perfil
-  return Promise.resolve({ fortalezas: [], reforzar: [], intereses: [] });
+  return request("/perfil/interpretar", { method: "POST", body: {
+    fortalezas: textos.fortalezas, reforzar: textos.reforzar, intereses: textos.intereses,
+  } })
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
@@ -212,8 +248,12 @@ export function solicitarUnirse(projectId, { rolId, mensaje }) {
 }
 
 export function interpretarProyecto(proyecto) {
-  // TODO(backend): POST /ia/interpretar-proyecto
-  return Promise.resolve({ roles: [] });
+  return request("/eventos/interpretar", { method: "POST", body: {
+    descripcion_libre: proyecto.descripcion,
+    categoria_principal: toCategory(proyecto.tipo),
+    detalles_especificos: { titulo: proyecto.titulo, materia: proyecto.materia,
+      integrantes: proyecto.integrantes, fechaLimite: proyecto.fechaLimite || null },
+  } })
 }
 
 export function obtenerRecomendaciones() {

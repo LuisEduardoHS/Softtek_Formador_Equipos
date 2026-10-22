@@ -6,6 +6,7 @@ from app.models.evento import Evento
 from app.models.participante import ParticipanteEvento
 from app.models.solicitud import SolicitudEquipo
 from app.models.usuario import PerfilUsuario, Usuario
+from app.core.security import get_current_user, require_self
 
 router = APIRouter(prefix="/notificaciones", tags=["Notificaciones"])
 
@@ -145,7 +146,9 @@ def _obtener_recomendaciones(db, usuario_id):
 
 
 @router.get("/{id_usuario}")
-def obtener_notificaciones(id_usuario: int, db: Session = Depends(get_db)):
+def obtener_notificaciones(id_usuario: int, db: Session = Depends(get_db),
+                           actor: Usuario = Depends(get_current_user)):
+    require_self(id_usuario, actor)
     usuario = db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado.")

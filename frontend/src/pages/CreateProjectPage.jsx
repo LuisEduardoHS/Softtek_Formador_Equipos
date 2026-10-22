@@ -11,6 +11,7 @@ import { Field, Segmented } from "../components/ui/Controls"
 import { useToast } from "../components/ui/Toast"
 import { crearProyecto, interpretarProyecto } from "../services/api"
 import { inputCls } from "../lib/ui"
+import { getSessionUser } from "../lib/session"
 
 const STEPS = ["Describe tu proyecto", "Roles necesarios"]
 
@@ -81,15 +82,14 @@ function DetailsStep({ form, set, errors }) {
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <p className="mb-1.5 text-sm font-semibold">Tipo de proyecto</p>
-          <Segmented
-            label="Tipo de proyecto"
-            value={form.tipo}
-            onChange={(v) => set("tipo", v)}
-            options={[
-              ["academico", "Académico"],
-              ["personal", "Personal"],
-            ]}
-          />
+          <div className="max-w-full overflow-x-auto">
+            <Segmented label="Tipo de proyecto" value={form.tipo} onChange={(v) => set("tipo", v)}
+              options={[
+                ["academico", "Académico"], ["personal", "Personal"],
+                ["deportivo", "Deportivo"], ["videojuegos", "Videojuegos"],
+                ["general", "General"],
+              ]} />
+          </div>
         </div>
         <Field id={ids.m} label="Materia" optional>
           <input
@@ -176,30 +176,41 @@ function RoleCard({ role, index, onChange, onRemove }) {
   )
 }
 
-function RolesStep({ form, roles, setRoles }) {
+function RolesStep({ form, roles, setRoles, requirements, setRequirements, suggestedByAi, setSuggestedByAi }) {
   const [state, setState] = useState(roles ? "ready" : "loading")
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     if (roles) return
     let alive = true
-    interpretarProyecto(form).then(
-      (res) => {
+    interpretarProyecto(form).then((res) => {
         if (!alive) return
-        setRoles(res.roles.map((r, i) => ({ ...r, id: `n${i}` })))
+        const req = res.requisitos
+        if (!req || !Array.isArray(req.roles_buscados)) throw new Error("Respuesta incompleta")
+        setRequirements(req)
+        setSuggestedByAi(true)
+        setRoles((req.roles_buscados ?? []).map((nombre, i) => ({
+          id: `n${i}`, nombre, habilidades: [], indispensable: false,
+        })))
         setState("ready")
-      },
-      () => alive && setState("error"),
-    )
+      }).catch(() => alive && setState("error"))
     return () => {
       alive = false
     }
-  }, [attempt, roles, form, setRoles])
+  }, [attempt, roles, form, setRoles, setRequirements, setSuggestedByAi])
 
   if (state === "loading") {
     return (
       <div className="space-y-4" aria-busy="true">
         <AILoading text="La IA está identificando los roles que necesita tu proyecto…" />
+        <Button variant="secondary" onClick={() => {
+          setRequirements({ habilidades_obligatorias: [], habilidades_deseables: [],
+            intereses_relacionados: [], restricciones_explicitas: [],
+            resumen: "", titulo_normalizado: "" })
+          setRoles([])
+          setSuggestedByAi(false)
+          setState("ready")
+        }}>Revisar manualmente</Button>
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} className="h-40 w-full rounded-2xl" />
         ))}
@@ -208,13 +219,18 @@ function RolesStep({ form, roles, setRoles }) {
   }
   if (state === "error") {
     return (
-      <ErrorState
-        message="No pudimos proponer los roles. Puedes reintentar o agregarlos tú."
-        onRetry={() => {
-          setState("loading")
-          setAttempt((a) => a + 1)
-        }}
-      />
+      <div className="space-y-3">
+        <ErrorState message="No pudimos proponer los roles. Puedes reintentar o agregarlos tú."
+          onRetry={() => { setState("loading"); setAttempt((a) => a + 1) }} />
+        <Button variant="secondary" onClick={() => {
+          setRequirements({ habilidades_obligatorias: [], habilidades_deseables: [],
+            intereses_relacionados: [], restricciones_explicitas: [],
+            resumen: "", titulo_normalizado: "" })
+          setRoles([])
+          setSuggestedByAi(false)
+          setState("ready")
+        }}>Revisar manualmente</Button>
+      </div>
     )
   }
 
@@ -227,7 +243,7 @@ function RolesStep({ form, roles, setRoles }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-2 rounded-xl border border-ai-line bg-ai-soft p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm">
-          <span className="font-semibold text-ai-ink">Estos son los roles que creemos que necesitas.</span> Renómbralos, quítalos o agrega
+          <span className="font-semibold text-ai-ink">{suggestedByAi ? "Estos son los roles propuestos para tu proyecto." : "Define los roles que necesita tu proyecto."}</span> Renómbralos, quítalos o agrega
           otros. Marca cuáles son indispensables.
         </p>
         <LocalProcessing className="shrink-0" />
@@ -246,6 +262,18 @@ function RolesStep({ form, roles, setRoles }) {
         ))}
       </ul>
 
+      {requirements && <Card className="space-y-5 p-5">
+        <div><h2 className="text-h3 font-semibold">Revisa los requisitos</h2>
+          <p className="text-sm text-ink-2">Corrige lo propuesto antes de confirmar. Solo lo que dejes aquí será requisito publicado.</p></div>
+        {[["habilidades_obligatorias", "Habilidades obligatorias"],
+          ["habilidades_deseables", "Habilidades deseables"],
+          ["restricciones_explicitas", "Condiciones de participación"]].map(([key, label]) =>
+          <div key={key}><p className="mb-2 text-sm font-semibold">{label}</p>
+            <TagEditor items={requirements[key] ?? []}
+              onChange={(items) => setRequirements((r) => ({ ...r, [key]: items }))}
+              variant="needed" placeholder={`Agregar ${label.toLowerCase()}`} /></div>)}
+      </Card>}
+
       <button
         type="button"
         onClick={add}
@@ -260,18 +288,34 @@ function RolesStep({ form, roles, setRoles }) {
 /* ------------------------------ Página ------------------------------ */
 
 const EMPTY = { titulo: "", descripcion: "", tipo: "academico", materia: "", integrantes: 4, fechaLimite: "" }
+const draftKey = () => `project-draft-6a-${getSessionUser().id_usuario || "anonymous"}`
+function readDraft() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(draftKey()) || "null")
+    return value?.form && typeof value.form === "object" ? value : null
+  } catch { return null }
+}
 
 export default function CreateProjectPage() {
   const navigate = useNavigate()
   const toast = useToast()
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState(EMPTY)
-  const [roles, setRoles] = useState(null)
-  const [analyzedFor, setAnalyzedFor] = useState(null)
+  const [form, setForm] = useState(() => readDraft()?.form ?? EMPTY)
+  const [roles, setRoles] = useState(() => readDraft()?.requirements ? readDraft()?.roles ?? null : null)
+  const [requirements, setRequirements] = useState(() => readDraft()?.requirements ?? null)
+  const [suggestedByAi, setSuggestedByAi] = useState(() => Boolean(readDraft()?.suggestedByAi))
+  const [analyzedFor, setAnalyzedFor] = useState(() => {
+    const draft = readDraft()
+    return draft?.roles && draft?.requirements ? `${draft.form.titulo}|${draft.form.descripcion}|${draft.form.integrantes}` : null
+  })
   const [errors, setErrors] = useState({})
   const [published, setPublished] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [createdProjectId, setCreatedProjectId] = useState(null)
+
+  useEffect(() => {
+    if (!published) sessionStorage.setItem(draftKey(), JSON.stringify({ form, roles, requirements, suggestedByAi }))
+  }, [form, roles, requirements, suggestedByAi, published])
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -287,6 +331,8 @@ export default function CreateProjectPage() {
     const key = `${form.titulo}|${form.descripcion}|${form.integrantes}`
     if (key !== analyzedFor) {
       setRoles(null)
+      setRequirements(null)
+      setSuggestedByAi(false)
       setAnalyzedFor(key)
     }
     setStep(1)
@@ -296,9 +342,10 @@ export default function CreateProjectPage() {
   const publish = async () => {
     setPublishing(true)
     try {
-      const proyecto = await crearProyecto({ ...form, roles })
+      const proyecto = await crearProyecto({ ...form, roles, requirements })
       setCreatedProjectId(proyecto.id)
       setPublished(true)
+      sessionStorage.removeItem(draftKey())
       toast("¡Proyecto guardado en la base de datos!")
     } catch (error) {
       console.error("Error al publicar proyecto:", error)
@@ -318,11 +365,11 @@ export default function CreateProjectPage() {
         </span>
         <h1 className="mt-6 text-h1 font-bold">¡Tu proyecto está publicado!</h1>
         <p className="mt-2 text-ink-2">
-          La IA ya está buscando personas que cubran los {roles.length} roles. Te avisaremos en cuanto haya candidatos.
+          El proyecto está publicado con los roles y requisitos que confirmaste.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           <Button size="lg" onClick={() => navigate(`/proyectos/${createdProjectId}`)}>
-            Ver candidatos <ArrowRight aria-hidden="true" className="size-4" />
+            Ver proyecto <ArrowRight aria-hidden="true" className="size-4" />
           </Button>
           <Button size="lg" variant="secondary" as={Link} to="/inicio">
             Ir al inicio
@@ -339,14 +386,14 @@ export default function CreateProjectPage() {
       </Link>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-h1 font-bold">Crear proyecto</h1>
-        {step === 1 && <AIBadge label="Roles propuestos por IA" />}
+        {step === 1 && suggestedByAi && <AIBadge label="Roles propuestos por IA" />}
       </div>
       <div className="mb-8">
         <ProgressSteps steps={STEPS} current={step} />
       </div>
 
       <div key={step} className="animate-fade-up">
-        {step === 0 ? <DetailsStep form={form} set={set} errors={errors} /> : <RolesStep form={form} roles={roles} setRoles={setRoles} />}
+        {step === 0 ? <DetailsStep form={form} set={set} errors={errors} /> : <RolesStep form={form} roles={roles} setRoles={setRoles} requirements={requirements} setRequirements={setRequirements} suggestedByAi={suggestedByAi} setSuggestedByAi={setSuggestedByAi} />}
       </div>
 
       {/* Acciones fijas (sobre la barra inferior en móvil) */}
@@ -366,7 +413,7 @@ export default function CreateProjectPage() {
               Continuar <ArrowRight aria-hidden="true" className="size-4" />
             </Button>
           ) : (
-            <Button onClick={publish} disabled={!validRoles || publishing} className="min-w-36">
+            <Button onClick={publish} disabled={!validRoles || !requirements || publishing} className="min-w-36">
               <CircleCheck aria-hidden="true" className="size-4" /> {publishing ? "Publicando…" : "Publicar"}
             </Button>
           )}

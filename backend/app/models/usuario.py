@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, JSON, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, JSON, DateTime, Text
 from sqlalchemy.sql import func
 from app.db.database import Base
 
@@ -20,5 +20,17 @@ class PerfilUsuario(Base):
     __tablename__ = "perfiles_usuarios"
     
     usuario_id = Column(Integer, ForeignKey("usuarios.id_usuario", ondelete="CASCADE"), primary_key=True)
+    nombre_mostrar = Column(String(100), nullable=True)
     datos_crudos = Column(JSON, default={})
     atributos_dinamicos = Column(JSON, default={})
+    resumen_publico_ia = Column(Text, nullable=True)
+    perfil_estructurado_ia = Column(JSON, nullable=True)  # solo revisión confirmada
+    perfil_borrador_ia = Column(JSON, nullable=True)  # extracción aún sin confirmar
+    embedding_perfil = Column(JSON, nullable=True)  # list[float] o NULL
+    perfil_estado_ia = Column(String(32), nullable=True)
+    perfil_fuente_revision = Column(String(64), nullable=True)
+    perfil_embedding_model = Column(String(100), nullable=True)
+    perfil_embedding_pipeline = Column(String(60), nullable=True)
+    perfil_embedding_fuente_revision = Column(String(64), nullable=True)
+    perfil_confirmado_at = Column(DateTime, nullable=True)
+    perfil_procesado_at = Column(DateTime, nullable=True)

@@ -1,5 +1,6 @@
 import json
 import math
+import httpx
 
 from ollama import Client, ResponseError, RequestError
 
@@ -15,10 +16,10 @@ class OllamaServiceError(Exception):
 
 
 class OllamaClient:
-    def __init__(self):
+    def __init__(self, timeout: float = 120.0):
         self.client = Client(
             host=OLLAMA_HOST,
-            timeout=120.0,
+            timeout=timeout,
         )
 
     def generate_text(self, prompt: str) -> str:
@@ -52,7 +53,7 @@ class OllamaClient:
 
             return content
 
-        except (ResponseError, RequestError) as error:
+        except (ResponseError, RequestError, httpx.HTTPError) as error:
             raise OllamaServiceError(
                 f"Error comunicarse con llama: {error}"
             ) from error
@@ -77,7 +78,7 @@ class OllamaClient:
                 format=schema,
                 options={"temperature": 0},
             )
-        except (ResponseError, RequestError) as error:
+        except (ResponseError, RequestError, httpx.HTTPError) as error:
             raise OllamaServiceError(f"Error al consultar Ollama: {error}") from error
         content = response.message.content
         if not isinstance(content, str) or not content.strip():
@@ -114,7 +115,7 @@ class OllamaClient:
                 raise OllamaServiceError("Nomic devolvió un embedding de dimensión incorrecta.")
             return [float(value) for value in vector]
 
-        except (ResponseError, RequestError) as error:
+        except (ResponseError, RequestError, httpx.HTTPError) as error:
             raise OllamaServiceError(
                 f"Error al generar embedding: {error}"
             ) from error

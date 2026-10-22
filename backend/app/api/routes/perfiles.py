@@ -4,8 +4,112 @@ from typing import Optional
 from app.db.database import get_db
 from app.models.usuario import Usuario, PerfilUsuario
 from app.schemas.perfil import PerfilPublicoOut, PerfilUpdate, PerfilOut
+from app.core.security import get_current_user, require_self
+from fastapi.concurrency import run_in_threadpool
+from app.schemas.ai_integration import ProfileInterpretRequest, ProfileReviewed
+from app.services.ai.profile_parser import ProfileParser
+from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
+from app.services.ai.schemas import StructuredProfile
+from app.services.ai.integration import content_revision, utc_now, process_profile_embedding
 
 router = APIRouter(prefix="/perfil", tags=["Perfil de Usuario"])
+
+
+def _own_profile(db: Session, actor: Usuario) -> PerfilUsuario:
+    perfil = db.get(PerfilUsuario, actor.id_usuario)
+    if perfil is None:
+        perfil = PerfilUsuario(usuario_id=actor.id_usuario, datos_crudos={}, atributos_dinamicos={})
+        db.add(perfil)
+        db.flush()
+    return perfil
+
+
+def _private_profile(usuario: Usuario, perfil: PerfilUsuario) -> PerfilOut:
+    return PerfilOut(
+        usuario_id=usuario.id_usuario, nombre=usuario.nombre, correo=usuario.correo,
+        carrera=usuario.carrera, estado_geografico=usuario.estado_geografico,
+        municipio=usuario.municipio, rol_sistema=usuario.rol_sistema,
+        datos_crudos=perfil.datos_crudos or {},
+        atributos_dinamicos=perfil.atributos_dinamicos or {},
+        perfil_estructurado_ia=perfil.perfil_estructurado_ia,
+        perfil_estado_ia=perfil.perfil_estado_ia,
+    )
+
+
+@router.post("/interpretar")
+async def interpretar_perfil(payload: ProfileInterpretRequest,
+                            db: Session = Depends(get_db),
+                            actor: Usuario = Depends(get_current_user)):
+    perfil = _own_profile(db, actor)
+    raw = dict(perfil.datos_crudos or {})
+    raw["borrador_texto_ia"] = payload.model_dump()
+    perfil.datos_crudos = raw
+    perfil.perfil_borrador_ia = None
+    perfil.perfil_estado_ia = "interpretando"
+    db.commit()
+    description = (f"Habilidades declaradas: {payload.fortalezas}\n"
+                   f"Áreas que desea reforzar: {payload.reforzar}\n"
+                   f"Intereses: {payload.intereses}")
+    try:
+        parsed = await run_in_threadpool(
+            ProfileParser(ai=OllamaClient(timeout=60)).parse_profile, description
+        )
+    except OllamaServiceError as error:
+        perfil.perfil_estado_ia = "interpretacion_pendiente"
+        db.commit()
+        raise HTTPException(status_code=503, detail="La interpretación no está disponible. Conservamos el borrador; puedes revisar manualmente y reintentar.") from error
+    perfil.perfil_borrador_ia = parsed.model_dump(mode="json")
+    perfil.perfil_estado_ia = "pendiente_revision"
+    db.commit()
+    return {
+        "fortalezas": [{"nombre": value, "nivel": None} for value in parsed.habilidades],
+        "reforzar": parsed.areas_mejora, "intereses": parsed.intereses,
+        "experiencia": parsed.experiencia, "resumen_publico": parsed.resumen_publico,
+        "estado": "pendiente_revision", "origen": "ia_sin_confirmar",
+    }
+
+
+@router.post("/confirmar", response_model=PerfilOut)
+async def confirmar_perfil(payload: ProfileReviewed,
+                          db: Session = Depends(get_db),
+                          actor: Usuario = Depends(get_current_user)):
+    perfil = _own_profile(db, actor)
+    actor.nombre = payload.nombre
+    if payload.carrera is not None:
+        actor.carrera = payload.carrera
+    structured = payload.structured()
+    confirmed = structured.model_dump(mode="json")
+    perfil.perfil_estructurado_ia = confirmed
+    perfil.resumen_publico_ia = structured.resumen_publico
+    perfil.perfil_fuente_revision = content_revision(confirmed)
+    perfil.perfil_confirmado_at = utc_now()
+    perfil.perfil_estado_ia = "pendiente_embedding"
+    perfil.embedding_perfil = None
+    perfil.perfil_embedding_fuente_revision = None
+    raw = dict(perfil.datos_crudos or {})
+    raw.update({"fortalezas": [item.model_dump() for item in payload.fortalezas],
+                "reforzar": payload.reforzar, "intereses": payload.intereses,
+                "disponibilidad": payload.disponibilidad,
+                "visibilidad": payload.visibilidad, "pausado": payload.pausado,
+                "bio": payload.resumen_publico})
+    perfil.datos_crudos = raw
+    db.commit()
+    await process_profile_embedding(db, perfil, structured)
+    db.commit()
+    db.refresh(perfil)
+    return _private_profile(actor, perfil)
+
+
+@router.post("/embedding/reintentar", response_model=PerfilOut)
+async def reintentar_embedding_perfil(db: Session = Depends(get_db),
+                                     actor: Usuario = Depends(get_current_user)):
+    perfil = _own_profile(db, actor)
+    if not perfil.perfil_estructurado_ia:
+        raise HTTPException(status_code=409, detail="Primero confirma el perfil.")
+    structured = StructuredProfile.model_validate(perfil.perfil_estructurado_ia)
+    await process_profile_embedding(db, perfil, structured)
+    db.commit()
+    return _private_profile(actor, perfil)
 
 
 def crear_perfil_publico(usuario, perfil):
@@ -47,6 +151,7 @@ def listar_estudiantes(
     exclude_id: Optional[int] = Query(None, gt=0),
     limit: int = Query(100, ge=1, le=200),
     db: Session = Depends(get_db),
+    actor: Usuario = Depends(get_current_user),
 ):
     query = db.query(Usuario, PerfilUsuario).outerjoin(
         PerfilUsuario, PerfilUsuario.usuario_id == Usuario.id_usuario
@@ -70,9 +175,10 @@ def listar_estudiantes(
 
 
 @router.get("/publico/{usuario_id}", response_model=PerfilPublicoOut)
-def obtener_perfil_publico(usuario_id: int, db: Session = Depends(get_db)):
+def obtener_perfil_publico(usuario_id: int, db: Session = Depends(get_db),
+                          actor: Usuario = Depends(get_current_user)):
     usuario = db.query(Usuario).filter(Usuario.id_usuario == usuario_id).first()
-    if not usuario:
+    if not usuario or usuario.estado_cuenta != "Activa":
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado.",
@@ -89,10 +195,12 @@ def obtener_perfil_publico(usuario_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{usuario_id}", response_model=PerfilOut)
-def obtener_perfil(usuario_id: int, db: Session = Depends(get_db)):
+def obtener_perfil(usuario_id: int, db: Session = Depends(get_db),
+                   actor: Usuario = Depends(get_current_user)):
     """
     Obtiene los datos personales y el perfil extendido (habilidades, bio, intereses) de un usuario.
     """
+    require_self(usuario_id, actor)
     usuario = db.query(Usuario).filter(Usuario.id_usuario == usuario_id).first()
     if not usuario:
         raise HTTPException(
@@ -107,24 +215,16 @@ def obtener_perfil(usuario_id: int, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(perfil)
     
-    return PerfilOut(
-        usuario_id=usuario.id_usuario,
-        nombre=usuario.nombre,
-        correo=usuario.correo,
-        carrera=usuario.carrera,
-        estado_geografico=usuario.estado_geografico,
-        municipio=usuario.municipio,
-        rol_sistema=usuario.rol_sistema,
-        datos_crudos=perfil.datos_crudos or {},
-        atributos_dinamicos=perfil.atributos_dinamicos or {}
-    )
+    return _private_profile(usuario, perfil)
 
 
 @router.put("/{usuario_id}", response_model=PerfilOut)
-def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depends(get_db)):
+def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depends(get_db),
+                      actor: Usuario = Depends(get_current_user)):
     """
     Actualiza la información dinámica del perfil del usuario dentro de la columna JSON 'datos_crudos'.
     """
+    require_self(usuario_id, actor)
     usuario = db.query(Usuario).filter(Usuario.id_usuario == usuario_id).first()
     if not usuario:
         raise HTTPException(
@@ -157,18 +257,12 @@ def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depend
     
     # Asignar de nuevo el diccionario para que SQLAlchemy detecte el cambio en el campo JSON
     perfil.datos_crudos = datos_actuales
+    if datos_crudos is not None or any(key in nuevos_datos for key in ("bio", "habilidades", "intereses")):
+        perfil.perfil_estado_ia = "obsoleto"
+        perfil.embedding_perfil = None
+        perfil.perfil_embedding_fuente_revision = None
     
     db.commit()
     db.refresh(perfil)
     
-    return PerfilOut(
-        usuario_id=usuario.id_usuario,
-        nombre=usuario.nombre,
-        correo=usuario.correo,
-        carrera=usuario.carrera,
-        estado_geografico=usuario.estado_geografico,
-        municipio=usuario.municipio,
-        rol_sistema=usuario.rol_sistema,
-        datos_crudos=perfil.datos_crudos or {},
-        atributos_dinamicos=perfil.atributos_dinamicos or {}
-    )
+    return _private_profile(usuario, perfil)

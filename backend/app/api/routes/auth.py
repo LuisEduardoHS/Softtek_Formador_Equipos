@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 from app.db.database import get_db
 from app.schemas.usuario import UsuarioRegistro, UsuarioLogin
 from app.models.usuario import Usuario, PerfilUsuario
+from app.core.security import create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
 
@@ -36,16 +37,16 @@ def registrar_usuario(user: UsuarioRegistro, db: Session = Depends(get_db)):
     
     # 4. Insertar y confirmar el usuario en MySQL
     db.add(nuevo_usuario)
+    db.flush()
+    db.add(PerfilUsuario(usuario_id=nuevo_usuario.id_usuario))
+    token = create_access_token(nuevo_usuario.id_usuario)
     db.commit()
     db.refresh(nuevo_usuario)
     
-    # 5. Crear automáticamente su perfil de usuario vacío enlazado
-    nuevo_perfil = PerfilUsuario(usuario_id=nuevo_usuario.id_usuario)
-    db.add(nuevo_perfil)
-    db.commit()
-    
     return {
         "mensaje": "Usuario registrado exitosamente",
+        "access_token": token,
+        "token_type": "bearer",
         "usuario": {
             "id_usuario": nuevo_usuario.id_usuario,
             "nombre": nuevo_usuario.nombre,
@@ -67,8 +68,12 @@ def login_usuario(user: UsuarioLogin, db: Session = Depends(get_db)):
             detail="Correo o contraseña incorrectos."
         )
     
+    if db_user.estado_cuenta != "Activa":
+        raise HTTPException(status_code=403, detail="Cuenta inactiva.")
     return {
         "mensaje": "Inicio de sesión exitoso",
+        "access_token": create_access_token(db_user.id_usuario),
+        "token_type": "bearer",
         "usuario": {
             "id_usuario": db_user.id_usuario,
             "nombre": db_user.nombre,
@@ -76,3 +81,9 @@ def login_usuario(user: UsuarioLogin, db: Session = Depends(get_db)):
             "carrera": db_user.carrera
         }
     }
+
+
+@router.get("/me")
+def obtener_sesion(actor: Usuario = Depends(get_current_user)):
+    return {"id_usuario": actor.id_usuario, "nombre": actor.nombre,
+            "correo": actor.correo, "carrera": actor.carrera}

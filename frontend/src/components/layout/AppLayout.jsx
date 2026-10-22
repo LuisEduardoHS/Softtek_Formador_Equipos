@@ -36,6 +36,7 @@ export default function AppLayout() {
   const detalle = usuario.carrera || usuario.correo || ""
 
   function cerrarSesion() {
+    sessionStorage.removeItem("access_token")
     localStorage.removeItem("usuario")
     navigate("/", { replace: true })
   }
