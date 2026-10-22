@@ -1,7 +1,6 @@
 import { Check, CircleDashed, Send } from "lucide-react"
 import Avatar from "../ui/Avatar"
 import SkillChip from "../ui/SkillChip"
-import { studentById } from "../../data/mockData"
 import { firstName } from "../../lib/projects"
 
 /**
@@ -14,11 +13,7 @@ export default function RoleCoverage({ roles, invitedByRole = {}, highlightRolId
     <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {roles.map((r, i) => {
         const member = r.cubiertoPor
-          ? studentById(String(r.cubiertoPor)) ?? {
-              id: String(r.cubiertoPor),
-              nombre: "Integrante",
-              carrera: "",
-            }
+          ? { id: String(r.cubiertoPor), nombre: `Integrante ${r.cubiertoPor}`, carrera: "" }
           : null
         const invited = invitedByRole[r.id]
         return (
@@ -47,7 +42,7 @@ export default function RoleCoverage({ roles, invitedByRole = {}, highlightRolId
                 <Avatar name={member.nombre} size="sm" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-ink">
-                    {member.id === "u0" ? "Tú" : member.nombre}
+                    {member.nombre}
                   </p>
                   <p className="truncate text-xs text-ink-2">{member.carrera}</p>
                 </div>

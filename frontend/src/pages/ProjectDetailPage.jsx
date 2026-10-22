@@ -9,23 +9,21 @@ import SkillChip from "../components/ui/SkillChip"
 import { AIPanel, LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, CardSkeleton, EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
-import RecommendationCard from "../components/recommendation/RecommendationCard"
 import RoleCoverage from "../components/project/RoleCoverage"
 import { TypeBadge } from "../components/project/ProjectCard"
 import { CoverageBar } from "../components/team/TeamSummaryCard"
 import InviteModal from "../components/invite/InviteModal"
 import useAsync from "../hooks/useAsync"
-import { enviarRetroalimentacion, obtenerCandidatos, obtenerProyecto, solicitarUnirse } from "../services/api"
-import { currentUser, invitations, projectSuggestions, studentById, teams } from "../data/mockData"
+import { obtenerCandidatos, obtenerInvitaciones, obtenerProyecto, solicitarUnirse } from "../services/api"
 import { coverage, formatDate } from "../lib/projects"
 import { getSessionUser } from "../lib/session"
 
 /* ------------------------------ Encabezado ------------------------------ */
 
 function ProjectHeader({ project, action }) {
-  const creador = studentById(project.creadorId) ?? {
+  const creador = {
     id: String(project.creadorId),
-    nombre: `Usuario ${project.creadorId}`,
+    nombre: `Persona ${project.creadorId}`,
     carrera: "",
   }
   const usuarioLocal = getSessionUser()
@@ -73,9 +71,8 @@ function Candidates({ project }) {
   const fetchCandidates = useCallback(() => obtenerCandidatos(project.id), [project.id])
   const cands = useAsync(fetchCandidates)
   const [target, setTarget] = useState(null)
-  const [invited, setInvited] = useState(
-    () => new Set(invitations.filter((i) => i.projectId === project.id && i.tipo === "enviada" && i.estado === "pendiente").map((i) => i.paraId)),
-  )
+  const [invited, setInvited] = useState(new Set())
+  const [selectedRoles, setSelectedRoles] = useState({})
   const { pendientes } = coverage(project)
 
   if (cands.loading) {
@@ -87,60 +84,35 @@ function Candidates({ project }) {
     )
   }
   if (cands.status === "error") return <ErrorState message="No pudimos cargar los candidatos." onRetry={cands.reload} />
-  if (pendientes.length === 0) {
-    return (
-      <EmptyState icon={CircleCheck} title="¡Todos los roles están cubiertos!">
-        Tu equipo está completo. Ya pueden empezar a trabajar.
-      </EmptyState>
-    )
-  }
-
   return (
-    <div className="space-y-10">
-      {pendientes.map((rol) => {
-        const lista = cands.data.filter((c) => c.rolId === rol.id)
-        return (
-          <section key={rol.id} aria-labelledby={`rol-${rol.id}`}>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h3 id={`rol-${rol.id}`} className="text-h3 font-semibold">
-                Para <span className="text-warn-ink">{rol.nombre}</span>
-              </h3>
-              {rol.indispensable && (
-                <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-xs font-semibold text-ink-2">Indispensable</span>
-              )}
-              <span className="text-sm text-ink-2">
-                · {lista.length} {lista.length === 1 ? "candidato" : "candidatos"}
-              </span>
-            </div>
-            {lista.length === 0 ? (
-              <EmptyState icon={SearchX} title="Aún no encontramos a nadie para este rol" className="py-8">
-                Te avisaremos en cuanto alguien con este perfil esté disponible. Mientras, puedes buscar manualmente desde Inicio.
-              </EmptyState>
-            ) : (
-              <div className="space-y-4">
-                {lista.map((rec) => {
-                  const student = studentById(rec.studentId)
-                  return (
-                    <RecommendationCard
-                      key={rec.id}
-                      variant="expanded"
-                      student={student}
-                      rol={rol}
-                      rec={rec}
-                      project={project}
-                      invited={invited.has(student.id)}
-                      onInvite={() => setTarget({ student, rol })}
-                      onViewProfile={() => navigate(`/perfil/${student.id}`)}
-                      onFeedback={(v) => enviarRetroalimentacion(rec.id, { util: v === "util" })}
-                      onDismiss={(motivo) => enviarRetroalimentacion(rec.id, { util: false, motivo })}
-                    />
-                  )
-                })}
-              </div>
-            )}
-          </section>
-        )
-      })}
+    <div className="space-y-4">
+      {cands.data.length === 0 && <EmptyState icon={SearchX} title="Aún no hay candidatos recomendados">
+        Se mostrarán perfiles con consentimiento y evidencia confirmada cuando haya coincidencias elegibles.
+      </EmptyState>}
+      {cands.data.map((rec) => <Card key={rec.candidate_id} className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="font-semibold">Persona #{rec.candidate_id}</h3>
+            <p className="text-xs text-ink-2">{rec.eligibility === "needs_review" ? "Requiere revisión" : "Elegible"} · {rec.evidence_group === "insufficient_evidence" ? "Evidencia insuficiente" : "Evidencia confirmada"}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => navigate(`/perfil/${rec.candidate_id}`)}>Ver perfil</Button>
+            {pendientes.length > 0 && !invited.has(rec.candidate_id) && <>
+              <select aria-label={`Rol para persona ${rec.candidate_id}`}
+                value={selectedRoles[rec.candidate_id] ?? pendientes[0].id}
+                onChange={(event) => setSelectedRoles((prev) => ({ ...prev, [rec.candidate_id]: event.target.value }))}
+                className="rounded-lg border border-line bg-surface px-2 text-sm">
+                {pendientes.map((rol) => <option key={rol.id} value={rol.id}>{rol.nombre}</option>)}
+              </select>
+              <Button onClick={() => setTarget({ student: { id: String(rec.candidate_id), nombre: `Persona ${rec.candidate_id}` },
+                rol: pendientes.find((rol) => String(rol.id) === String(selectedRoles[rec.candidate_id] ?? pendientes[0].id)) })}>Invitar</Button>
+            </>}
+          </div>
+        </div>
+        {rec.explanation.strengths.map((fact, i) => <p key={`s${i}`} className="mt-2 text-sm text-ink">{fact}</p>)}
+        {rec.explanation.gaps.map((fact, i) => <p key={`g${i}`} className="mt-2 text-sm text-warn-ink">{fact}</p>)}
+        {rec.explanation.unknowns.map((fact, i) => <p key={`u${i}`} className="mt-2 text-sm text-ink-2">{fact}</p>)}
+      </Card>)}
 
       <InviteModal
         open={!!target}
@@ -148,7 +120,7 @@ function Candidates({ project }) {
         student={target?.student}
         rol={target?.rol}
         project={project}
-        onSent={(s) => setInvited((prev) => new Set(prev).add(s.id))}
+        onSent={(s) => { setInvited((prev) => new Set(prev).add(Number(s.id))); cands.reload() }}
       />
     </div>
   )
@@ -172,8 +144,8 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
       toast("Solicitud enviada. Te avisaremos cuando respondan.")
       onSent(rolId)
       onClose()
-    } catch {
-      toast("No pudimos enviar tu solicitud. Inténtalo de nuevo.", "error")
+    } catch (error) {
+      toast(error.message || "No pudimos enviar tu solicitud.", "error")
     } finally {
       setSending(false)
     }
@@ -239,23 +211,6 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
   )
 }
 
-function YourFit({ project, suggestion }) {
-  const rol = project.roles.find((r) => r.id === suggestion.rolId)
-  const mias = new Set(currentUser.fortalezas.map((f) => f.nombre))
-  return (
-    <AIPanel title={`Podrías cubrir «${rol.nombre}»`}>
-      <p>{suggestion.porQue}</p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {rol.habilidades.map((h) => (
-          <SkillChip key={h} variant={mias.has(h) ? "match" : "needed"}>
-            {h}
-          </SkillChip>
-        ))}
-      </div>
-    </AIPanel>
-  )
-}
-
 /* -------------------------------- Página -------------------------------- */
 
 // La key reinicia todo el estado al navegar de un proyecto a otro
@@ -267,20 +222,21 @@ export default function ProjectDetailRoute() {
 function ProjectDetailPage({ id }) {
   const fetchProject = useCallback(() => obtenerProyecto(id), [id])
   const { status, data: project, error, reload } = useAsync(fetchProject)
+  const sentInvitations = useAsync(obtenerInvitaciones)
   const [joinOpen, setJoinOpen] = useState(false)
   const [requestedRol, setRequestedRol] = useState(null)
 
   const invitedByRole = useMemo(() => {
     if (!project) return {}
     const map = {}
-    invitations
+    (sentInvitations.data ?? [])
       .filter((i) => i.projectId === project.id && i.tipo === "enviada" && i.estado === "pendiente")
       .forEach((i) => {
         const rol = project.roles.find((r) => r.nombre === i.rol)
-        if (rol) map[rol.id] = studentById(i.paraId).nombre
+        if (rol) map[rol.id] = i.destinatario?.nombre ?? `Persona ${i.paraId}`
       })
     return map
-  }, [project])
+  }, [project, sentInvitations.data])
 
   const back = (
     <Link to="/proyectos" className="mb-4 inline-flex min-h-9 items-center gap-1 text-sm font-medium text-ink-2 hover:text-ink">
@@ -329,8 +285,6 @@ function ProjectDetailPage({ id }) {
   const usuarioId = usuarioLocal.id_usuario
   const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
   const esIntegrante = usuarioId !== undefined && project.roles.some((r) => String(r.cubiertoPor) === String(usuarioId))
-  const team = teams.find((t) => t.projectId === project.id)
-  const suggestion = projectSuggestions.find((s) => s.projectId === project.id)
   const { cubiertos, total, pendientes } = coverage(project)
 
   let action
@@ -342,7 +296,7 @@ function ProjectDetailPage({ id }) {
     )
   } else if (esIntegrante) {
     action = (
-      <Button as={Link} to={team ? `/equipos/${team.id}` : "/equipos"} variant="secondary">
+      <Button as={Link} to="/equipos" variant="secondary">
         <Users aria-hidden="true" className="size-4" /> Ver mi equipo
       </Button>
     )
@@ -363,12 +317,6 @@ function ProjectDetailPage({ id }) {
       {back}
       <div className="space-y-10">
         <ProjectHeader project={project} action={action} />
-
-        {!esDueno && !esIntegrante && suggestion && (
-          <div className="animate-fade-up [animation-delay:80ms]">
-            <YourFit project={project} suggestion={suggestion} />
-          </div>
-        )}
 
         <section aria-labelledby="cov-title" className="animate-fade-up [animation-delay:120ms]">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -406,7 +354,7 @@ function ProjectDetailPage({ id }) {
           open
           onClose={() => setJoinOpen(false)}
           project={project}
-          defaultRolId={suggestion?.rolId}
+          defaultRolId={null}
           onSent={setRequestedRol}
         />
       )}

@@ -89,8 +89,10 @@ async def confirmar_perfil(payload: ProfileReviewed,
     raw = dict(perfil.datos_crudos or {})
     raw.update({"fortalezas": [item.model_dump() for item in payload.fortalezas],
                 "reforzar": payload.reforzar, "intereses": payload.intereses,
+                "experiencia": payload.experiencia,
                 "disponibilidad": payload.disponibilidad,
                 "visibilidad": payload.visibilidad, "pausado": payload.pausado,
+                "consentimiento_recomendaciones": payload.consentimiento_recomendaciones,
                 "bio": payload.resumen_publico})
     perfil.datos_crudos = raw
     db.commit()
@@ -256,8 +258,11 @@ def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depend
     datos_actuales.update(nuevos_datos)
     
     # Asignar de nuevo el diccionario para que SQLAlchemy detecte el cambio en el campo JSON
+    semantic_keys = {"fortalezas", "habilidades", "intereses", "reforzar", "bio", "experiencia", "disponibilidad"}
+    semantic_changed = any(datos_actuales.get(key) != (perfil.datos_crudos or {}).get(key)
+                           for key in semantic_keys)
     perfil.datos_crudos = datos_actuales
-    if datos_crudos is not None or any(key in nuevos_datos for key in ("bio", "habilidades", "intereses")):
+    if semantic_changed:
         perfil.perfil_estado_ia = "obsoleto"
         perfil.embedding_perfil = None
         perfil.perfil_embedding_fuente_revision = None

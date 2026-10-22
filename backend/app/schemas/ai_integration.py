@@ -31,6 +31,7 @@ class ProfileReviewed(_Strict):
     disponibilidad: list[str] = Field(default_factory=list)
     visibilidad: dict[str, bool]
     pausado: bool = False
+    consentimiento_recomendaciones: bool = False
 
     @model_validator(mode="after")
     def bounded_lists(self):

@@ -10,7 +10,7 @@ import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls
 import { useToast } from "../components/ui/Toast"
 import PublicProfile from "../components/profile/PublicProfile"
 import InviteModal from "../components/invite/InviteModal"
-import { guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
+import { confirmarPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 import { getSessionUser } from "../lib/session"
 
@@ -25,6 +25,7 @@ const PERFIL_DEFAULT = {
   grupoExterno: "",
   visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
   pausado: false,
+  consentimiento_recomendaciones: false,
 }
 
 /* ------------------------------ Edición ------------------------------ */
@@ -56,7 +57,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       ...p,
       fortalezas: names.map((n) => ({
         nombre: n,
-        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? "intermedio",
+        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? null,
       })),
     }))
 
@@ -74,7 +75,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       {aiDirty && (
         <div role="status" className="flex animate-fade-up items-center gap-3 rounded-xl border border-ai-line bg-ai-soft p-4 text-sm text-ink">
           <RefreshCw aria-hidden="true" className="size-4 shrink-0 text-ai-ink" />
-          Actualizaremos tus recomendaciones con estos cambios al guardar.
+          Confirmaremos los datos que cambiaste y actualizaremos su vector si Ollama está disponible.
         </div>
       )}
 
@@ -109,7 +110,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
         />
       </Section>
 
-      <Section title="Quiero reforzar" desc="La IA lo usa para encontrar quién te complementa." badge={<span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2"><Lock className="size-3" /> {perfil.visibilidad?.reforzar ? "Visible" : "Privado"}</span>}>
+      <Section title="Quiero reforzar" desc="Estas áreas no se consideran habilidades adquiridas." badge={<span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2"><Lock className="size-3" /> {perfil.visibilidad?.reforzar ? "Visible" : "Privado"}</span>}>
         <TagEditor items={perfil.reforzar || []} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
       </Section>
 
@@ -140,6 +141,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
           <Switch label="Mostrar «Quiero reforzar»" description="Privado por defecto." checked={perfil.visibilidad?.reforzar ?? false} onChange={setVis("reforzar")} />
           <Switch label="Compartir mi correo con mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
           <Switch label="Pausar mi perfil" checked={perfil.pausado ?? false} onChange={set("pausado")} />
+          <Switch label="Activar recomendaciones" description="Permite sugerir tu perfil a organizadores y mostrarte proyectos." checked={perfil.consentimiento_recomendaciones ?? false} onChange={set("consentimiento_recomendaciones")} />
         </div>
       </Section>
 
@@ -189,10 +191,21 @@ function MyProfile() {
 
   const save = async () => {
     try {
-      const actualizado = await guardarPerfil(perfil)
+      let actualizado
+      if (aiDirty) {
+        const confirmado = await confirmarPerfil({
+          nombre: perfil.nombre, carrera: perfil.carrera, fortalezas: perfil.fortalezas,
+          reforzar: perfil.reforzar, intereses: perfil.intereses,
+          experiencia: perfil.experiencia ?? [], resumen_publico: perfil.resumen_publico ?? "",
+          disponibilidad: perfil.disponibilidad, visibilidad: perfil.visibilidad,
+          pausado: perfil.pausado, consentimiento_recomendaciones: perfil.consentimiento_recomendaciones,
+        })
+        actualizado = await guardarPerfil({ ...confirmado, semestre: perfil.semestre,
+          grupoExterno: perfil.grupoExterno })
+      } else actualizado = await guardarPerfil(perfil)
       setSaved(actualizado)
       setPerfil(actualizado)
-      toast(aiDirty ? "Perfil guardado y recomendaciones actualizadas en MySQL." : "Perfil guardado en base de datos.", "success")
+      toast(aiDirty ? "Perfil confirmado; recomendaciones disponibles según tus permisos." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
       toast(error.message || "Error al guardar el perfil.", "error")

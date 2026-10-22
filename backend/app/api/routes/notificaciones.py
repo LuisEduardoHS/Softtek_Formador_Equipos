@@ -5,144 +5,31 @@ from app.db.database import get_db
 from app.models.evento import Evento
 from app.models.participante import ParticipanteEvento
 from app.models.solicitud import SolicitudEquipo
-from app.models.usuario import PerfilUsuario, Usuario
+from app.models.usuario import Usuario
 from app.core.security import get_current_user, require_self
+from app.services.ai.recommendations.orm_adapter import candidate_recommendations
 
 router = APIRouter(prefix="/notificaciones", tags=["Notificaciones"])
 
 
-def _normalizar(texto):
-    return texto.strip().casefold() if isinstance(texto, str) else ""
-
-
-def _habilidades_visibles(perfil):
-    if not perfil:
-        return set()
-
-    datos = perfil.datos_crudos or {}
-    if not isinstance(datos, dict):
-        return set()
-    visibilidad = datos.get("visibilidad") or {}
-    if not isinstance(visibilidad, dict):
-        visibilidad = {}
-    if not visibilidad.get("fortalezas", True) or datos.get("pausado", False):
-        return set()
-
-    habilidades = datos.get("fortalezas", datos.get("habilidades", []))
-    if not isinstance(habilidades, list):
-        return set()
-
-    nombres = set()
-    for habilidad in habilidades:
-        if isinstance(habilidad, str):
-            nombre = _normalizar(habilidad)
-        elif isinstance(habilidad, dict):
-            nombre = _normalizar(habilidad.get("nombre"))
-        else:
-            nombre = ""
-        if nombre:
-            nombres.add(nombre)
-    return nombres
-
-
-def _obtener_recomendaciones(db, usuario_id):
-    eventos = (
-        db.query(Evento)
-        .filter(Evento.creador_id == usuario_id, Evento.estado == "Abierto")
-        .order_by(Evento.fecha_creacion.desc())
-        .all()
-    )
-    if not eventos:
-        return []
-
-    ids_evento = [evento.id_evento for evento in eventos]
-    miembros = db.query(ParticipanteEvento).filter(
-        ParticipanteEvento.id_evento.in_(ids_evento)
-    ).all()
-    miembros_por_evento = {}
-    for miembro in miembros:
-        miembros_por_evento.setdefault(miembro.id_evento, set()).add(miembro.id_usuario)
-
-    invitaciones = db.query(SolicitudEquipo).filter(
-        SolicitudEquipo.id_evento.in_(ids_evento),
-        SolicitudEquipo.estado.ilike("pendiente"),
-    ).all()
-    invitados_por_evento = {}
-    for invitacion in invitaciones:
-        invitados_por_evento.setdefault(invitacion.id_evento, set()).add(invitacion.id_destinatario)
-
-    estudiantes = (
-        db.query(Usuario, PerfilUsuario)
-        .outerjoin(PerfilUsuario, PerfilUsuario.usuario_id == Usuario.id_usuario)
-        .filter(Usuario.estado_cuenta == "Activa", Usuario.id_usuario != usuario_id)
-        .all()
-    )
-
-    recomendaciones = []
+def _obtener_recomendaciones(db, actor: Usuario):
+    """Expose only the public, deterministic engine projection to the owner."""
+    eventos = db.query(Evento).filter(
+        Evento.creador_id == actor.id_usuario, Evento.estado == "Abierto"
+    ).order_by(Evento.fecha_creacion.desc()).all()
+    items = []
     for evento in eventos:
-        detalles = evento.detalles_especificos or {}
-        requisitos = evento.requisitos_ia or {}
-        if not isinstance(detalles, dict):
-            detalles = {}
-        if not isinstance(requisitos, dict):
-            requisitos = {}
-        roles = detalles.get("roles") or requisitos.get("roles") or []
-        if not roles and isinstance(requisitos.get("roles_buscados"), list):
-            habilidades = requisitos.get("habilidades_obligatorias", [])
-            roles = [
-                {"nombre": nombre, "habilidades": habilidades}
-                for nombre in requisitos["roles_buscados"]
-                if isinstance(nombre, str)
-            ]
-        if not isinstance(roles, list):
-            continue
-
-        excluidos = miembros_por_evento.get(evento.id_evento, set())
-        excluidos.update(invitados_por_evento.get(evento.id_evento, set()))
-        for rol_index, rol in enumerate(roles):
-            if not isinstance(rol, dict) or rol.get("cubiertoPor"):
-                continue
-
-            nombre_rol = rol.get("nombre")
-            habilidades_rol = rol.get("habilidades", [])
-            if not isinstance(habilidades_rol, list):
-                habilidades_rol = []
-            habilidades_globales = requisitos.get("habilidades_obligatorias", [])
-            if isinstance(habilidades_globales, list):
-                habilidades_rol = [*habilidades_rol, *habilidades_globales]
-            requeridas = {
-                habilidad
-                for valor in habilidades_rol
-                if (habilidad := _normalizar(valor))
-            }
-            nombre_normalizado = _normalizar(nombre_rol)
-            if nombre_normalizado:
-                requeridas.add(nombre_normalizado)
-            if not requeridas:
-                continue
-
-            for estudiante, perfil in estudiantes:
-                if estudiante.id_usuario in excluidos:
-                    continue
-                coincidentes = sorted(_habilidades_visibles(perfil) & requeridas)
-                if not coincidentes:
-                    continue
-
-                recomendaciones.append({
-                    "id": f"recomendacion-{evento.id_evento}-{estudiante.id_usuario}-{rol_index}",
-                    "grupo": "ia",
-                    "texto": (
-                        f"{estudiante.nombre} coincide con el rol «{nombre_rol or coincidentes[0]}» "
-                        f"en «{evento.titulo}» por {', '.join(coincidentes)}."
-                    ),
-                    "fecha": None,
-                    "accion": {
-                        "label": "Ver proyecto",
-                        "to": f"/proyectos/{evento.id_evento}",
-                    },
-                })
-
-    return recomendaciones
+        for rec in candidate_recommendations(db, evento, actor, top_n=3):
+            fact = (rec.explanation.strengths or rec.explanation.unknowns or
+                    ["Revisa la evidencia del candidato."])[0]
+            items.append({
+                "id": f"recomendacion-{evento.id_evento}-{rec.candidate_id}",
+                "grupo": "ia",
+                "texto": f"Candidato recomendado para «{evento.titulo}»: {fact}",
+                "fecha": None,
+                "accion": {"label": "Ver proyecto", "to": f"/proyectos/{evento.id_evento}"},
+            })
+    return items
 
 
 @router.get("/{id_usuario}")
@@ -199,7 +86,7 @@ def obtener_notificaciones(id_usuario: int, db: Session = Depends(get_db),
             "accion": accion,
         })
 
-    notificaciones.extend(_obtener_recomendaciones(db, id_usuario))
+    notificaciones.extend(_obtener_recomendaciones(db, actor))
 
     eventos_del_usuario = db.query(Evento.id_evento).outerjoin(
         ParticipanteEvento, ParticipanteEvento.id_evento == Evento.id_evento

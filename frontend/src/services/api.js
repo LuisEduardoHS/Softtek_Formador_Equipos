@@ -97,6 +97,9 @@ function mapPerfil(perfil) {
     fortalezas,
     reforzar: Array.isArray(datos.reforzar) ? datos.reforzar : [],
     intereses: Array.isArray(datos.intereses) ? datos.intereses : [],
+    experiencia: Array.isArray(perfil.perfil_estructurado_ia?.experiencia) ? perfil.perfil_estructurado_ia.experiencia : [],
+    resumen_publico: perfil.perfil_estructurado_ia?.resumen_publico ?? datos.bio ?? "",
+    consentimiento_recomendaciones: datos.consentimiento_recomendaciones === true,
     disponibilidad: Array.isArray(datos.disponibilidad) ? datos.disponibilidad : [],
     visibilidad: {
       fortalezas: true,
@@ -123,7 +126,7 @@ export async function guardarPerfil(perfil) {
 
   const datos_crudos = Object.fromEntries(
     Object.entries(perfil).filter(([key]) =>
-      !["id", "usuario_id", "correo", "estado_geografico", "municipio"].includes(key),
+      !["id", "usuario_id", "correo", "estado_geografico", "municipio", "perfil_estructurado_ia", "perfil_estado_ia"].includes(key),
     ),
   )
   const actualizado = await request(`/perfil/${usuarioLocal.id_usuario}`, {
@@ -232,8 +235,7 @@ export async function obtenerProyecto(id) {
 }
 
 // ============================================================================
-// RUTAS PENDIENTES DE DESARROLLAR EN FASTAPI
-// (Mantenemos retornos vacíos o estructurados para que no truene React)
+// Flujos de IA y recomendaciones conectados a FastAPI
 // ============================================================================
 
 export function interpretarPerfil(textos) {
@@ -243,8 +245,8 @@ export function interpretarPerfil(textos) {
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  // TODO(backend): POST /proyectos/{id}/solicitudes
-  return Promise.resolve({ id: `s${Date.now()}`, estado: "pendiente" });
+  // La solicitud de adhesión aún no tiene endpoint; nunca simular su envío.
+  return Promise.reject(new Error("Las solicitudes para unirse aún no están disponibles."))
 }
 
 export function interpretarProyecto(proyecto) {
@@ -256,19 +258,15 @@ export function interpretarProyecto(proyecto) {
   } })
 }
 
-export function obtenerRecomendaciones() {
-  // TODO(backend): GET /recomendaciones (Requiere FastAPI + Ollama)
-  return Promise.resolve({ companeros: [], proyectos: [] });
+export async function obtenerRecomendaciones(topN = 10) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) throw new Error("No hay usuario autenticado.")
+  const proyectos = await request(`/recomendaciones/usuarios/${encodeURIComponent(usuarioLocal.id_usuario)}/proyectos?top_n=${topN}`)
+  return { proyectos }
 }
 
-export function obtenerCandidatos(projectId) {
-  // TODO(backend): GET /proyectos/{id}/candidatos
-  return Promise.resolve([]);
-}
-
-export function enviarRetroalimentacion(recomendacionId, datos) {
-  // TODO(backend): POST /recomendaciones/{id}/retroalimentacion
-  return Promise.resolve({ ok: true });
+export function obtenerCandidatos(projectId, topN = 10) {
+  return request(`/recomendaciones/eventos/${encodeURIComponent(projectId)}/candidatos?top_n=${topN}`)
 }
 
 export function obtenerInvitaciones() {

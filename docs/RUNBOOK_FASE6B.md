@@ -1,0 +1,34 @@
+# Fase 6B MVP: recomendaciones conectadas
+
+## Requisitos previos
+
+Seguir `RUNBOOK_FASE6A.md`: configurar `DATABASE_URL` y `AUTH_SECRET`, aplicar la revisión Alembic `20261022_6a` con respaldo previo y arrancar FastAPI, MySQL y React. Esta fase no cambia el esquema ni necesita Ollama en tiempo de consulta. El motor usa hechos confirmados aunque falten embeddings; solo usa un vector cuando modelo, pipeline y revisión de origen son válidos. La suite automatizada usa SQLite temporal.
+
+Cada persona debe confirmar su perfil y activar **Recomendaciones** de manera explícita. El valor inicial es desactivado. Un perfil pausado, una cuenta inactiva o un perfil sin consentimiento queda fuera de las sugerencias a organizadores. Las habilidades vienen del perfil confirmado; las áreas de mejora nunca acreditan competencias. Requisitos de evento sin confirmación del creador permanecen desconocidos.
+
+## API y operación
+
+- `GET /recomendaciones/eventos/{id_evento}/candidatos?top_n=10`: Bearer del creador del evento. `top_n` acepta 1 a 20. Omite creador, integrantes, solicitudes e invitaciones pendientes, perfiles ocultos y candidatos inelegibles.
+- `GET /recomendaciones/usuarios/{id_usuario}/proyectos?top_n=10`: Bearer del mismo usuario. Omite eventos cerrados, propios, donde participa o con acción pendiente. Requiere consentimiento del perfil.
+- Ambas respuestas contienen identificadores, `eligibility`, `evidence_group`, cobertura, explicación y versión de política. No contienen nombres, correo, vectores, puntuaciones ni datos crudos. `needs_review` y `insufficient_evidence` se muestran como tales; una coincidencia no autoriza ni ejecuta invitaciones.
+- `GET /notificaciones/{id_usuario}` conserva invitaciones y actividad de equipo. Las sugerencias IA se calculan con `recommend_candidates`; no hay un algoritmo textual paralelo. Se recalculan al leer, sin mensajes persistidos, colas ni cron.
+
+React consulta los endpoints con la sesión validada, muestra carga, vacío y error en Inicio, Coincidencias y candidatos del proyecto. Para invitar, el organizador debe revisar perfil y rol. La ruta de invitaciones vuelve a validar propietario, estado abierto, destinatario activo/no pausado y duplicado pendiente. Antes de cualquier nueva acción de escritura, revalidar permisos, membresía, consentimiento y estado contra la base: el resultado consultado puede quedar obsoleto entre lectura y uso.
+
+## Verificación
+
+Desde `backend/`, con el entorno virtual activo: `python -m pytest -q` y `python -m pip check`. Desde `frontend/`: `npm run build`. Las pruebas HTTP usan una base SQLite temporal, tokens de prueba, perfiles confirmados y eventos; comprueban 401/403, top N, exclusiones, privacidad, ausencia de vectores, datos no confirmados y notificaciones.
+
+Para un smoke de MySQL **sin escribir datos**, una vez configurada `DATABASE_URL` y aplicada la migración de 6A, ejecutar desde `backend/`:
+
+```powershell
+python -c "from sqlalchemy import text; from app.db.database import engine; c=engine.connect(); print(c.execute(text('SELECT 1')).scalar()); c.close()"
+```
+
+Después iniciar sesión con una cuenta de prueba, confirmar perfil/consentimiento y consultar ambos endpoints con su Bearer. Usar un evento propio abierto y hechos confirmados; comprobar que otro actor recibe 403 en candidatos y que la respuesta carece de `profile_embedding` y `ranking_score`. No compartir token ni cadena de conexión en logs o capturas. En este entorno, `backend/.env` sí configura MySQL y `SELECT 1` respondió correctamente, pero la base seleccionada tiene **cero tablas**: falta la estructura inicial y la revisión Alembic. No se crearon tablas ni se ejecutó un smoke HTTP contra MySQL. Preparar la estructura siguiendo 6A antes de esa verificación.
+
+## Límites del MVP
+
+La adaptación ORM lee instantáneas por solicitud y las notificaciones recalculan por evento; puede requerir paginación/caché cuando crezca la base. No hay generación Llama durante la consulta ni explicación generativa. Un evento o perfil legado sin confirmación da evidencia desconocida; no se promueve el texto libre ni la salida IA pendiente. La interfaz del detalle de proyecto mantiene otros elementos heredados, pero las recomendaciones visibles proceden del motor y las invitaciones pendientes del servidor.
+
+La acción heredada «Solicitar unirme» todavía no tiene endpoint de solicitudes de adhesión. La UI informa que no está disponible y no simula un envío exitoso. Las invitaciones del organizador sí usan su ruta existente.

@@ -5,6 +5,7 @@ from app.api.routes.perfiles import router as perfil_router
 from app.api.routes.eventos import router as eventos_router
 from app.api.routes import solicitudes
 from app.api.routes import notificaciones
+from app.api.routes import recomendaciones
 
 app = FastAPI(
     title="API Universitaria - Equipos e Inteligencia Artificial",
@@ -33,6 +34,7 @@ app.include_router(perfil_router)
 app.include_router(eventos_router)
 app.include_router(solicitudes.router,tags=["Invitaciones y Equipos"])
 app.include_router(notificaciones.router)
+app.include_router(recomendaciones.router)
 
 @app.get("/")
 def read_root():

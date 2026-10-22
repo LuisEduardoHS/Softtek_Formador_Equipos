@@ -9,7 +9,7 @@ import { enviarInvitacion } from "../../services/api"
 
 function mensajeSugerido(student, project, rol) {
   const nombre = student.nombre.split(" ")[0]
-  return `¡Hola ${nombre}! Estoy formando un equipo para «${project.titulo}» y creo que tu experiencia en ${rol.nombre.toLowerCase()} sería justo lo que nos falta. ¿Te gustaría sumarte?`
+  return `¡Hola ${nombre}! Estoy formando un equipo para «${project.titulo}» y quisiera invitarte para conversar sobre el rol ${rol.nombre}. ¿Te gustaría participar?`
 }
 
 /**

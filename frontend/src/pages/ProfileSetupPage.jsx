@@ -6,7 +6,7 @@ import Card from "../components/ui/Card"
 import ProgressSteps from "../components/ui/ProgressSteps"
 import AvailabilityGrid from "../components/ui/AvailabilityGrid"
 import TagEditor from "../components/ui/TagEditor"
-import { LevelPicker } from "../components/ui/Controls"
+import { LevelPicker, Switch } from "../components/ui/Controls"
 import AIBadge, { LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
@@ -87,7 +87,7 @@ function summarize(blocks) {
   }).filter(Boolean)
 }
 
-function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailability }) {
+function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailability, consent, setConsent }) {
   const [state, setState] = useState(perfil ? "ready" : "loading")
   const [msg, setMsg] = useState(0)
   const [attempt, setAttempt] = useState(0)
@@ -212,6 +212,10 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
           className="w-full rounded-lg border border-line bg-surface p-3 text-sm" />
       </ReviewBlock>
 
+      <ReviewBlock title="Recomendaciones" desc="Tú decides si tu perfil puede aparecer en sugerencias para organizadores y recibir proyectos sugeridos.">
+        <Switch label="Activar recomendaciones" checked={consent} onChange={setConsent} />
+      </ReviewBlock>
+
       <ReviewBlock
         title="Disponibilidad"
         badge={
@@ -265,6 +269,7 @@ export default function ProfileSetupPage() {
   const [textos, setTextos] = useState({ nombre: "", foto: null, idiomas: "", fortalezas: "", reforzar: "", intereses: "" })
   const [disponibilidad, setDisponibilidad] = useState([])
   const [perfil, setPerfil] = useState(null)
+  const [consent, setConsent] = useState(false)
   const [analyzedFor, setAnalyzedFor] = useState(null)
   const [errors, setErrors] = useState({})
   const [done, setDone] = useState(false)
@@ -312,6 +317,7 @@ export default function ProfileSetupPage() {
       disponibilidad,
       visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
       pausado: false,
+      consentimiento_recomendaciones: consent,
     }
 
     setSaving(true)
@@ -382,6 +388,8 @@ export default function ProfileSetupPage() {
                     disponibilidad={disponibilidad}
                     perfil={perfil}
                     setPerfil={setPerfil}
+                    consent={consent}
+                    setConsent={setConsent}
                     onEditAvailability={() => go(1)}
                   />
                 </div>
