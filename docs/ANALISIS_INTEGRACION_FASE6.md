@@ -2,30 +2,30 @@
 
 **Fecha:** 2026-10-22
 **Alcance:** diagnóstico y plan. No implementa integración, rutas, persistencia, migraciones ni cambios de producto.
-**Fuentes:** árbol local `feat/ai-matching` en `c18233a` más archivos locales de Fase 5 sin seguimiento; `origin/isaac` actualizado a `adda4c7` mediante `git fetch origin`; plan maestro de continuidad en `C:\Users\admon\Downloads\PLAN_MAESTRO_CONTINUIDAD_IA_SOFTTEK.md`; diseños de Fases 4 y 5 y README de IA/matching/recomendaciones. Las observaciones de MySQL se basan en `database/db_actividad.sql` y modelos ORM del repositorio, **no en una inspección de la base desplegada**.
+**Fuentes:** árbol integrado `feat/ai-matching` en `befa8c5`, que incluye Fase 5 (`ed1fcd5`), auditoría previa (`afbe98d`) y `origin/isaac` hasta `adda4c7`; plan maestro de continuidad en `C:\Users\admon\Downloads\PLAN_MAESTRO_CONTINUIDAD_IA_SOFTTEK.md`; diseños de Fases 4 y 5 y README de IA/matching/recomendaciones. Las observaciones de MySQL se basan en `database/db_actividad.sql` y modelos ORM del repositorio, **no en una inspección de la base desplegada**.
 
 ## 1. Estado Git y decisión de integración
 
 | Comprobación | Resultado |
 | --- | --- |
-| Rama local | `feat/ai-matching`, `HEAD c18233a` (`Merge remote-tracking branch 'origin/isaac' into feat/ai-matching`), alineada con `origin/feat/ai-matching` antes y después del fetch. |
-| Trabajo local de Fase 5 | Directorio completo `backend/app/services/ai/recommendations/` y cinco pruebas `backend/tests/test_recommendations_{candidates,projects,explanations,freshness,scenarios}.py` **sin seguimiento**. Incluyen el README y contratos/servicios de Fase 5. Deben conservarse íntegros. |
+| Rama local | `feat/ai-matching`; merge local `befa8c5`, todavía sin publicar en `origin/feat/ai-matching`. No se hizo push. |
+| Trabajo de Fase 5 conservado | `ed1fcd5` registra los ocho archivos de `recommendations/` y las cinco pruebas `test_recommendations_*.py`; `afbe98d` registra la auditoría previa. El merge mantuvo esos archivos y `matching/`. |
 | Antecesor común | `d90b7e5`, último commit de Isaac ya incorporado a `feat/ai-matching` por `c18233a`. |
 | Nuevos commits de Isaac | `ca3199c` «modificaciones de diseño» y `adda4c7` «mejoras conexiones y diseño»; punta remota `origin/isaac=adda4c7` tras fetch. |
 | Diferencia nueva de Isaac | 27 archivos: `notificaciones.py` nuevo; ampliación de `solicitudes.py`, registro en `main.py`; componentes y páginas React, `session.js`, `ErrorBoundary.jsx`, `api.js`. **Sin cambios** nuevos en ORM, esquemas Pydantic, SQL, parsers, embeddings o pruebas. |
-| Merge | **No realizado.** El árbol no está limpio por los archivos de Fase 5; esta condición bloquea expresamente el merge solicitado. No se hizo commit, stash, reset, clean, rebase, push ni merge con `main`. |
-| Comprobación de conflictos | `git merge-tree --write-tree HEAD origin/isaac` devolvió un árbol sin marcadores de conflicto textual para los commits rastreados. No comprueba los archivos sin seguimiento ni la compatibilidad funcional y **no autoriza** el merge. |
+| Merge | `befa8c5` incorporó `origin/isaac` mediante `git merge --no-ff`. Se preservaron los dos padres `afbe98d` y `adda4c7`. No se tocó `main` ni la rama de Isaac, ni se hizo push, reset, clean, rebase o stash. |
+| Conflictos | Ningún conflicto textual; estrategia `ort` completó el merge. Sigue una **divergencia funcional** entre las sugerencias de `notificaciones.py` y el motor de Fase 5, deliberadamente sin resolver en código en esta tarea. |
 
-`git diff HEAD..origin/isaac` muestra eliminaciones de `matching/`, sus pruebas y los documentos de diseño porque compara **dos puntas divergentes**: Isaac nunca tuvo esos commits propios de IA. No es evidencia de que un merge normal los borraría. Aun con una mezcla textual limpia, las nuevas rutas de notificaciones introducen una implementación de recomendaciones distinta del motor puro, por lo que el riesgo funcional sigue abierto. Antes de cualquier merge futuro, preservar de forma explícita los archivos sin seguimiento y acordar el tratamiento de esa ruta con el equipo; no recurrir a limpieza, stash automático ni selección masiva de un lado.
+La comparación previa `git diff c18233a..origin/isaac` mostraba eliminaciones de `matching/`, sus pruebas y documentos porque contrastaba dos puntas divergentes. El merge normal **no los eliminó**: se conservaron ambos historiales. Las nuevas rutas de notificaciones introducen una implementación distinta del motor puro; que el merge compile y pase pruebas no resuelve esa divergencia funcional.
 
 ## 2. Verificaciones ejecutadas
 
 | Superficie probada | Comando y resultado | Límite |
 | --- | --- | --- |
-| Backend local | `backend/.venv/Scripts/python.exe -m pytest -q`: **168 passed**. | Pruebas de la rama local y Fase 5 sin seguimiento; no corren la punta de `origin/isaac` ni prueban MySQL u Ollama reales. |
-| Dependencias Python locales | `python -m pip check`: **No broken requirements found.** | No valida versiones disponibles en despliegue. |
-| Frontend local | `npm run build` con `frontend/node_modules` ya existente: **build Vite correcto**, 1984 módulos transformados. | Se construyó el frontend de `feat/ai-matching`, no el de `origin/isaac`; compilar no verifica permisos ni contratos HTTP. |
-| Nuevos commits remotos | Lectura de `git show`, diffs y comparación de rutas/UI. | Auditoría estática. No se hizo checkout, merge ni prueba de ejecución de la rama remota. |
+| Backend antes y después del merge | `backend/.venv/Scripts/python.exe -m pytest -q`: **168 passed** en ambas ejecuciones. | La suite no cubre integración real con MySQL, autorización HTTP de las rutas nuevas ni Ollama real. Los commits de Isaac no agregaron tests. |
+| Dependencias Python después del merge | `python -m pip check`: **No broken requirements found.** | No valida versiones disponibles en despliegue. |
+| Frontend después del merge | `npm run build` con `frontend/node_modules` ya existente: **build Vite correcto**, 1986 módulos transformados. | Compilar no verifica permisos ni contratos HTTP; no se instalaron dependencias. |
+| Merge y archivos | `git diff --check HEAD^1..HEAD` sin errores; árbol de trabajo limpio antes de actualizar este documento. | Validación textual y estructural, no evaluación de producto. |
 
 ## 3. Arquitectura observada y contratos que aún no conectan
 
@@ -59,7 +59,18 @@
 - `ProfileParser` y `EventParser` generan estructuras Pydantic desde Ollama; `generate_profile_embedding` y `generate_event_embedding` producen listas finitas, y con `nomic-embed-text` validan **768 dimensiones**. El parser recibe texto libre; el JSON estructuralmente válido no garantiza que el hecho sea cierto. Los casos de regresión IA-01 a IA-05 y las pruebas puras reducen riesgos conocidos, pero no equivalen a evaluación semántica en producción. `embeddings.py` omite `areas_mejora` del texto de perfil.
 - `OllamaClient` usa timeout de 120 s y errores controlados, pero las rutas actuales no invocan IA, no hay estado de procesamiento, reintentos ni cola. Integrarlo directamente en POST/PUT podría bloquear peticiones; definir flujo desacoplado e idempotente. No enviar PII innecesaria a Llama para explicaciones; `personalize_recommendation` solo permite seleccionar variantes de hechos ya aprobados y conserva fallback determinista.
 - `matching/` implementa `Evidence`, `CandidateInput`, `EventInput`, `RequirementAssessment`, `MatchResult`, normalización/equivalencias versionadas, elegibilidad, complementariedad, coseno y ranking. Política inicial: 0.40 obligatorias, 0.25 complementariedad, 0.15 deseables, 0.10 coseno, 0.10 intereses. Datos desconocidos no se convierten en incumplimiento; solo una contradicción confirmada puede activar filtros estrictos configurados. Vectores ausentes/incompatibles dan `None`, no cero.
-- `recommendations/` local (aún sin seguimiento) implementa resultados públicos para organizadores y usuarios, explicaciones deterministas con reformulación opcional controlada, duplicados y huellas de vigencia `current/stale/unknown`. Es un motor **puro**: los contextos `OrganizerRecommendationContext` y `UserRecommendationContext` suponen que un adaptador ya verificó permisos, visibilidad, membresía y acciones. No hay todavía fuente confiable de `SourceVersions`; no publicar `current` por defecto. Los DTO públicos no contienen scores ni embeddings. Una huella `current` tampoco autoriza una invitación posterior.
+- `recommendations/`, ahora registrado en `ed1fcd5` y preservado en el merge, implementa resultados públicos para organizadores y usuarios, explicaciones deterministas con reformulación opcional controlada, duplicados y huellas de vigencia `current/stale/unknown`. Es un motor **puro**: los contextos `OrganizerRecommendationContext` y `UserRecommendationContext` suponen que un adaptador ya verificó permisos, visibilidad, membresía y acciones. No hay todavía fuente confiable de `SourceVersions`; no publicar `current` por defecto. Los DTO públicos no contienen scores ni embeddings. Una huella `current` tampoco autoriza una invitación posterior.
+
+### Una sola fuente de recomendaciones: decisión propuesta, sin cambio funcional
+
+| Aspecto | `notificaciones.py` de Isaac | `matching/` + `recommendations/` de IA |
+| --- | --- | --- |
+| Entrada | Consulta eventos propios abiertos, perfiles activos, JSON de `roles`/`fortalezas` y pendientes durante cada GET. | Recibe `EventInput`, `CandidateInput` y contextos autorizados preparados; no consulta BD. |
+| Selección | Intersección textual de cadenas y un resultado por rol coincidente. | Elegibilidad, requisitos obligatorios/deseables, vacantes, complementariedad, coseno compatible, ranking y grupos de evidencia. |
+| Seguridad y explicación | Usa ID de ruta sin actor autenticado; texto con nombre y coincidencias; no tiene revisión ni estado de evidencia. | DTO públicos sin vector, score, nombre ni correo; incluyen IDs del par. La privacidad depende de que el futuro adaptador suministre contexto verificado. |
+| Duplicados/vigencia | Excluye algunos invitados y miembros, pero el mismo par puede aparecer por varios roles; recalcula sin revisiones. | Identifica el par evento/persona y compara huellas `current/stale/unknown`; una acción sigue necesitando revalidación transaccional. |
+
+**Propuesta:** usar `recommend_candidates` y `recommend_projects` como **única fuente de selección, orden y explicación**. Una futura capa backend autenticada construye la misma instantánea autorizada para el endpoint de recomendaciones y, si producto decide mostrar sugerencias en notificaciones, transforma sus DTO públicos a tarjetas `grupo="ia"` sin volver a calcular coincidencias. Las notificaciones de invitación aceptada/rechazada y actividad de equipo son hechos transaccionales distintos y pueden permanecer en su flujo propio. Definir una clave estable por audiencia/par/política/revisión para la presentación; las acciones se deduplican por par y estado real. No enviar nombre ni habilidades privadas hasta que la proyección de audiencia las autorice. Evitar escanear todos los perfiles en cada GET; decidir lectura por lotes, paginación y caché invalidable después de medir. **No se sustituye ni modifica la ruta actual en este merge**: la decisión requiere acordar identidad, contratos de datos y comportamiento de UI con sus responsables.
 
 ## 4. Flujo integrado propuesto y fronteras
 
@@ -90,6 +101,8 @@ Los responsables son roles propuestos; confirmar asignación con el equipo. Cada
 
 **6.1, solo identidad y permisos de servidor.** Es el bloqueo más fuerte: hoy una persona puede indicar IDs ajenos en rutas de perfil, equipo, invitaciones o notificaciones, y ningún contexto de Fase 5 puede considerarse autorizado si se construye sobre esos IDs. Entregar primero una matriz de permisos acordada y pruebas de acceso cruzado con la interfaz de actor autenticado; después conectar adaptadores de lectura. Este encargo debe coordinarse con el responsable de autenticación, sin mezclar en la misma entrega cambios de IA, migraciones o UI.
 
+**Contrato propuesto para 6.1:** una dependencia backend obtiene `actor_id` y estado de cuenta desde una credencial verificable por servidor; un servicio de autorización decide `can_read_own_profile`, `can_edit_own_profile`, `can_manage_event`, `can_read_team`, `can_read_notifications`, `can_invite` y `can_respond_invitation`. El ID de ruta solo identifica el recurso y nunca reemplaza `actor_id`. El mecanismo de sesión/token y su ciclo de vida deben acordarse con backend antes de codificar. El conjunto mínimo de pruebas HTTP cubre ausencia/invalidación de credencial, IDs ajenos, creador equivocado, invitación dirigida a otra persona, cuenta inactiva, perfil oculto o pausado, y que el error 403/404 no revele datos privados. La salida de 6.1 es esta frontera de identidad funcionando en las rutas sensibles, con pruebas; no incorpora aún matching, recomendaciones ni Ollama.
+
 ## 6. Riesgos y preguntas pendientes
 
 1. **Seguridad alta:** rutas actuales y nuevas carecen de identidad de servidor; notificaciones pueden revelar nombres, proyecto y coincidencias por ID manipulable. La ruta de equipos entrega vectores. No publicar recomendaciones reales antes de resolverlo.
@@ -97,6 +110,6 @@ Los responsables son roles propuestos; confirmar asignación con el equipo. Cada
 3. **Paridad de datos:** SQL, ORM, `EventoOut` y frontend divergen en perfil IA, vector, rol y categoría. El esquema real puede diferir; `create_all` no sirve como plan de migración.
 4. **Concurrencia:** una recomendación puede pasar de válida a obsoleta antes de la acción; los checks de pendiente en consultas separadas no evitan doble envío. La operación final necesita control transaccional y restricciones comprobadas.
 5. **Rendimiento y operación:** el cálculo por lectura de notificaciones de Isaac recorre perfiles por evento; el procesamiento Ollama puede durar hasta 120 s. Definir límites, lotes, caché/invalidación y estado de procesamiento antes de producción.
-6. **Evaluación:** 168 pruebas locales y build verde prueban reglas y compilación, no precisión semántica real, calidad del ranking ni seguridad HTTP. Las novedades remotas no traen pruebas y no se ejecutaron en esta rama.
+6. **Evaluación:** 168 pruebas integradas y build verde prueban reglas existentes y compilación, no precisión semántica real, calidad del ranking ni seguridad HTTP. Los commits nuevos de Isaac no traen pruebas de sus rutas y el merge no añade esa cobertura automáticamente.
 
-**Siguiente decisión de Git:** conservar y registrar conscientemente el trabajo local de Fase 5, revisar con Isaac la coexistencia de notificaciones y recomendaciones, y repetir preflight con árbol limpio. Solo entonces considerar un merge normal de `origin/isaac`, seguido de pytest, `pip check`, build frontend y pruebas de integración de contratos. Este documento no efectúa esa decisión.
+**Estado final de integración:** `origin/isaac` quedó incorporado en `befa8c5` sin conflictos textuales. El siguiente trabajo es acordar la fuente única de recomendaciones y ejecutar el encargo 6.1 de identidad/permisos antes de exponer nuevos endpoints o acciones. Este documento no cambia lógica de backend, frontend o BD.
