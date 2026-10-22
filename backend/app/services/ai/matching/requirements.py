@@ -42,11 +42,17 @@ _CONSTRAINT_FILLER = {
 }
 
 
-def _constraint_mentions(evidence: str, requirement: str) -> bool:
-    """Require an explicit shared condition token, not semantic similarity."""
+def _constraint_mentions(evidence: str, requirement: str, *, require_all: bool = True) -> bool:
+    """Compare explicit condition tokens without claiming an unmentioned clause.
+
+    Positive evidence must cover every salient part of a condition. A confirmed
+    denial of any part can contradict a conjunctive condition.
+    """
     evidence_terms = set(normalize_term(evidence).split()) - _CONSTRAINT_FILLER
     required_terms = set(normalize_term(requirement).split()) - _CONSTRAINT_FILLER
-    return bool(evidence_terms & required_terms) if required_terms else normalize_term(evidence) == normalize_term(requirement)
+    if not required_terms:
+        return normalize_term(evidence) == normalize_term(requirement)
+    return required_terms <= evidence_terms if require_all else bool(evidence_terms & required_terms)
 
 
 def _dedupe_terms(items: Iterable[str], catalog: EquivalenceCatalog) -> list[str]:
@@ -155,7 +161,9 @@ def assess_requirements(
                                       "restriccion_sin_confirmar"))
             continue
         availability = [item for item in (candidate.availability or ())
-                        if item.kind == "availability" and _constraint_mentions(item.value, term)]
+                        if item.kind == "availability" and _constraint_mentions(
+                            item.value, term, require_all=item.polarity != "denies"
+                        )]
         status, supporting, reason = _candidate_status(availability)
         result.append(_assessment(term, "explicit_constraint", status, organizer + supporting, reason))
     return result
