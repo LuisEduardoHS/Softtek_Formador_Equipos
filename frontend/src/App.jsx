@@ -23,6 +23,7 @@ function App() {
       {/* Públicas: Landing → Auth → Profile (onboarding) */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/registro" element={<AuthPage initialMode="signup" />} />
       <Route path="/profile" element={<ProfileSetupPage />} />
       <Route path="/sistema-diseno" element={<DesignSystemPage />} />
 

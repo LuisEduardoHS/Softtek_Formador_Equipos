@@ -239,6 +239,14 @@ export function obtenerInvitaciones() {
   return request(`/invitaciones/${encodeURIComponent(usuarioLocal.id_usuario)}`)
 }
 
+export function obtenerNotificaciones() {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("No hay usuario autenticado.")
+  }
+  return request(`/notificaciones/${encodeURIComponent(usuarioLocal.id_usuario)}`)
+}
+
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
   const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
