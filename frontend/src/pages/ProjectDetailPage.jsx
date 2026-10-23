@@ -218,7 +218,14 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
                   onChange={() => setRolId(r.id)}
                   className="size-4 accent-primary"
                 />
-                <span className="flex-1 text-sm font-medium">{r.nombre}</span>
+                <span className="flex-1 text-sm font-medium">
+                  <span className="block">{r.nombre}</span>
+                  {r.habilidades.length > 0 && (
+                    <span className="mt-0.5 block text-xs font-normal text-ink-2">
+                      Habilidades: {r.habilidades.join(", ")}
+                    </span>
+                  )}
+                </span>
                 {r.id === defaultRolId && <span className="text-xs font-semibold text-ai-ink">Sugerido para ti</span>}
               </label>
             ))}

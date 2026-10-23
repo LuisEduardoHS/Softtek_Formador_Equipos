@@ -47,7 +47,7 @@ function Section({ title, desc, badge, children }) {
 const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad"]
 
 function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
-  const ids = { c: useId(), s: useId(), g: useId(), e: useId() }
+  const ids = { n: useId(), c: useId(), s: useId(), g: useId(), e: useId() }
   const set = (k) => (v) => setPerfil((p) => ({ ...p, [k]: v }))
   const setVis = (k) => (v) => setPerfil((p) => ({ ...p, visibilidad: { ...p.visibilidad, [k]: v } }))
 
@@ -79,7 +79,10 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       )}
 
       <Section title="Información básica">
-        <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
+        <div className="grid gap-4 sm:grid-cols-[1fr_1fr_140px]">
+          <Field id={ids.n} label="Nombre">
+            <input id={ids.n} value={perfil.nombre || ""} onChange={(e) => set("nombre")(e.target.value)} className={inputCls()} />
+          </Field>
           <Field id={ids.c} label="Carrera">
             <input id={ids.c} value={perfil.carrera || ""} onChange={(e) => set("carrera")(e.target.value)} className={inputCls()} />
           </Field>
@@ -188,10 +191,20 @@ function MyProfile() {
   const aiDirty = AI_FIELDS.some((k) => JSON.stringify(perfil[k]) !== JSON.stringify(saved[k]))
 
   const save = async () => {
+    if (!perfil.nombre?.trim()) {
+      toast("El nombre no puede quedar vacío.", "error")
+      return
+    }
+
     try {
-      const actualizado = await guardarPerfil(perfil)
+      const actualizado = await guardarPerfil({ ...perfil, nombre: perfil.nombre.trim() })
       setSaved(actualizado)
       setPerfil(actualizado)
+      try {
+        localStorage.setItem("usuario", JSON.stringify({ ...getSessionUser(), nombre: actualizado.nombre }))
+      } catch (error) {
+        console.error("No se pudo actualizar el nombre guardado de la sesión:", error)
+      }
       toast(aiDirty ? "Perfil guardado y recomendaciones actualizadas en MySQL." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
