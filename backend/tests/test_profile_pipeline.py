@@ -91,6 +91,33 @@ def test_profile_summary_fallback_uses_only_extracted_facts(ai):
     assert profile.resumen_publico == "Habilidades declaradas: Python"
 
 
+def test_negated_professional_experience_is_not_a_learning_goal(ai):
+    ai.generate_structured = MagicMock(return_value=json.dumps({
+        "habilidades": ["portero"],
+        "experiencia": ["torneos amateurs"],
+        "areas_mejora": ["Experiencia profesional"],
+        "resumen_publico": "",
+    }))
+    profile = ProfileParser(ai).parse_profile(
+        "Juego fútbol como portero, he participado en torneos amateurs. "
+        "No tengo experiencia profesional."
+    )
+    assert profile.habilidades == ["portero"]
+    assert profile.areas_mejora == []
+    assert "experiencia profesional" not in profile.resumen_publico.lower()
+    assert "negación o falta de experiencia no implica" in ai.generate_structured.call_args.kwargs["prompt"]
+
+
+def test_explicit_goal_is_preserved_despite_negation(ai):
+    ai.generate_structured = MagicMock(return_value=json.dumps({
+        "areas_mejora": ["Experiencia profesional"], "resumen_publico": "",
+    }))
+    profile = ProfileParser(ai).parse_profile(
+        "No tengo experiencia profesional, pero quiero adquirir experiencia profesional."
+    )
+    assert profile.areas_mejora == ["Experiencia profesional"]
+
+
 @pytest.mark.parametrize("vector", [[], [float("nan")] * 768, [0.1] * 3])
 def test_profile_embedding_rejects_bad_vectors(ai, vector):
     ai.generate_embedding = MagicMock(return_value=vector)

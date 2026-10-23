@@ -81,3 +81,117 @@ def test_event_embedding_once_and_labels():
 def test_event_embedding_rejects_empty():
     with pytest.raises(ValueError):
         generate_event_embedding(StructuredEventRequirements(), MagicMock())
+
+
+def test_explicit_goalkeeper_survives_inconsistent_model_responses():
+    description = (
+        "Equipo amateur busca portero para sábados en Monterrey; "
+        "no exige experiencia profesional."
+    )
+    ai = MagicMock()
+    ai.generate_structured.side_effect = [
+        json.dumps({"roles_buscados": ["portero"]}),
+        json.dumps({"roles_buscados": [], "restricciones_explicitas": ["sábados en Monterrey"]}),
+        json.dumps({"roles_buscados": []}),
+    ]
+    parser = EventParser(ai)
+    for _ in range(3):
+        parsed = parser.parse_event(description, categoria_principal="Deportivo")
+        assert parsed.roles_buscados == ["portero"]
+        assert parsed.habilidades_obligatorias == []
+    assert "incluye \"portero\" en roles_buscados" in ai.generate_structured.call_args.kwargs["prompt"]
+
+
+@pytest.mark.parametrize("description", [
+    "Ya tenemos portero para el equipo amateur.",
+    "No buscamos portero; necesitamos defensa.",
+])
+def test_goalkeeper_is_not_added_without_explicit_vacancy(description):
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({"roles_buscados": []})
+    parsed = EventParser(ai).parse_event(description, categoria_principal="Deportivo")
+    assert parsed.roles_buscados == []
+
+
+def test_game_jam_rejects_foreign_requirements_and_covered_role():
+    description = (
+        "Necesitamos un artista 3D con Blender y un programador Unreal Engine 5 "
+        "para la game jam; músico ya cubierto; Git deseable."
+    )
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({
+        "habilidades_obligatorias": ["Python", "CAD"],
+        "habilidades_deseables": ["Git"],
+        "roles_buscados": ["programación de navegación", "músico"],
+        "restricciones_explicitas": ["game jam", "Blender", "Git deseable"],
+    })
+    parsed = EventParser(ai).parse_event(description, categoria_principal="Videojuegos")
+    assert parsed.habilidades_obligatorias == ["Blender", "Unreal Engine 5"]
+    assert parsed.habilidades_deseables == ["Git"]
+    assert parsed.roles_buscados == ["artista 3D", "programador Unreal Engine 5"]
+    assert parsed.restricciones_explicitas == []
+    prompt = ai.generate_structured.call_args.kwargs["prompt"]
+    assert '"Se valora CAD"' not in prompt
+    assert '"Buscamos quien programe navegación"' not in prompt
+
+
+def test_python_programmer_is_required_and_project_topic_is_not_restriction():
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({
+        "roles_buscados": ["programador"],
+        "habilidades_obligatorias": [],
+        "restricciones_explicitas": ["IA", "proyecto de IA"],
+    })
+    parsed = EventParser(ai).parse_event(
+        "Buscamos programador Python para proyecto de IA."
+    )
+    assert parsed.roles_buscados == ["programador"]
+    assert parsed.habilidades_obligatorias == ["Python"]
+    assert parsed.restricciones_explicitas == []
+
+
+def test_foreign_skills_and_roles_are_removed_without_inventing_replacements():
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({
+        "habilidades_obligatorias": ["Python"],
+        "habilidades_deseables": ["CAD"],
+        "roles_buscados": ["programación de navegación"],
+    })
+    parsed = EventParser(ai).parse_event("Buscamos artista para crear personajes.")
+    assert parsed.habilidades_obligatorias == []
+    assert parsed.habilidades_deseables == []
+    assert parsed.roles_buscados == []
+
+
+def test_internal_restriction_marker_is_not_a_fact():
+    description = (
+        "Buscamos desarrollador con Laravel y MySQL obligatorios; Docker deseable."
+    )
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({
+        "habilidades_obligatorias": ["Laravel", "MySQL"],
+        "habilidades_deseables": ["Docker"],
+        "restricciones_explicitas": ["descripcion_restricciones_explicitas"],
+    })
+    parsed = EventParser(ai).parse_event(description)
+    assert parsed.habilidades_obligatorias == ["Laravel", "MySQL"]
+    assert parsed.habilidades_deseables == ["Docker"]
+    assert parsed.restricciones_explicitas == []
+    assert "placeholders como valores" in ai.generate_structured.call_args.kwargs["prompt"]
+
+
+def test_valid_sunday_availability_survives_placeholder_filter():
+    ai = MagicMock()
+    ai.generate_structured.return_value = json.dumps({
+        "restricciones_explicitas": [
+            "descripcion_restricciones_explicitas",
+            "<horario>",
+            "sin especificar",
+            "restricciones explícitas",
+            "Disponibilidad los domingos",
+        ],
+    })
+    parsed = EventParser(ai).parse_event(
+        "Se requiere disponibilidad los domingos para los entrenamientos."
+    )
+    assert parsed.restricciones_explicitas == ["Disponibilidad los domingos"]

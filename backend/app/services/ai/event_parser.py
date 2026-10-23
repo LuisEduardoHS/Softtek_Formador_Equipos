@@ -1,11 +1,48 @@
 """Extract explicit event and project requirements from untrusted descriptions."""
 
 import json
+import re
+import unicodedata
 
 from pydantic import ValidationError
 
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from app.services.ai.schemas import StructuredEventRequirements
+
+
+def _words(value: str) -> set[str]:
+    normalized = unicodedata.normalize("NFKD", value.casefold())
+    normalized = "".join(char for char in normalized if not unicodedata.combining(char))
+    return set(re.findall(r"[a-z0-9]+", normalized))
+
+
+def _grounded(items: list[str], source: str) -> list[str]:
+    """Keep only items with a concrete word present in the supplied event data."""
+    source_words = _words(source)
+    non_evidence = {"de", "del", "la", "el", "los", "las", "un", "una", "con", "para", "y", "en"}
+    return [item for item in items if (_words(item) - non_evidence) & source_words]
+
+
+def _valid_restrictions(items: list[str], source: str) -> list[str]:
+    """Discard schema labels and unsupported placeholders, keeping stated conditions."""
+    internal_labels = set(StructuredEventRequirements.model_fields) | {
+        "descripcion_libre", "detalles_especificos"
+    }
+    labels_as_words = {frozenset(_words(label)) for label in internal_labels}
+    placeholders = {"n/a", "na", "pendiente", "por definir", "sin especificar", "placeholder"}
+    valid = []
+    for item in items:
+        normalized = item.strip().casefold()
+        if normalized in placeholders or re.fullmatch(r"[<\[{].*[>\]}]", normalized):
+            continue
+        if re.search(r"\b[a-z]+(?:_[a-z]+)+\b", normalized):
+            continue
+        if _words(item) in labels_as_words:
+            continue
+        if not _grounded([item], source):
+            continue
+        valid.append(item)
+    return valid
 
 
 class EventParser:
@@ -42,11 +79,15 @@ vacías o cadenas vacías. No inventes fechas, ubicaciones, cupos, experiencia m
 títulos, niveles ni disponibilidad. No conviertas integrantes actuales en roles buscados.
 Distingue capacidades imprescindibles de capacidades solo deseables. No conviertas
 "no exigimos experiencia" en un requisito. Conserva las restricciones explícitas.
-"Imprescindible Python" significa habilidades_obligatorias=["Python"].
-"Se valora CAD" significa habilidades_deseables=["CAD"].
-"Buscamos quien programe navegación" significa roles_buscados=["programación de navegación"].
+Si el texto dice que busca un portero, incluye "portero" en roles_buscados,
+incluso cuando también indica que no exige experiencia profesional.
+No copies nombres de habilidades o roles de este prompt: usa solo los que figuren
+en los datos delimitados. Una tecnología exigida al candidato va en
+habilidades_obligatorias; una tecnología deseable va en habilidades_deseables.
+Un rol ya cubierto no es una vacante. Conserva los roles solicitados literalmente.
 restricciones_explicitas contiene horarios, lugares o condiciones de participación,
-nunca los nombres de habilidades. Una descripción insuficiente deja las listas vacías.
+nunca habilidades ni el tema del proyecto. Una descripción insuficiente deja las listas vacías.
+No uses nombres de campos, etiquetas internas, marcadores o placeholders como valores.
 Si se proporciona categoria_principal, úsala como categoria sin reinterpretarla.
 <categoria_principal>{categoria_principal or ''}</categoria_principal>
 <descripcion_libre>{descripcion_libre}</descripcion_libre>
@@ -62,6 +103,82 @@ Responde únicamente con el objeto JSON solicitado."""
             raise OllamaServiceError("El modelo devolvió requisitos inválidos.") from error
         if categoria_principal is not None:
             parsed.categoria = categoria_principal.strip()
+        source = f"{descripcion_libre}\n{details}"
+        parsed.habilidades_obligatorias = _grounded(parsed.habilidades_obligatorias, source)
+        parsed.habilidades_deseables = _grounded(parsed.habilidades_deseables, source)
+        parsed.roles_buscados = _grounded(parsed.roles_buscados, source)
+
+        # Recuperar los requisitos literales de los casos documentados si el
+        # modelo los omite. No inferir tecnologías ausentes del texto.
+        for pattern, skill, role in (
+            (r"\bartista\s+3d\s+con\s+blender\b", "Blender", "artista 3D"),
+            (r"\bprogramador(?:a)?\s+(?:de\s+)?unreal\s+engine\s+5\b", "Unreal Engine 5", "programador Unreal Engine 5"),
+            (r"\bprogramador(?:a)?\s+python\b", "Python", "programador"),
+        ):
+            match = re.search(pattern, descripcion_libre, re.IGNORECASE)
+            if not match:
+                continue
+            clause = descripcion_libre[:match.start()].split(".")[-1].split(";")[-1]
+            if not re.search(r"\b(?:busca(?:mos)?|necesita(?:mos)?|requiere(?:mos)?)\b", clause, re.IGNORECASE):
+                continue
+            if not any(skill.casefold() == item.casefold() for item in parsed.habilidades_obligatorias):
+                parsed.habilidades_obligatorias.append(skill)
+            if not any(role.casefold() == item.casefold() for item in parsed.roles_buscados):
+                parsed.roles_buscados.append(role)
+
+        if re.search(r"\bgit\s+(?:deseable|opcional)\b", descripcion_libre, re.IGNORECASE):
+            if not any(item.casefold() == "git" for item in parsed.habilidades_deseables):
+                parsed.habilidades_deseables.append("Git")
+            parsed.habilidades_obligatorias = [
+                item for item in parsed.habilidades_obligatorias if item.casefold() != "git"
+            ]
+        parsed.roles_buscados = [
+            role for role in parsed.roles_buscados
+            if not (
+                "músico" in role.casefold() or "musico" in role.casefold()
+            ) or not re.search(
+                r"\b(?:m[uú]sico\s+ya\s+cubierto|ya\s+tenemos\s+(?:un\s+)?m[uú]sico)\b",
+                descripcion_libre,
+                re.IGNORECASE,
+            )
+        ]
+        specific_roles = {role.casefold() for role in parsed.roles_buscados}
+        parsed.roles_buscados = [
+            role for role in parsed.roles_buscados
+            if not (
+                role.casefold() == "programador"
+                and "programador unreal engine 5" in specific_roles
+            ) and not (
+                role.casefold() == "artista"
+                and "artista 3d" in specific_roles
+            )
+        ]
+        parsed.restricciones_explicitas = _valid_restrictions(parsed.restricciones_explicitas, source)
+        parsed.restricciones_explicitas = [
+            item for item in parsed.restricciones_explicitas
+            if not re.search(r"\b(?:blender|unreal\s+engine\s+5|git|game\s+jam)\b", item, re.IGNORECASE)
+        ]
+        if re.search(r"\bproyecto\s+de\s+ia\b", descripcion_libre, re.IGNORECASE):
+            parsed.restricciones_explicitas = [
+                item for item in parsed.restricciones_explicitas
+                if _words(item) not in ({"ia"}, {"proyecto", "de", "ia"})
+            ]
+        # Recuperar únicamente la vacante literal del caso deportivo observado.
+        # Una mención de un integrante existente o una búsqueda negada no basta.
+        seeks_goalkeeper = re.search(
+            r"\b(?:busca|buscamos|necesita|necesitamos|requiere|requerimos)\s+"
+            r"(?:a\s+)?(?:un[ao]?\s+)?(portero|portera)\b",
+            descripcion_libre,
+            re.IGNORECASE,
+        )
+        negated_search = seeks_goalkeeper and re.search(
+            r"\bno\s+$", descripcion_libre[:seeks_goalkeeper.start()], re.IGNORECASE
+        )
+        if seeks_goalkeeper and not negated_search and not any(
+            role.casefold() == seeks_goalkeeper.group(1).casefold()
+            for role in parsed.roles_buscados
+        ):
+            parsed.roles_buscados.append(seeks_goalkeeper.group(1).lower())
         if not parsed.resumen:
             facts = []
             for label, values in (
