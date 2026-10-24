@@ -1,4 +1,30 @@
+# 🚀 Formador de Equipos (Softtek)
 
+Plataforma para la creación y gestión inteligente de equipos de trabajo.
+
+---
+
+## 🛠️ Requisitos Previos
+
+Antes de comenzar, asegúrate de contar con los siguientes elementos configurados en tu sistema:
+* **Python** (versión 3.10 o superior)
+* **Node.js** (versión LTS)
+* **MySQL** activo localmente
+* **Ollama** ejecutándose en segundo plano
+
+---
+
+## ⚙️ Guía de Instalación y Ejecución
+
+### 🐍 1. Backend
+
+Todas las operaciones de esta sección se ejecutan desde la carpeta `/Backend`.
+
+#### A. Setup Inicial (Solo la primera vez)
+
+1. **Crear el entorno virtual:**
+   ```powershell
+   python -m venv venv
 -------------------- Backend-----------------------------
 
 # Crear el entorno virtual si es la primera vez que se ejecutara el proyecto
