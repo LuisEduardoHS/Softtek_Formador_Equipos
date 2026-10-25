@@ -19,6 +19,7 @@ from sqlalchemy.pool import StaticPool
 from app.db.database import Base, get_db
 from app.main import app
 from app.models.evento import Evento
+from app.models.participante import ParticipanteEvento
 from app.models.usuario import PerfilUsuario, Usuario
 from app.core.security import create_access_token
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
@@ -72,6 +73,69 @@ def requirements():
             "resumen": "Buscamos Python", "habilidades_obligatorias": ["Python"],
             "habilidades_deseables": ["Docker"], "roles_buscados": ["backend"],
             "intereses_relacionados": [], "restricciones_explicitas": ["domingos"]}
+
+
+def _merge_event(engine):
+    with Session(engine) as db:
+        db.add(Evento(id_evento=71, creador_id=1, titulo="Proyecto integrado",
+                      categoria_principal="Academico", estado="Abierto",
+                      detalles_especificos={"integrantes": 3, "roles": [
+                          {"id": "backend", "nombre": "Backend", "habilidades": ["Python"]}]},
+                      requisitos_ia=requirements(), requisitos_confirmados_at=integration.utc_now(),
+                      requisitos_fuente_revision="old", estado_ia="listo",
+                      embedding_requisitos=[0.2] * 768, embedding_fuente_revision="old"))
+        db.commit()
+
+
+def test_merged_join_request_preserves_auth_and_creates_requester_membership(context):
+    client, engine = context
+    _merge_event(engine)
+    body = {"rol_esperado": "backend", "mensaje_explicacion": "Puedo apoyar con Python"}
+    url = "/eventos/71/solicitudes?solicitante_id=2"
+    assert client.post(url, json=body).status_code == 401
+    assert client.post(url, json=body, headers=headers(1)).status_code == 403
+    sent = client.post(url, json=body, headers=headers(2))
+    assert sent.status_code == 200, sent.text
+    assert client.post(url, json=body, headers=headers(2)).status_code == 409
+    request_id = sent.json()["id"]
+    response = client.patch(f"/invitaciones/{request_id}", json={"estado": "Aceptada"},
+                            headers=headers(1))
+    assert response.status_code == 200, response.text
+    with Session(engine) as db:
+        member = db.query(ParticipanteEvento).filter_by(id_evento=71).one()
+        assert member.id_usuario == 2
+        assert member.rol == "Backend"
+    event = client.get("/eventos/71", headers=headers(2)).json()
+    assert event["creador_nombre"] == "Ana"
+    assert event["detalles_especificos"]["roles"][0]["cubiertoPor"] == "2"
+    assert "embedding_requisitos" not in event
+    notifications = client.get("/notificaciones/2", headers=headers(2)).json()
+    assert any("aceptó tu solicitud" in item["texto"] for item in notifications)
+
+
+@pytest.mark.parametrize("category", ["Academico", "Personal", "Deportivo", "Videojuegos", "General"])
+def test_merged_edit_preserves_categories_and_invalidates_old_ai_evidence(context, category):
+    client, engine = context
+    _merge_event(engine)
+    body = {"categoria_principal": category, "descripcion_libre": "Descripción revisada",
+            "integrantes": 3, "detalles_especificos": {"roles": [
+                {"id": "backend", "nombre": "Backend", "habilidades": ["Go"]}]},
+            "requisitos_ia": {"roles": []}}
+    url = "/eventos/71?usuario_id=1"
+    assert client.put(url, json=body).status_code == 401
+    assert client.put(url, json=body, headers=headers(2)).status_code == 403
+    response = client.put(url, json=body, headers=headers(1))
+    assert response.status_code == 200, response.text
+    assert response.json()["categoria_principal"] == category
+    assert response.json()["detalles_especificos"]["tipo"] == category.casefold()
+    assert response.json()["requisitos_confirmados"] is False
+    with Session(engine) as db:
+        event = db.get(Evento, 71)
+        assert event.embedding_requisitos is None
+        assert event.requisitos_confirmados_at is None
+        assert event.requisitos_ia == {}
+        assert event.requisitos_borrador_ia["habilidades_obligatorias"] == ["Python"]
+        assert event.estado_ia == "pendiente_revision"
 
 
 def test_auth_401_403_and_private_profile(context):

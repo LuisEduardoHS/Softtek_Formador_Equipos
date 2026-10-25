@@ -45,9 +45,20 @@ function SectionHeader({ title, desc, action, id }) {
 
 /* ------------------------- Perfil completo ------------------------- */
 
-function ProfileProgress({ value = 75 }) {
+function ProfileProgress({ value, status }) {
   const r = 22
   const c = 2 * Math.PI * r
+  const progress = value ?? 0
+  const message = status === "loading"
+    ? "Calculando el avance de tu perfil…"
+    : status === "error"
+      ? "No pudimos calcular el avance de tu perfil."
+      : progress === 100
+        ? "¡Tu perfil está completo!"
+        : progress >= 60
+          ? "Tu perfil está casi listo"
+          : "Completa tu perfil"
+
   return (
     <Card className="flex items-center gap-4 p-4 sm:p-5">
       <div className="relative grid size-14 shrink-0 place-items-center">
@@ -61,16 +72,20 @@ function ProfileProgress({ value = 75 }) {
             strokeWidth="5"
             strokeLinecap="round"
             strokeDasharray={c}
-            strokeDashoffset={c * (1 - value / 100)}
+            strokeDashoffset={c * (1 - progress / 100)}
             className="stroke-success transition-[stroke-dashoffset] duration-700"
           />
         </svg>
-        <span className="absolute text-xs font-bold">{value}%</span>
+        <span className="absolute text-xs font-bold">{value === null ? "—" : `${value}%`}</span>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-ink">Tu perfil está casi listo</p>
+        <p className="font-semibold text-ink">{message}</p>
         <p className="text-sm text-ink-2">
-          Agrega tus habilidades y tecnologías para que la IA encuentre tu equipo ideal.
+          {status === "success"
+            ? "Agrega tus habilidades y tecnologías para que la IA encuentre tu equipo ideal."
+            : status === "loading"
+              ? "Estamos revisando los datos que has completado."
+              : "Vuelve a cargar la página para intentarlo de nuevo."}
         </p>
       </div>
       <Button variant="secondary" size="sm" as={Link} to="/perfil" className="shrink-0">
@@ -296,8 +311,8 @@ export default function HomePage() {
   const perfilQuery = useAsync(obtenerPerfil)
   const usuarioGuardado = getSessionUser()
   
-  const nombreReal = usuarioGuardado.nombre || perfilQuery.data?.nombre || "Estudiante"
-  const progresoReal = perfilQuery.data?.perfilCompleto || 20
+  const nombreReal = perfilQuery.data?.nombre || usuarioGuardado.nombre || "Estudiante"
+  const progresoReal = perfilQuery.status === "success" ? perfilQuery.data.perfilCompleto : null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
@@ -316,14 +331,14 @@ export default function HomePage() {
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-10">
           <div className="animate-fade-up [animation-delay:60ms]">
-            <ProfileProgress value={progresoReal} />
+            <ProfileProgress value={progresoReal} status={perfilQuery.status} />
           </div>
 
           <section aria-labelledby="rec-title" className="animate-fade-up [animation-delay:120ms]">
             <SectionHeader
               id="rec-title"
               title="Convocatorias Abiertas"
-              desc="Proyectos y eventos registrados en MySQL para formar equipo."
+              desc="Proyectos disponibles para formar tu próximo equipo"
               action={<LocalProcessing />}
             />
             <Recommendations />

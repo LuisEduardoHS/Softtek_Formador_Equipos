@@ -26,6 +26,7 @@ export function StatusBadge({ estado }) {
 export default function InvitationItem({ invitation, person, project, onRespond, busy = false, compact = false }) {
   const { tipo, estado, rol, mensaje } = invitation
   const recibida = tipo === "recibida"
+  const solicitudUnirse = invitation.tipoSolicitud === "unirse"
   const canRespond = recibida && estado === "pendiente" && onRespond
   const nombrePersona = person?.nombre || "Usuario"
   const tituloProyecto = project?.titulo || invitation.proyecto?.titulo || "proyecto"
@@ -36,7 +37,16 @@ export default function InvitationItem({ invitation, person, project, onRespond,
         <Avatar name={nombrePersona} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-sm text-ink">
-            {recibida ? (
+            {solicitudUnirse && recibida ? (
+              <>
+                <span className="font-semibold">{nombrePersona}</span> solicita unirse a{" "}
+                <span className="font-semibold">{tituloProyecto}</span>
+              </>
+            ) : solicitudUnirse ? (
+              <>
+                Solicitaste unirte a <span className="font-semibold">{tituloProyecto}</span>
+              </>
+            ) : recibida ? (
               <>
                 <span className="font-semibold">{nombrePersona}</span> te invitó a{" "}
                 <span className="font-semibold">{tituloProyecto}</span>

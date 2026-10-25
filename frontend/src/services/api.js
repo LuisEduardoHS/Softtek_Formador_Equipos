@@ -1,6 +1,7 @@
 /**
  * Capa de servicios conectada a FastAPI (MySQL).
  */
+import { calculateProfileCompletion } from "../lib/profileCompletion"
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000"
 const CATEGORIES = { academico: "Academico", personal: "Personal", deportivo: "Deportivo",
@@ -93,6 +94,12 @@ function mapPerfil(perfil) {
     carrera: perfil.carrera,
     estado_geografico: perfil.estado_geografico ?? "",
     municipio: perfil.municipio ?? "",
+    perfilCompleto: calculateProfileCompletion({
+      ...datos,
+      nombre: perfil.nombre,
+      correo: perfil.correo,
+      carrera: perfil.carrera,
+    }),
     semestre: Number(datos.semestre) || 1,
     fortalezas,
     reforzar: Array.isArray(datos.reforzar) ? datos.reforzar : [],
@@ -126,7 +133,7 @@ export async function guardarPerfil(perfil) {
 
   const datos_crudos = Object.fromEntries(
     Object.entries(perfil).filter(([key]) =>
-      !["id", "usuario_id", "correo", "estado_geografico", "municipio", "perfil_estructurado_ia", "perfil_estado_ia"].includes(key),
+      !["id", "usuario_id", "correo", "estado_geografico", "municipio", "perfilCompleto", "perfil_estructurado_ia", "perfil_estado_ia"].includes(key),
     ),
   )
   const actualizado = await request(`/perfil/${usuarioLocal.id_usuario}`, {
@@ -177,17 +184,22 @@ function mapEventoAProyecto(evento) {
     tipo: detalles.tipo || evento.categoria_principal?.toLowerCase() || "academico",
     materia: detalles.materia ?? "",
     creadorId: String(evento.creador_id),
+    creadorNombre: evento.creador_nombre ?? null,
     integrantes: Number(detalles.integrantes) || 1,
     fechaLimite: detalles.fechaLimite || null,
     creado: evento.fecha_creacion?.slice(0, 10) ?? "",
     estado: evento.estado,
-    roles: rolesEvento.map((rol, index) => ({
-      id: String(rol.id ?? index),
-      nombre: typeof rol.nombre === "string" ? rol.nombre : "Rol sin nombre",
-      habilidades: Array.isArray(rol.habilidades) ? rol.habilidades : [],
-      indispensable: Boolean(rol.indispensable),
-      cubiertoPor: rol.cubiertoPor ?? null,
-    })),
+    roles: rolesEvento.map((rol, index) => {
+      const habilidades = Array.isArray(rol.habilidades) ? rol.habilidades : []
+      const nombre = typeof rol.nombre === "string" ? rol.nombre.trim() : ""
+      return {
+        id: String(rol.id ?? index),
+        nombre: nombre || (habilidades.length ? `Rol para ${habilidades.slice(0, 3).join(", ")}` : "Rol sin nombre"),
+        habilidades,
+        indispensable: Boolean(rol.indispensable),
+        cubiertoPor: rol.cubiertoPor ?? null,
+      }
+    }),
   }
 }
 
@@ -234,6 +246,33 @@ export async function obtenerProyecto(id) {
   return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
+export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles }) {
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+    throw new Error("Inicia sesión para editar este proyecto.")
+  }
+
+  const categoria = toCategory(tipo)
+  const params = new URLSearchParams({ usuario_id: String(usuarioId) })
+  return request(`/eventos/${encodeURIComponent(id)}?${params.toString()}`, {
+    method: "PUT",
+    body: {
+      categoria_principal: categoria,
+      descripcion_libre: descripcion,
+      integrantes: Number(integrantes),
+      detalles_especificos: {
+        tipo,
+        materia: tipo === "personal" ? "" : materia,
+        integrantes: Number(integrantes),
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+    },
+  }).then(mapEventoAProyecto)
+}
+
 // ============================================================================
 // Flujos de IA y recomendaciones conectados a FastAPI
 // ============================================================================
@@ -245,8 +284,15 @@ export function interpretarPerfil(textos) {
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  // La solicitud de adhesión aún no tiene endpoint; nunca simular su envío.
-  return Promise.reject(new Error("Las solicitudes para unirse aún no están disponibles."))
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("Inicia sesión para solicitar unirte a un evento.")
+  }
+  const params = new URLSearchParams({ solicitante_id: String(usuarioLocal.id_usuario) })
+  return request(`/eventos/${encodeURIComponent(projectId)}/solicitudes?${params.toString()}`, {
+    method: "POST",
+    body: { rol_esperado: String(rolId), mensaje_explicacion: mensaje },
+  })
 }
 
 export function interpretarProyecto(proyecto) {

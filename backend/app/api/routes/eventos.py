@@ -4,10 +4,11 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 from app.core.security import get_current_user
 from app.db.database import get_db
+from app.models.participante import ParticipanteEvento
 from app.models.evento import Evento
 from app.models.usuario import Usuario
 from app.schemas.ai_integration import EventInterpretRequest, EventReviewed
-from app.schemas.evento import EventoCreate, EventoOut
+from app.schemas.evento import EventoCreate, EventoOut, EventoUpdate
 from app.services.ai.event_parser import EventParser
 from app.services.ai.integration import content_revision, process_event_embedding, utc_now
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
@@ -16,12 +17,24 @@ from app.services.ai.schemas import StructuredEventRequirements
 router = APIRouter(prefix="/eventos", tags=["Eventos y Convocatorias"])
 
 
-def _visible(evento: Evento, actor: Usuario) -> EventoOut:
+def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
+    creator = db.get(Usuario, evento.creador_id)
+    details = dict(evento.detalles_especificos or {})
+    roles = details.get("roles")
+    if isinstance(roles, list):
+        participants = db.query(ParticipanteEvento).filter(
+            ParticipanteEvento.id_evento == evento.id_evento).all()
+        assignments = {p.rol.strip().casefold(): str(p.id_usuario) for p in participants if p.rol}
+        details["roles"] = [
+            {**role, "cubiertoPor": assignments.get(str(role.get("nombre", "")).strip().casefold())}
+            if isinstance(role, dict) else role for role in roles
+        ]
     return EventoOut(
         id_evento=evento.id_evento, creador_id=evento.creador_id,
+        creador_nombre=creator.nombre if creator else None,
         categoria_principal=evento.categoria_principal, titulo=evento.titulo,
         descripcion_libre=evento.descripcion_libre,
-        detalles_especificos=evento.detalles_especificos or {},
+        detalles_especificos=details,
         requisitos_ia=(evento.requisitos_ia or {}) if evento.requisitos_confirmados_at else {},
         requisitos_confirmados=bool(evento.requisitos_confirmados_at),
         estado_ia=evento.estado_ia if evento.creador_id == actor.id_usuario else None,
@@ -90,7 +103,7 @@ async def crear_evento(payload: EventoCreate, db: Session = Depends(get_db),
         await process_event_embedding(db, evento, confirmed)
         db.commit()
         db.refresh(evento)
-    return _visible(evento, actor)
+    return _visible(evento, actor, db)
 
 
 @router.post("/{id_evento}/confirmar", response_model=EventoOut)
@@ -103,7 +116,7 @@ async def confirmar_evento(id_evento: int, payload: EventReviewed,
     await process_event_embedding(db, evento, confirmed)
     db.commit()
     db.refresh(evento)
-    return _visible(evento, actor)
+    return _visible(evento, actor, db)
 
 
 @router.post("/{id_evento}/embedding/reintentar", response_model=EventoOut)
@@ -115,7 +128,7 @@ async def reintentar_embedding_evento(id_evento: int, db: Session = Depends(get_
     confirmed = StructuredEventRequirements.model_validate(evento.requisitos_ia)
     await process_event_embedding(db, evento, confirmed)
     db.commit()
-    return _visible(evento, actor)
+    return _visible(evento, actor, db)
 
 
 @router.get("/", response_model=list[EventoOut])
@@ -127,7 +140,7 @@ def listar_eventos(categoria_principal: str | None = Query(None),
         query = query.filter(Evento.categoria_principal == categoria_principal)
     if estado:
         query = query.filter(Evento.estado == estado)
-    return [_visible(e, actor) for e in query.order_by(Evento.id_evento.desc()).all()
+    return [_visible(e, actor, db) for e in query.order_by(Evento.id_evento.desc()).all()
             if e.estado != "Borrador" or e.creador_id == actor.id_usuario]
 
 
@@ -137,4 +150,99 @@ def obtener_evento(id_evento: int, db: Session = Depends(get_db),
     evento = db.get(Evento, id_evento)
     if not evento or (evento.estado == "Borrador" and evento.creador_id != actor.id_usuario):
         raise HTTPException(404, "Evento no encontrado.")
-    return _visible(evento, actor)
+    return _visible(evento, actor, db)
+
+
+@router.put("/{id_evento}", response_model=EventoOut)
+def actualizar_evento(
+    id_evento: int,
+    cambios: EventoUpdate,
+    usuario_id: int,
+    db: Session = Depends(get_db),
+    actor: Usuario = Depends(get_current_user),
+):
+    if usuario_id != actor.id_usuario:
+        raise HTTPException(403, "El usuario debe coincidir con la sesión.")
+    evento = db.query(Evento).filter(Evento.id_evento == id_evento).first()
+    if not evento:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Evento no encontrado.",
+        )
+    if evento.creador_id != usuario_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo quien creó el evento puede editarlo.",
+        )
+    if cambios.categoria_principal not in {"Academico", "Personal", "Deportivo", "Videojuegos", "General"}:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="El tipo de proyecto no es válido.",
+        )
+
+    participantes = db.query(ParticipanteEvento).filter(
+        ParticipanteEvento.id_evento == id_evento
+    ).all()
+    if len(participantes) + 1 > cambios.integrantes:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El número de integrantes no puede ser menor que las personas que ya forman parte del equipo.",
+        )
+
+    detalles = dict(cambios.detalles_especificos)
+    roles = detalles.get("roles")
+    if not isinstance(roles, list):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="La lista de roles no es válida.",
+        )
+    if any(
+        not isinstance(rol, dict)
+        or not isinstance(rol.get("nombre"), str)
+        or not rol["nombre"].strip()
+        for rol in roles
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Cada rol debe tener un nombre válido.",
+        )
+    roles_por_nombre = {
+        rol["nombre"].strip().casefold()
+        for rol in roles
+    }
+    roles_asignados = {participante.rol.strip().casefold() for participante in participantes if participante.rol}
+    roles_eliminados = roles_asignados - roles_por_nombre
+    if roles_eliminados:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="No puedes quitar un rol que ya tiene un integrante asignado.",
+        )
+
+    detalles["tipo"] = cambios.categoria_principal.casefold()
+    detalles["integrantes"] = cambios.integrantes
+    detalles["fechaLimite"] = detalles.get("fechaLimite") or None
+
+    evento.categoria_principal = cambios.categoria_principal
+    evento.descripcion_libre = cambios.descripcion_libre
+    evento.detalles_especificos = detalles
+    # Edits must not retain confirmed evidence or vectors from an older revision.
+    evento.requisitos_borrador_ia = evento.requisitos_ia
+    evento.requisitos_ia = {}
+    evento.requisitos_confirmados_at = None
+    evento.requisitos_fuente_revision = None
+    evento.embedding_requisitos = None
+    evento.embedding_fuente_revision = None
+    evento.embedding_model = None
+    evento.embedding_pipeline = None
+    evento.procesado_at = None
+    evento.estado_ia = "pendiente_revision"
+    db.commit()
+    db.refresh(evento)
+
+    creador = db.query(Usuario).filter(Usuario.id_usuario == evento.creador_id).first()
+    if not creador:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No encontramos a la persona creadora del evento.",
+        )
+    return _visible(evento, actor, db)

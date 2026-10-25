@@ -8,6 +8,7 @@ from app.models.solicitud import SolicitudEquipo
 from app.models.usuario import Usuario
 from app.core.security import get_current_user, require_self
 from app.services.ai.recommendations.orm_adapter import candidate_recommendations
+from app.api.routes.solicitudes import MARCADOR_SOLICITUD_UNIRSE
 
 router = APIRouter(prefix="/notificaciones", tags=["Notificaciones"])
 
@@ -68,13 +69,27 @@ def obtener_notificaciones(id_usuario: int, db: Session = Depends(get_db),
 
         recibida = solicitud.id_destinatario == id_usuario
         estado = (solicitud.estado or "").casefold()
+        es_solicitud_unirse = (solicitud.mensaje_explicacion or "").startswith(
+            MARCADOR_SOLICITUD_UNIRSE
+        )
         if recibida and estado == "pendiente":
-            texto = f"{otra_persona.nombre} te invitó a «{evento.titulo}»."
+            if es_solicitud_unirse:
+                texto = f"{otra_persona.nombre} solicita unirse a «{evento.titulo}»."
+            else:
+                texto = f"{otra_persona.nombre} te invitó a «{evento.titulo}»."
             accion = {"label": "Responder", "to": "/invitaciones"}
         elif not recibida and estado in {"aceptada", "rechazada"}:
-            respuesta = "aceptó" if estado == "aceptada" else "rechazó"
-            texto = f"{otra_persona.nombre} {respuesta} tu invitación a «{evento.titulo}»."
-            accion = {"label": "Ver invitaciones", "to": "/invitaciones"}
+            if es_solicitud_unirse:
+                respuesta = "aceptó" if estado == "aceptada" else "rechazó"
+                texto = f"{otra_persona.nombre} {respuesta} tu solicitud para unirte a «{evento.titulo}»."
+                accion = {
+                    "label": "Ver equipo" if estado == "aceptada" else "Ver solicitudes",
+                    "to": "/equipos" if estado == "aceptada" else "/invitaciones",
+                }
+            else:
+                respuesta = "aceptó" if estado == "aceptada" else "rechazó"
+                texto = f"{otra_persona.nombre} {respuesta} tu invitación a «{evento.titulo}»."
+                accion = {"label": "Ver invitaciones", "to": "/invitaciones"}
         else:
             continue
 

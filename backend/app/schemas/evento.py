@@ -19,10 +19,18 @@ class EventoCreate(BaseModel):
             raise ValueError("Se requiere confirmación explícita del creador.")
         return self
 
+class EventoUpdate(BaseModel):
+    categoria_principal: str
+    descripcion_libre: Optional[str] = None
+    detalles_especificos: Dict[str, Any]
+    requisitos_ia: Dict[str, Any]
+    integrantes: int = Field(ge=2, le=8)
+
 class EventoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id_evento: int
     creador_id: int
+    creador_nombre: Optional[str] = None
     categoria_principal: str
     titulo: str
     descripcion_libre: Optional[str] = None
