@@ -24,7 +24,8 @@ async function request(path, { method = "GET", body } = {}) {
       window.dispatchEvent(new Event("session-expired"))
     }
     const errorData = await res.json().catch(() => ({}));
-    const error = new Error(typeof errorData.detail === "string" ? errorData.detail : `Error ${res.status} en ${path}`)
+    const detail = Array.isArray(errorData.detail) ? errorData.detail.map((item) => item.msg).join(". ") : errorData.detail
+    const error = new Error(typeof detail === "string" ? detail : `Error ${res.status} en ${path}`)
     error.status = res.status
     throw error
   }
@@ -94,6 +95,7 @@ function mapPerfil(perfil) {
     carrera: perfil.carrera,
     estado_geografico: perfil.estado_geografico ?? "",
     municipio: perfil.municipio ?? "",
+    perfil_estado_ia: perfil.perfil_estado_ia ?? "pendiente_revision",
     perfilCompleto: calculateProfileCompletion({
       ...datos,
       nombre: perfil.nombre,
@@ -152,8 +154,8 @@ export async function confirmarPerfil(perfil) {
   return mapPerfil(confirmado)
 }
 
-export function reintentarEmbeddingPerfil() {
-  return request("/perfil/embedding/reintentar", { method: "POST" })
+export async function reintentarEmbeddingPerfil() {
+  return mapPerfil(await request("/perfil/embedding/reintentar", { method: "POST" }))
 }
 
 export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
@@ -185,10 +187,16 @@ function mapEventoAProyecto(evento) {
     materia: detalles.materia ?? "",
     creadorId: String(evento.creador_id),
     creadorNombre: evento.creador_nombre ?? null,
-    integrantes: Number(detalles.integrantes) || 1,
+    integrantes: Number(detalles.integrantes) || 8,
     fechaLimite: detalles.fechaLimite || null,
     creado: evento.fecha_creacion?.slice(0, 10) ?? "",
     estado: evento.estado,
+    estado_ia: evento.estado_ia,
+    requisitos_confirmados: evento.requisitos_confirmados === true,
+    requirements: evento.requisitos_confirmados ? requisitos : null,
+    fuente_revision: evento.fuente_revision,
+    soy_integrante: evento.soy_integrante === true,
+    cupos_disponibles: evento.cupos_disponibles ?? 0,
     roles: rolesEvento.map((rol, index) => {
       const habilidades = Array.isArray(rol.habilidades) ? rol.habilidades : []
       const nombre = typeof rol.nombre === "string" ? rol.nombre.trim() : ""
@@ -198,6 +206,9 @@ function mapEventoAProyecto(evento) {
         habilidades,
         indispensable: Boolean(rol.indispensable),
         cubiertoPor: rol.cubiertoPor ?? null,
+        vacantes: rol.vacantes ?? 1,
+        ocupados: rol.ocupados ?? 0,
+        integrantesIds: rol.integrantesIds ?? [],
       }
     }),
   }
@@ -246,7 +257,7 @@ export async function obtenerProyecto(id) {
   return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
-export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles }) {
+export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles, fuente_revision }) {
   const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
   const usuarioId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
@@ -269,8 +280,21 @@ export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes
         roles,
       },
       requisitos_ia: { roles },
+      fuente_revision,
     },
   }).then(mapEventoAProyecto)
+}
+
+export function confirmarProyecto(project, requirements) {
+  return request(`/eventos/${encodeURIComponent(project.id)}/confirmar`, {
+    method: "POST",
+    body: { requirements: { ...requirements, categoria: toCategory(project.tipo) },
+      confirmado_por_creador: true, fuente_revision: project.fuente_revision },
+  }).then(mapEventoAProyecto)
+}
+
+export function reintentarEmbeddingProyecto(id) {
+  return request(`/eventos/${encodeURIComponent(id)}/embedding/reintentar`, { method: "POST" }).then(mapEventoAProyecto)
 }
 
 // ============================================================================
@@ -339,6 +363,7 @@ export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
   const body = {
     id_destinatario: Number(paraId),
     id_evento: Number(projectId),
+    rol_esperado: rol || "Participante",
     mensaje_explicacion: `${mensaje}${rol ? `\n\nRol propuesto: ${rol}` : ""}`,
   }
   return request(`/invitaciones/?de_id=${encodeURIComponent(usuarioLocal.id_usuario)}`, {

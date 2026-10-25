@@ -8,9 +8,10 @@ import AvailabilityGrid from "../components/ui/AvailabilityGrid"
 import { EmptyState, Skeleton } from "../components/ui/Feedback"
 import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls"
 import { useToast } from "../components/ui/Toast"
+import AIStatus from "../components/ui/AIStatus"
 import PublicProfile from "../components/profile/PublicProfile"
 import InviteModal from "../components/invite/InviteModal"
-import { confirmarPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
+import { confirmarPerfil, reintentarEmbeddingPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 import { getSessionUser } from "../lib/session"
 
@@ -47,7 +48,7 @@ function Section({ title, desc, badge, children }) {
 
 const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad"]
 
-function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
+function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, saving }) {
   const ids = { n: useId(), c: useId(), s: useId(), g: useId(), e: useId() }
   const set = (k) => (v) => setPerfil((p) => ({ ...p, [k]: v }))
   const setVis = (k) => (v) => setPerfil((p) => ({ ...p, visibilidad: { ...p.visibilidad, [k]: v } }))
@@ -154,7 +155,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
             <p className="text-sm text-ink-2">Tienes cambios sin guardar</p>
             <div className="flex gap-2">
               <Button variant="ghost" onClick={onDiscard}>Descartar</Button>
-              <Button onClick={onSave}>Guardar cambios</Button>
+              <Button onClick={onSave} disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
             </div>
           </div>
         </div>
@@ -171,6 +172,10 @@ function MyProfile() {
   const [saved, setSaved] = useState(null)
   const [perfil, setPerfil] = useState(null)
   const [mode, setMode] = useState("editar")
+  const [saving, setSaving] = useState(false)
+  const [reviewing, setReviewing] = useState(false)
+  const [reviewed, setReviewed] = useState(false)
+  const [operationError, setOperationError] = useState("")
 
   useEffect(() => {
     obtenerPerfil()
@@ -189,22 +194,27 @@ function MyProfile() {
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
+  if (!perfil) return <div role="alert" className="p-8">No pudimos cargar tu perfil. Recarga para reintentar.</div>
+
   const dirty = JSON.stringify(perfil) !== JSON.stringify(saved)
   const aiDirty = AI_FIELDS.some((k) => JSON.stringify(perfil[k]) !== JSON.stringify(saved[k]))
 
-  const save = async () => {
+  const save = async (confirmReview = false) => {
+    if (saving) return
     if (!perfil.nombre?.trim()) {
       toast("El nombre no puede quedar vacío.", "error")
       return
     }
 
+    setSaving(true)
+    setOperationError("")
     try {
       let actualizado
-      if (aiDirty) {
+      if (aiDirty || confirmReview === true) {
         const confirmado = await confirmarPerfil({
           nombre: perfil.nombre, carrera: perfil.carrera, fortalezas: perfil.fortalezas,
           reforzar: perfil.reforzar, intereses: perfil.intereses,
-          experiencia: perfil.experiencia ?? [], resumen_publico: perfil.resumen_publico ?? "",
+          experiencia: perfil.experiencia ?? [], resumen_publico: aiDirty || perfil.perfil_estado_ia === "obsoleto" ? "" : perfil.resumen_publico ?? "",
           disponibilidad: perfil.disponibilidad, visibilidad: perfil.visibilidad,
           pausado: perfil.pausado, consentimiento_recomendaciones: perfil.consentimiento_recomendaciones,
         })
@@ -213,12 +223,26 @@ function MyProfile() {
       } else actualizado = await guardarPerfil(perfil)
       setSaved(actualizado)
       setPerfil(actualizado)
+      setReviewing(false)
+      setReviewed(false)
       localStorage.setItem("usuario", JSON.stringify({ ...getSessionUser(), nombre: actualizado.nombre }))
       toast(aiDirty ? "Perfil confirmado; recomendaciones disponibles según tus permisos." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
+      setOperationError(error.message || "Error al guardar el perfil.")
       toast(error.message || "Error al guardar el perfil.", "error")
-    }
+    } finally { setSaving(false) }
+  }
+
+  const retry = async () => {
+    setSaving(true)
+    setOperationError("")
+    try {
+      const updated = await reintentarEmbeddingPerfil()
+      setPerfil(updated)
+      setSaved(updated)
+    } catch (error) { setOperationError(error.message) }
+    finally { setSaving(false) }
   }
 
   return (
@@ -239,9 +263,20 @@ function MyProfile() {
         />
       </header>
 
+      <div className="mb-5 space-y-3">
+        <AIStatus state={aiDirty ? "obsoleto" : saved.perfil_estado_ia} busy={saving} disabled={dirty} onRetry={retry}
+          onReview={() => { setMode("editar"); setReviewing(true); setReviewed(false) }} />
+        {reviewing && <Card className="space-y-3 p-4">
+          <p className="text-sm">Revisa las fortalezas, intereses, disponibilidad y permisos del formulario antes de confirmar.</p>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={reviewed}
+            onChange={(event) => setReviewed(event.target.checked)} />He revisado mis datos y quiero confirmar esta versión.</label>
+          <Button disabled={!reviewed || saving} onClick={() => save(true)}>Confirmar y generar análisis</Button>
+        </Card>}
+        {operationError && <p role="alert" className="text-sm text-danger">{operationError}</p>}
+      </div>
       <div key={mode} className="animate-fade-in">
         {mode === "editar" ? (
-          <EditProfile perfil={perfil} setPerfil={setPerfil} dirty={dirty} aiDirty={aiDirty} onSave={save} onDiscard={() => setPerfil(saved)} />
+          <fieldset disabled={saving}><EditProfile perfil={perfil} setPerfil={setPerfil} dirty={dirty} aiDirty={aiDirty} saving={saving} onSave={() => save()} onDiscard={() => setPerfil(saved)} /></fieldset>
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-ink-2">Así ven tu perfil las demás personas{dirty && " (incluye cambios sin guardar)"}.</p>

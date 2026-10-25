@@ -10,9 +10,10 @@ from app.models.usuario import Usuario
 from app.schemas.ai_integration import EventInterpretRequest, EventReviewed
 from app.schemas.evento import EventoCreate, EventoOut, EventoUpdate
 from app.services.ai.event_parser import EventParser
-from app.services.ai.integration import content_revision, process_event_embedding, utc_now
+from app.services.ai.integration import content_revision, process_event_embedding, utc_now, event_source_revision
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from app.services.ai.schemas import StructuredEventRequirements
+from app.services.team_rules import lock_event, roster, validated_roles, capacity, role_key
 
 router = APIRouter(prefix="/eventos", tags=["Eventos y Convocatorias"])
 
@@ -20,15 +21,20 @@ router = APIRouter(prefix="/eventos", tags=["Eventos y Convocatorias"])
 def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
     creator = db.get(Usuario, evento.creador_id)
     details = dict(evento.detalles_especificos or {})
+    participants = db.query(ParticipanteEvento).filter(
+        ParticipanteEvento.id_evento == evento.id_evento).all()
+    member_ids = {p.id_usuario for p in participants} | {evento.creador_id}
     roles = details.get("roles")
     if isinstance(roles, list):
-        participants = db.query(ParticipanteEvento).filter(
-            ParticipanteEvento.id_evento == evento.id_evento).all()
-        assignments = {p.rol.strip().casefold(): str(p.id_usuario) for p in participants if p.rol}
-        details["roles"] = [
-            {**role, "cubiertoPor": assignments.get(str(role.get("nombre", "")).strip().casefold())}
-            if isinstance(role, dict) else role for role in roles
-        ]
+        details["roles"] = []
+        for role in roles:
+            if not isinstance(role, dict):
+                continue
+            ids = [str(p.id_usuario) for p in participants
+                   if role_key(p.rol) == role_key(role.get("nombre"))]
+            slots = role.get("vacantes", 1)
+            details["roles"].append({**role, "ocupados": len(ids), "integrantesIds": ids,
+                                     "cubiertoPor": ids[0] if ids and len(ids) >= slots else None})
     return EventoOut(
         id_evento=evento.id_evento, creador_id=evento.creador_id,
         creador_nombre=creator.nombre if creator else None,
@@ -38,12 +44,15 @@ def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
         requisitos_ia=(evento.requisitos_ia or {}) if evento.requisitos_confirmados_at else {},
         requisitos_confirmados=bool(evento.requisitos_confirmados_at),
         estado_ia=evento.estado_ia if evento.creador_id == actor.id_usuario else None,
+        fuente_revision=event_source_revision(evento) if evento.creador_id == actor.id_usuario else None,
+        soy_integrante=actor.id_usuario in member_ids,
+        cupos_disponibles=max(0, capacity(details) - len(member_ids)),
         estado=evento.estado, fecha_creacion=evento.fecha_creacion,
     )
 
 
 def _owned(db: Session, id_evento: int, actor: Usuario) -> Evento:
-    evento = db.get(Evento, id_evento)
+    evento = lock_event(db, id_evento)
     if evento is None:
         raise HTTPException(404, "Evento no encontrado.")
     if evento.creador_id != actor.id_usuario:
@@ -57,10 +66,11 @@ def _confirm(evento: Evento, req: StructuredEventRequirements) -> StructuredEven
     confirmed = req.model_copy(update={"categoria": evento.categoria_principal})
     data = confirmed.model_dump(mode="json")
     evento.requisitos_ia = data
-    evento.requisitos_fuente_revision = content_revision(data)
+    evento.requisitos_fuente_revision = content_revision({"source": event_source_revision(evento), "requirements": data})
     evento.requisitos_confirmados_at = utc_now()
     evento.estado_ia = "pendiente_embedding"
     evento.estado = "Abierto"
+    evento.requisitos_borrador_ia = None
     evento.embedding_requisitos = None
     evento.embedding_fuente_revision = None
     return confirmed
@@ -93,14 +103,21 @@ async def crear_evento(payload: EventoCreate, db: Session = Depends(get_db),
         requisitos_ia={}, embedding_requisitos=None,
         estado="Borrador", estado_ia="pendiente_revision",
     )
+    details = dict(evento.detalles_especificos)
+    if "integrantes" in details:
+        capacity(details)
+    if "roles" in details:
+        details["roles"] = validated_roles(details)
+    evento.detalles_especificos = details
     confirmed = None
     if payload.requisitos_confirmados is not None:
         confirmed = _confirm(evento, payload.requisitos_confirmados)
+    revision = evento.requisitos_fuente_revision
     db.add(evento)
     db.commit()
     db.refresh(evento)
     if confirmed is not None:
-        await process_event_embedding(db, evento, confirmed)
+        await process_event_embedding(db, evento, confirmed, expected_revision=revision)
         db.commit()
         db.refresh(evento)
     return _visible(evento, actor, db)
@@ -111,9 +128,12 @@ async def confirmar_evento(id_evento: int, payload: EventReviewed,
                           db: Session = Depends(get_db),
                           actor: Usuario = Depends(get_current_user)):
     evento = _owned(db, id_evento, actor)
+    if payload.fuente_revision and payload.fuente_revision != event_source_revision(evento):
+        raise HTTPException(409, "El proyecto cambió mientras lo revisabas. Recarga los requisitos.")
     confirmed = _confirm(evento, payload.requirements)
+    revision = evento.requisitos_fuente_revision
     db.commit()
-    await process_event_embedding(db, evento, confirmed)
+    await process_event_embedding(db, evento, confirmed, expected_revision=revision)
     db.commit()
     db.refresh(evento)
     return _visible(evento, actor, db)
@@ -123,10 +143,12 @@ async def confirmar_evento(id_evento: int, payload: EventReviewed,
 async def reintentar_embedding_evento(id_evento: int, db: Session = Depends(get_db),
                                      actor: Usuario = Depends(get_current_user)):
     evento = _owned(db, id_evento, actor)
-    if not evento.requisitos_confirmados_at or not evento.requisitos_ia:
+    if not evento.requisitos_confirmados_at or not evento.requisitos_ia or not evento.requisitos_fuente_revision:
         raise HTTPException(409, "Primero confirma los requisitos.")
     confirmed = StructuredEventRequirements.model_validate(evento.requisitos_ia)
-    await process_event_embedding(db, evento, confirmed)
+    revision = evento.requisitos_fuente_revision
+    db.commit()
+    await process_event_embedding(db, evento, confirmed, expected_revision=revision)
     db.commit()
     return _visible(evento, actor, db)
 
@@ -163,12 +185,9 @@ def actualizar_evento(
 ):
     if usuario_id != actor.id_usuario:
         raise HTTPException(403, "El usuario debe coincidir con la sesión.")
-    evento = db.query(Evento).filter(Evento.id_evento == id_evento).first()
-    if not evento:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Evento no encontrado.",
-        )
+    evento = lock_event(db, id_evento)
+    if cambios.fuente_revision and cambios.fuente_revision != event_source_revision(evento):
+        raise HTTPException(409, "El proyecto cambió. Recarga antes de guardar.")
     if evento.creador_id != usuario_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -180,44 +199,11 @@ def actualizar_evento(
             detail="El tipo de proyecto no es válido.",
         )
 
-    participantes = db.query(ParticipanteEvento).filter(
-        ParticipanteEvento.id_evento == id_evento
-    ).all()
-    if len(participantes) + 1 > cambios.integrantes:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="El número de integrantes no puede ser menor que las personas que ya forman parte del equipo.",
-        )
-
+    participantes = roster(db, evento)
+    if len({p.id_usuario for p in participantes} | {evento.creador_id}) > cambios.integrantes:
+        raise HTTPException(409, "La capacidad no puede ser menor que los integrantes actuales.")
     detalles = dict(cambios.detalles_especificos)
-    roles = detalles.get("roles")
-    if not isinstance(roles, list):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="La lista de roles no es válida.",
-        )
-    if any(
-        not isinstance(rol, dict)
-        or not isinstance(rol.get("nombre"), str)
-        or not rol["nombre"].strip()
-        for rol in roles
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Cada rol debe tener un nombre válido.",
-        )
-    roles_por_nombre = {
-        rol["nombre"].strip().casefold()
-        for rol in roles
-    }
-    roles_asignados = {participante.rol.strip().casefold() for participante in participantes if participante.rol}
-    roles_eliminados = roles_asignados - roles_por_nombre
-    if roles_eliminados:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="No puedes quitar un rol que ya tiene un integrante asignado.",
-        )
-
+    detalles["roles"] = validated_roles(detalles, participantes)
     detalles["tipo"] = cambios.categoria_principal.casefold()
     detalles["integrantes"] = cambios.integrantes
     detalles["fechaLimite"] = detalles.get("fechaLimite") or None
@@ -226,7 +212,8 @@ def actualizar_evento(
     evento.descripcion_libre = cambios.descripcion_libre
     evento.detalles_especificos = detalles
     # Edits must not retain confirmed evidence or vectors from an older revision.
-    evento.requisitos_borrador_ia = evento.requisitos_ia
+    if evento.requisitos_confirmados_at:
+        evento.requisitos_borrador_ia = evento.requisitos_ia
     evento.requisitos_ia = {}
     evento.requisitos_confirmados_at = None
     evento.requisitos_fuente_revision = None

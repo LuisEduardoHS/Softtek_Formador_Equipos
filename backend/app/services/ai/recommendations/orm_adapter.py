@@ -2,7 +2,7 @@
 
 import math
 import re
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -111,6 +111,10 @@ def candidate_from_orm(user: Usuario, profile: PerfilUsuario | None,
 
 def event_from_orm(event: Evento, members: list[ParticipanteEvento]) -> EventInput:
     """Never promote legacy requisitos_ia without a creator confirmation stamp."""
+    details = _json_object(event.detalles_especificos)
+    max_people = details.get("integrantes", 8)
+    if type(max_people) is not int or max_people < 2:
+        max_people = 8
     requirements = None
     if event.requisitos_confirmados_at:
         try:
@@ -132,11 +136,15 @@ def event_from_orm(event: Evento, members: list[ParticipanteEvento]) -> EventInp
                  + _evidence("organizer_confirmed", "skill", requirements.habilidades_deseables)
                  + _evidence("organizer_confirmed", "role", requirements.roles_buscados))
         constraints = _evidence("organizer_confirmed", "constraint", requirements.restricciones_explicitas)
-        occupied = {apply_equivalence(member.rol) for member in members if _safe_fact(member.rol)}
+        occupied = Counter(apply_equivalence(member.rol) for member in members if _safe_fact(member.rol))
+        defined_roles = details.get("roles", [])
+        defined_roles = defined_roles if isinstance(defined_roles, list) else []
+        vacancies = {apply_equivalence(role["nombre"]): role.get("vacantes", 1)
+                     for role in defined_roles if isinstance(role, dict) and _safe_fact(role.get("nombre"))}
         if all(member.rol for member in members):
             outstanding = _evidence("organizer_confirmed", "role", [
                 role for role in requirements.roles_buscados
-                if apply_equivalence(role) not in occupied
+                if occupied[apply_equivalence(role)] < vacancies.get(apply_equivalence(role), 1)
             ])
     participants = [Participant(user_id=event.creador_id, role=None, confirmed=True)]
     participants.extend(Participant(user_id=m.id_usuario, role=_safe_fact(m.rol), confirmed=True)
@@ -149,7 +157,7 @@ def event_from_orm(event: Evento, members: list[ParticipanteEvento]) -> EventInp
         )
     return EventInput(
         event_id=event.id_evento, creator_id=event.creador_id,
-        state="open" if event.estado == "Abierto" else "closed",
+        state="open" if event.estado == "Abierto" and len({p.user_id for p in participants}) < max_people else "closed",
         requirements=requirements, confirmed_requirements=facts,
         participants=participants, outstanding_roles=outstanding,
         explicit_constraints=constraints, event_embedding=vector,

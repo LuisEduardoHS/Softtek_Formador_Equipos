@@ -8,6 +8,7 @@ from pydantic import ValidationError
 
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from app.services.ai.schemas import StructuredEventRequirements
+from app.services.ai.skill_terms import canonical_skill, reviewed_skills, skill_statements
 
 
 def _words(value: str) -> set[str]:
@@ -154,6 +155,10 @@ Responde únicamente con el objeto JSON solicitado."""
             )
         ]
         parsed.restricciones_explicitas = _valid_restrictions(parsed.restricciones_explicitas, source)
+        title = (detalles_especificos or {}).get("titulo")
+        if isinstance(title, str) and title.strip():
+            parsed.restricciones_explicitas = [item for item in parsed.restricciones_explicitas
+                                              if _words(item) != _words(title)]
         parsed.restricciones_explicitas = [
             item for item in parsed.restricciones_explicitas
             if not re.search(r"\b(?:blender|unreal\s+engine\s+5|git|game\s+jam)\b", item, re.IGNORECASE)
@@ -179,6 +184,25 @@ Responde únicamente con el objeto JSON solicitado."""
             for role in parsed.roles_buscados
         ):
             parsed.roles_buscados.append(seeks_goalkeeper.group(1).lower())
+        facts = skill_statements(descripcion_libre, event=True)
+        for field in ("habilidades_obligatorias", "habilidades_deseables"):
+            setattr(parsed, field, [v for v in reviewed_skills(getattr(parsed, field))
+                                   if not facts.get(canonical_skill(v), set()) & {"denied", "goal"}
+                                   and not re.search(r"\b(?:no|sin)\b", v, re.I)])
+        for skill, states in facts.items():
+            if states & {"denied", "goal"}:
+                continue
+            if "required" in states:
+                parsed.habilidades_obligatorias = reviewed_skills(parsed.habilidades_obligatorias + [skill])
+                parsed.habilidades_deseables = [v for v in parsed.habilidades_deseables if v != skill]
+            elif "preferred" in states:
+                parsed.habilidades_deseables = reviewed_skills(parsed.habilidades_deseables + [skill])
+                parsed.habilidades_obligatorias = [v for v in parsed.habilidades_obligatorias if v != skill]
+        parsed.restricciones_explicitas = [item for item in parsed.restricciones_explicitas
+                                          if not any(states & {"required", "preferred", "denied", "goal"}
+                                                     for states in skill_statements(item, event=True).values())]
+        if any(states & {"denied", "goal"} for states in facts.values()):
+            parsed.resumen = ""
         if not parsed.resumen:
             facts = []
             for label, values in (

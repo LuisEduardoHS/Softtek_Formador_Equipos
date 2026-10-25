@@ -25,6 +25,7 @@ class EventoUpdate(BaseModel):
     detalles_especificos: Dict[str, Any]
     requisitos_ia: Dict[str, Any]
     integrantes: int = Field(ge=2, le=8)
+    fuente_revision: str | None = Field(default=None, min_length=64, max_length=64)
 
 class EventoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -38,5 +39,8 @@ class EventoOut(BaseModel):
     requisitos_ia: Dict[str, Any] = Field(default_factory=dict)
     estado_ia: str | None = None
     requisitos_confirmados: bool = False
+    fuente_revision: str | None = None
+    soy_integrante: bool = False
+    cupos_disponibles: int = 0
     estado: str
     fecha_creacion: datetime

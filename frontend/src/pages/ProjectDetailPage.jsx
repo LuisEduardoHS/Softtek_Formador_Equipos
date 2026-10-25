@@ -9,6 +9,7 @@ import { Segmented } from "../components/ui/Controls"
 import { LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, CardSkeleton, EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
+import ProjectAIReview from "../components/project/ProjectAIReview"
 import RoleCoverage from "../components/project/RoleCoverage"
 import { TypeBadge } from "../components/project/ProjectCard"
 import { CoverageBar } from "../components/team/TeamSummaryCard"
@@ -225,6 +226,7 @@ function EditProjectModal({ project, onClose, onSaved }) {
   const [tipo, setTipo] = useState(project.tipo)
   const [integrantes, setIntegrantes] = useState(project.integrantes)
   const [fechaLimite, setFechaLimite] = useState(project.fechaLimite || "")
+  const [descripcion, setDescripcion] = useState(project.descripcion)
   const [roles, setRoles] = useState(() => project.roles.map((role) => ({ ...role, habilidades: [...role.habilidades] })))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
@@ -260,7 +262,8 @@ function EditProjectModal({ project, onClose, onSaved }) {
       const updated = await actualizarProyecto(project.id, {
         tipo,
         materia: project.materia,
-        descripcion: project.descripcion,
+        descripcion,
+        fuente_revision: project.fuente_revision,
         integrantes,
         fechaLimite,
         roles,
@@ -290,6 +293,10 @@ function EditProjectModal({ project, onClose, onSaved }) {
       }
     >
       <form id="edit-project-form" onSubmit={submit} className="space-y-6">
+        <p className="rounded-lg bg-ai-soft p-3 text-sm">Al guardar tendrás que revisar y confirmar los requisitos actualizados antes de volver a usar el análisis de IA.</p>
+        <label className="block text-sm font-semibold">Descripción
+          <textarea value={descripcion} onChange={(event) => setDescripcion(event.target.value)} rows={4} className={`${inputCls()} mt-2 w-full`} />
+        </label>
         <div>
           <p className="mb-2 text-sm font-semibold">Tipo de proyecto</p>
           <Segmented
@@ -351,7 +358,7 @@ function EditProjectModal({ project, onClose, onSaved }) {
                     <input
                       value={role.nombre}
                       onChange={(event) => updateRole(role.id, { nombre: event.target.value })}
-                      disabled={Boolean(role.cubiertoPor)}
+                      disabled={role.ocupados > 0 || Boolean(role.cubiertoPor)}
                       placeholder="Nombre del rol"
                       className={`${inputCls()} disabled:bg-surface-2 disabled:opacity-70`}
                     />
@@ -372,7 +379,7 @@ function EditProjectModal({ project, onClose, onSaved }) {
                 <button
                   type="button"
                   aria-label={`Quitar rol ${role.nombre}`}
-                  disabled={Boolean(role.cubiertoPor) || roles.length === 1}
+                  disabled={role.ocupados > 0 || Boolean(role.cubiertoPor) || roles.length === 1}
                   onClick={() => setRoles((current) => current.filter((item) => item.id !== role.id))}
                   className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-lg text-ink-2 hover:bg-danger-soft hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -467,9 +474,12 @@ function ProjectDetailPage({ id }) {
   const usuarioLocal = getSessionUser()
   const usuarioId = usuarioLocal.id_usuario
   const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
-  const esIntegrante = usuarioId !== undefined && project.roles.some((r) => String(r.cubiertoPor) === String(usuarioId))
+  const esIntegrante = project.soy_integrante
   const { cubiertos, total, pendientes } = coverage(project)
 
+  const pendingApplication = (sentInvitations.data ?? []).find((item) =>
+    String(item.projectId) === String(project.id) && item.estado === "pendiente" &&
+    item.tipo === "enviada" && item.tipoSolicitud === "unirse")
   let action
   if (esDueno) {
     action = (
@@ -483,8 +493,8 @@ function ProjectDetailPage({ id }) {
         <Users aria-hidden="true" className="size-4" /> Ver mi equipo
       </Button>
     )
-  } else if (pendientes.length > 0) {
-    action = requestedRol ? (
+  } else if (pendientes.length > 0 && project.cupos_disponibles > 0 && project.estado === "Abierto") {
+    action = requestedRol || pendingApplication ? (
       <Button disabled className="animate-scale-in">
         <CircleCheck aria-hidden="true" className="size-4" /> Solicitud enviada
       </Button>
@@ -500,6 +510,8 @@ function ProjectDetailPage({ id }) {
       {back}
       <div className="space-y-10">
         <ProjectHeader project={project} action={action} />
+        {esDueno && <ProjectAIReview key={`${project.id}-${project.fuente_revision}-${project.estado_ia}`} project={project} onSaved={reload} />}
+        {!esDueno && !project.requisitos_confirmados && <p role="status" className="rounded-lg bg-ai-soft p-4 text-sm">El creador está revisando los requisitos actuales. El análisis anterior ya no se utiliza.</p>}
 
         <section aria-labelledby="cov-title" className="animate-fade-up [animation-delay:120ms]">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -516,18 +528,18 @@ function ProjectDetailPage({ id }) {
           <RoleCoverage roles={project.roles} invitedByRole={esDueno ? invitedByRole : {}} highlightRolId={requestedRol} />
         </section>
 
-        {esDueno && (
+        {esDueno && project.requisitos_confirmados && (
           <section aria-labelledby="cand-title" className="animate-fade-up [animation-delay:180ms]">
             <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
               <div>
                 <h2 id="cand-title" className="text-h2 font-semibold">
                   Candidatos recomendados
                 </h2>
-                <p className="text-sm text-ink-2">Agrupados por el rol pendiente que cubrirían.</p>
+                <p className="text-sm text-ink-2">Revisa la evidencia y elige un rol disponible antes de invitar.</p>
               </div>
               <LocalProcessing />
             </div>
-            <Candidates project={project} />
+            <Candidates key={`${project.id}-${project.fuente_revision}-${project.estado_ia}`} project={project} />
           </section>
         )}
       </div>
@@ -547,7 +559,7 @@ function ProjectDetailPage({ id }) {
           onClose={() => setEditOpen(false)}
           onSaved={() => {
             setEditOpen(false)
-            toast("Cambios guardados.")
+            toast("Cambios guardados. Revisa y confirma los requisitos actualizados.")
             reload()
           }}
         />

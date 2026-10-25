@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.solicitud import SolicitudEquipo
@@ -7,6 +7,7 @@ from app.models.evento import Evento
 from app.models.usuario import PerfilUsuario, Usuario
 from app.schemas.solicitud import SolicitudCreate, SolicitudUnirse, SolicitudUpdate
 from app.core.security import get_current_user, require_self
+from app.services.team_rules import (team_transaction, lock_event, available_role, reject_pending_pair)
 
 router = APIRouter()
 MARCADOR_SOLICITUD_UNIRSE = "[SOLICITUD_UNIRSE]"
@@ -87,176 +88,83 @@ def obtener_invitaciones(id_usuario: int, db: Session = Depends(get_db),
 
 
 @router.post("/eventos/{id_evento}/solicitudes")
-def solicitar_unirse(
-    id_evento: int,
-    solicitud: SolicitudUnirse,
-    solicitante_id: int,
-    db: Session = Depends(get_db),
-    actor: Usuario = Depends(get_current_user),
-):
+def solicitar_unirse(id_evento: int, solicitud: SolicitudUnirse, solicitante_id: int,
+                     db: Session = Depends(get_db), actor: Usuario = Depends(get_current_user)):
     require_self(solicitante_id, actor)
-    evento = db.query(Evento).filter(Evento.id_evento == id_evento).first()
-    if not evento or (evento.estado or "").casefold() != "abierto":
-        raise HTTPException(status_code=404, detail="El evento no está disponible.")
-    if evento.creador_id == solicitante_id:
-        raise HTTPException(status_code=400, detail="No puedes solicitar unirte a tu propio evento.")
+    with team_transaction(db):
+        evento = lock_event(db, id_evento)
+        rol = available_role(db, evento, actor.id_usuario, solicitud.rol_esperado)
+        reject_pending_pair(db, evento, actor.id_usuario)
+        nueva = SolicitudEquipo(
+            id_evento=id_evento, id_remitente=actor.id_usuario, id_destinatario=evento.creador_id,
+            mensaje_explicacion=(f"{MARCADOR_SOLICITUD_UNIRSE}\nRol solicitado: {rol}\n\n"
+                                 f"{(solicitud.mensaje_explicacion or '').strip()}"), estado="Pendiente")
+        db.add(nueva)
+        db.flush()
+        result = {"id": nueva.id_solicitud, "estado": "pendiente"}
+    return result
 
-    solicitante = db.query(Usuario).filter(Usuario.id_usuario == solicitante_id).first()
-    if not solicitante:
-        raise HTTPException(status_code=404, detail="No encontramos tu cuenta.")
-
-    participante = db.query(ParticipanteEvento).filter(
-        ParticipanteEvento.id_evento == id_evento,
-        ParticipanteEvento.id_usuario == solicitante_id,
-    ).first()
-    if participante:
-        raise HTTPException(status_code=409, detail="Ya formas parte de este equipo.")
-
-    detalles = evento.detalles_especificos or {}
-    requisitos = evento.requisitos_ia or {}
-    roles = detalles.get("roles") if isinstance(detalles, dict) else None
-    if not isinstance(roles, list):
-        roles = requisitos.get("roles", []) if isinstance(requisitos, dict) else []
-    rol = next(
-        (
-            item for index, item in enumerate(roles)
-            if isinstance(item, dict)
-            and str(item.get("id", index)) == str(solicitud.rol_esperado)
-        ),
-        None,
-    )
-    if not rol:
-        raise HTTPException(status_code=400, detail="El rol seleccionado no existe en este evento.")
-    if rol.get("cubiertoPor"):
-        raise HTTPException(status_code=409, detail="Ese rol ya está cubierto.")
-
-    solicitud_existente = db.query(SolicitudEquipo).filter(
-        SolicitudEquipo.id_evento == id_evento,
-        SolicitudEquipo.id_remitente == solicitante_id,
-        SolicitudEquipo.id_destinatario == evento.creador_id,
-        SolicitudEquipo.estado.ilike("pendiente"),
-    ).first()
-    if solicitud_existente:
-        raise HTTPException(status_code=409, detail="Ya tienes una solicitud pendiente para este evento.")
-
-    mensaje = (
-        f"{MARCADOR_SOLICITUD_UNIRSE}\n"
-        f"Rol solicitado: {rol.get('nombre', 'Participante')}\n\n"
-        f"{(solicitud.mensaje_explicacion or '').strip()}"
-    )
-    nueva_solicitud = SolicitudEquipo(
-        id_evento=id_evento,
-        id_remitente=solicitante_id,
-        id_destinatario=evento.creador_id,
-        mensaje_explicacion=mensaje,
-        estado="Pendiente",
-    )
-    db.add(nueva_solicitud)
-    db.commit()
-    db.refresh(nueva_solicitud)
-    return {"id": nueva_solicitud.id_solicitud, "estado": "pendiente"}
 
 @router.post("/invitaciones/")
 def crear_solicitud(sol: SolicitudCreate, de_id: int, db: Session = Depends(get_db),
-                   actor: Usuario = Depends(get_current_user)):
+                    actor: Usuario = Depends(get_current_user)):
     require_self(de_id, actor)
-    evento = db.query(Evento).filter(Evento.id_evento == sol.id_evento).first()
-    destinatario = db.query(Usuario).filter(Usuario.id_usuario == sol.id_destinatario).first()
-    if not evento or evento.creador_id != de_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No encontramos un evento tuyo para enviar esta invitación.",
-        )
-    if evento.estado != "Abierto":
-        raise HTTPException(status_code=409, detail="El evento no está abierto a invitaciones.")
-    if not destinatario:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No encontramos a la persona que quieres invitar.",
-        )
-    if destinatario.estado_cuenta != "Activa":
-        raise HTTPException(status_code=409, detail="La cuenta destinataria no está activa.")
-    perfil_destinatario = db.get(PerfilUsuario, destinatario.id_usuario)
-    if perfil_destinatario and (perfil_destinatario.datos_crudos or {}).get("pausado", False):
-        raise HTTPException(status_code=409, detail="El perfil destinatario no está disponible.")
-    if sol.id_destinatario == de_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No puedes invitarte a tu propio evento.",
-        )
+    with team_transaction(db):
+        evento = lock_event(db, sol.id_evento)
+        if evento.creador_id != actor.id_usuario:
+            raise HTTPException(403, "Solo quien creó el evento puede invitar.")
+        # Read the legacy footer for old clients, but construct the stored type/role
+        # ourselves so user text cannot change who is enrolled on acceptance.
+        message = (sol.mensaje_explicacion or "").strip()
+        if message.startswith(MARCADOR_SOLICITUD_UNIRSE):
+            raise HTTPException(422, "El mensaje contiene un marcador reservado.")
+        role_hint = sol.rol_esperado
+        if "\n\nRol propuesto: " in message:
+            message, legacy_role = message.rsplit("\n\nRol propuesto: ", 1)
+            if role_hint in (None, "Participante"):
+                role_hint = legacy_role
+        role = available_role(db, evento, sol.id_destinatario, role_hint)
+        reject_pending_pair(db, evento, sol.id_destinatario)
+        nueva = SolicitudEquipo(
+            id_evento=evento.id_evento, id_remitente=actor.id_usuario,
+            id_destinatario=sol.id_destinatario,
+            mensaje_explicacion=f"{message}\n\nRol propuesto: {role}", estado="Pendiente")
+        db.add(nueva)
+        db.flush()
+        result = {"id": nueva.id_solicitud, "estado": "pendiente"}
+    return result
 
-    solicitud_existente = db.query(SolicitudEquipo).filter(
-        SolicitudEquipo.id_evento == sol.id_evento,
-        SolicitudEquipo.id_remitente == de_id,
-        SolicitudEquipo.id_destinatario == sol.id_destinatario,
-        SolicitudEquipo.estado == "Pendiente",
-    ).first()
-    if solicitud_existente:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Ya enviaste una invitación pendiente a esta persona para el evento.",
-        )
-
-    nueva_solicitud = SolicitudEquipo(
-        id_evento=sol.id_evento,
-        id_remitente=de_id,
-        id_destinatario=sol.id_destinatario,
-        mensaje_explicacion=sol.mensaje_explicacion,
-        estado="Pendiente"
-    )
-    db.add(nueva_solicitud)
-    db.commit()
-    db.refresh(nueva_solicitud)
-    return {"id": nueva_solicitud.id_solicitud, "estado": "pendiente"}
 
 @router.patch("/invitaciones/{id_solicitud}")
 def responder_solicitud(id_solicitud: int, sol_update: SolicitudUpdate, db: Session = Depends(get_db),
                         actor: Usuario = Depends(get_current_user)):
-    db_sol = db.query(SolicitudEquipo).filter(SolicitudEquipo.id_solicitud == id_solicitud).first()
-    if not db_sol:
-        raise HTTPException(status_code=404, detail="Solicitud no encontrada")
-    require_self(db_sol.id_destinatario, actor)
+    estado = sol_update.estado.strip().casefold()
+    if estado not in {"aceptada", "rechazada"}:
+        raise HTTPException(422, "La respuesta debe ser aceptada o rechazada.")
+    with team_transaction(db):
+        # Lock order is always event -> request -> roster/users. The first lookup
+        # locates the event only; never use its cached state to authorize acceptance.
+        hint = db.get(SolicitudEquipo, id_solicitud)
+        if not hint:
+            raise HTTPException(404, "Solicitud no encontrada.")
+        evento = lock_event(db, hint.id_evento)
+        sol = db.query(SolicitudEquipo).filter_by(id_solicitud=id_solicitud).populate_existing().with_for_update().one()
+        require_self(sol.id_destinatario, actor)
+        if (sol.estado or "").casefold() != "pendiente":
+            raise HTTPException(409, "Esta solicitud ya fue respondida.")
+        es_adhesion = _es_solicitud_unirse(sol)
+        if (es_adhesion and sol.id_destinatario != evento.creador_id) or (
+                not es_adhesion and sol.id_remitente != evento.creador_id):
+            raise HTTPException(409, "La solicitud ya no corresponde al creador actual del evento.")
+        if estado == "aceptada":
+            user_id = sol.id_remitente if es_adhesion else sol.id_destinatario
+            _, requested_role, _ = _detalles_solicitud(sol)
+            role = available_role(db, evento, user_id, requested_role)
+            db.add(ParticipanteEvento(id_evento=evento.id_evento, id_usuario=user_id, rol=role))
+        sol.estado = estado.capitalize()
+        db.flush()
+    return {"id": id_solicitud, "estado": estado}
 
-    estado_normalizado = sol_update.estado.strip().casefold()
-    if estado_normalizado not in {"aceptada", "rechazada"}:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="La respuesta debe ser aceptada o rechazada.",
-        )
-    if (db_sol.estado or "").casefold() != "pendiente":
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Esta invitación ya fue respondida.",
-        )
-    if estado_normalizado == "aceptada":
-        evento = db.get(Evento, db_sol.id_evento)
-        if not evento or evento.estado != "Abierto":
-            raise HTTPException(status_code=409, detail="El evento ya no acepta integrantes.")
-
-    estado_guardado = estado_normalizado.capitalize()
-    db_sol.estado = estado_guardado
-    
-    es_solicitud_unirse = _es_solicitud_unirse(db_sol)
-    if estado_normalizado == "aceptada":
-        id_usuario_aceptado = db_sol.id_remitente if es_solicitud_unirse else db_sol.id_destinatario
-        miembro_existente = db.query(ParticipanteEvento).filter(
-            ParticipanteEvento.id_evento == db_sol.id_evento,
-            ParticipanteEvento.id_usuario == id_usuario_aceptado,
-        ).first()
-        if miembro_existente:
-            db.commit()
-            return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
-
-        _, rol, _ = _detalles_solicitud(db_sol)
-        nuevo_participante = ParticipanteEvento(
-            id_evento=db_sol.id_evento,
-            id_usuario=id_usuario_aceptado,
-            rol=rol[:50] or "Participante",
-        )
-        db.add(nuevo_participante)
-
-    db.commit()
-    return {"id": db_sol.id_solicitud, "estado": estado_normalizado}
 
 @router.get("/equipos/{id_usuario}")
 def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
@@ -331,19 +239,13 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
             if not isinstance(rol, dict):
                 continue
             nombre_rol = rol.get("nombre", "Rol sin nombre")
-            miembro_asignado = next(
-                (
-                    miembro for miembro in miembros
-                    if miembro["rol"].casefold() == str(nombre_rol).casefold()
-                ),
-                None,
-            )
+            assigned = [miembro for miembro in miembros
+                        if miembro["rol"].strip().casefold() == str(nombre_rol).strip().casefold()]
+            slots = rol.get("vacantes", 1)
             roles.append({
-                **rol,
-                "id": str(rol.get("id", index)),
-                "cubiertoPor": (
-                    str(miembro_asignado["id"]) if miembro_asignado else rol.get("cubiertoPor")
-                ),
+                **rol, "id": str(rol.get("id", index)), "ocupados": len(assigned),
+                "integrantesIds": [str(member["id"]) for member in assigned],
+                "cubiertoPor": str(assigned[0]["id"]) if assigned and len(assigned) >= slots else None,
             })
 
         proyecto = {
@@ -353,7 +255,9 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
             "titulo": evento.titulo,
             "descripcion_libre": evento.descripcion_libre,
             "detalles_especificos": {**detalles, "roles": roles},
-            "requisitos_ia": requisitos,
+            "requisitos_ia": requisitos if evento.requisitos_confirmados_at else {},
+            "requisitos_confirmados": bool(evento.requisitos_confirmados_at),
+            "estado_ia": evento.estado_ia if evento.creador_id == actor.id_usuario else None,
             "estado": evento.estado,
             "fecha_creacion": evento.fecha_creacion.isoformat() if evento.fecha_creacion else None,
         }

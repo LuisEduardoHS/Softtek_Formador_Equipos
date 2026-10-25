@@ -1,7 +1,6 @@
 """HTTP auth, reviewed AI persistence, and recoverable failures for 6A."""
 import os
 import asyncio
-from types import SimpleNamespace
 
 os.environ.setdefault("DATABASE_URL", "sqlite://")
 os.environ.setdefault("AUTH_SECRET", "test-secret-for-six-a-with-at-least-32-characters")
@@ -313,17 +312,26 @@ def test_direct_reviewed_event_persists_when_embedding_fails(context, monkeypatc
         assert event.embedding_requisitos is None
 
 
-def test_late_embedding_does_not_replace_newer_revision(monkeypatch):
-    profile = SimpleNamespace(perfil_fuente_revision="old", embedding_perfil=None,
-                              perfil_estado_ia="pendiente_embedding")
-    class FakeDb:
-        def refresh(self, obj):
-            obj.perfil_fuente_revision = "new"
-    monkeypatch.setattr(integration, "generate_reviewed_profile_vector", lambda _: [1.0] * 768)
-    structured = StructuredProfile(habilidades=["Python"], resumen_publico="Python")
-    asyncio.run(integration.process_profile_embedding(FakeDb(), profile, structured))
-    assert profile.embedding_perfil is None
-    assert profile.perfil_fuente_revision == "new"
+def test_late_embedding_does_not_replace_newer_revision(context, monkeypatch):
+    _, engine = context
+    with Session(engine) as db:
+        profile = PerfilUsuario(usuario_id=1, perfil_fuente_revision="old",
+                                perfil_confirmado_at=integration.utc_now(), perfil_estado_ia="pendiente_embedding")
+        db.add(profile)
+        db.commit()
+    def late_result(_):
+        with Session(engine) as other:
+            other.get(PerfilUsuario, 1).perfil_fuente_revision = "new"
+            other.commit()
+        return [1.0] * 768
+    monkeypatch.setattr(integration, "generate_reviewed_profile_vector", late_result)
+    with Session(engine) as db:
+        profile = db.get(PerfilUsuario, 1)
+        structured = StructuredProfile(habilidades=["Python"], resumen_publico="Python")
+        asyncio.run(integration.process_profile_embedding(db, profile, structured))
+        db.commit()
+        assert profile.embedding_perfil is None
+        assert profile.perfil_fuente_revision == "new"
 
 
 def test_versioned_migration_preserves_legacy_rows(tmp_path, monkeypatch):

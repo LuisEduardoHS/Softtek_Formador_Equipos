@@ -31,7 +31,7 @@ def _private_profile(usuario: Usuario, perfil: PerfilUsuario) -> PerfilOut:
         municipio=usuario.municipio, rol_sistema=usuario.rol_sistema,
         datos_crudos=perfil.datos_crudos or {},
         atributos_dinamicos=perfil.atributos_dinamicos or {},
-        perfil_estructurado_ia=perfil.perfil_estructurado_ia,
+        perfil_estructurado_ia=perfil.perfil_estructurado_ia if perfil.perfil_estado_ia in {"listo", "pendiente_embedding"} else None,
         perfil_estado_ia=perfil.perfil_estado_ia,
     )
 
@@ -95,8 +95,9 @@ async def confirmar_perfil(payload: ProfileReviewed,
                 "consentimiento_recomendaciones": payload.consentimiento_recomendaciones,
                 "bio": payload.resumen_publico})
     perfil.datos_crudos = raw
+    revision = perfil.perfil_fuente_revision
     db.commit()
-    await process_profile_embedding(db, perfil, structured)
+    await process_profile_embedding(db, perfil, structured, expected_revision=revision)
     db.commit()
     db.refresh(perfil)
     return _private_profile(actor, perfil)
@@ -106,10 +107,13 @@ async def confirmar_perfil(payload: ProfileReviewed,
 async def reintentar_embedding_perfil(db: Session = Depends(get_db),
                                      actor: Usuario = Depends(get_current_user)):
     perfil = _own_profile(db, actor)
-    if not perfil.perfil_estructurado_ia:
+    if (not perfil.perfil_estructurado_ia or not perfil.perfil_confirmado_at or not perfil.perfil_fuente_revision
+            or perfil.perfil_estado_ia not in {"listo", "pendiente_embedding"}):
         raise HTTPException(status_code=409, detail="Primero confirma el perfil.")
     structured = StructuredProfile.model_validate(perfil.perfil_estructurado_ia)
-    await process_profile_embedding(db, perfil, structured)
+    revision = perfil.perfil_fuente_revision
+    db.commit()
+    await process_profile_embedding(db, perfil, structured, expected_revision=revision)
     db.commit()
     return _private_profile(actor, perfil)
 
@@ -266,6 +270,8 @@ def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depend
         perfil.perfil_estado_ia = "obsoleto"
         perfil.embedding_perfil = None
         perfil.perfil_embedding_fuente_revision = None
+        perfil.perfil_fuente_revision = None
+        perfil.perfil_confirmado_at = None
     
     db.commit()
     db.refresh(perfil)

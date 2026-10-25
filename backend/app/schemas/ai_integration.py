@@ -1,8 +1,10 @@
 """Reviewed 6A input; parser suggestions and confirmed facts are separate."""
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
+from app.services.ai.skill_terms import canonical_skill, folded
+import re
 
 
 class _Strict(BaseModel):
@@ -18,6 +20,13 @@ class ProfileInterpretRequest(_Strict):
 class ReviewedSkill(_Strict):
     nombre: str = Field(min_length=1, max_length=150)
     nivel: str | None = Field(default=None, max_length=50)
+
+    @field_validator("nombre")
+    @classmethod
+    def affirmative_skill(cls, value):
+        if re.search(r"\b(?:no|sin|quiero|aprender)\b", folded(value)):
+            raise ValueError("Las fortalezas deben ser habilidades afirmadas; separa negaciones y objetivos de aprendizaje.")
+        return canonical_skill(value)
 
 
 class ProfileReviewed(_Strict):
@@ -63,6 +72,7 @@ class EventInterpretRequest(_Strict):
 class EventReviewed(_Strict):
     requirements: StructuredEventRequirements
     confirmado_por_creador: bool
+    fuente_revision: str | None = Field(default=None, min_length=64, max_length=64)
 
     @model_validator(mode="after")
     def explicit_review(self):

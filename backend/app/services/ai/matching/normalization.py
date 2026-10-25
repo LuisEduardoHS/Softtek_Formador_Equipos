@@ -50,8 +50,10 @@ class EquivalenceCatalog(BaseModel):
 
 
 DEFAULT_EQUIVALENCES = EquivalenceCatalog(
-    version="2026-10-21.v1",
-    aliases={"UE5": "Unreal Engine 5"},
+    version="2026-10-25.v2",
+    aliases={"UE5": "Unreal Engine 5", "programar en Python": "Python",
+             "programación en Python": "Python", "sé programar en Python": "Python",
+             "programar en SQL": "SQL", "programación en SQL": "SQL", "sé programar en SQL": "SQL"},
 )
 
 

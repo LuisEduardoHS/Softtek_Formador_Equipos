@@ -306,7 +306,7 @@ export default function CreateProjectPage() {
   const [suggestedByAi, setSuggestedByAi] = useState(() => Boolean(readDraft()?.suggestedByAi))
   const [analyzedFor, setAnalyzedFor] = useState(() => {
     const draft = readDraft()
-    return draft?.roles && draft?.requirements ? `${draft.form.titulo}|${draft.form.descripcion}|${draft.form.integrantes}` : null
+    return draft?.roles && draft?.requirements ? JSON.stringify(draft.form) : null
   })
   const [errors, setErrors] = useState({})
   const [published, setPublished] = useState(false)
@@ -328,7 +328,7 @@ export default function CreateProjectPage() {
     if (form.descripcion.trim().length < 30) e.descripcion = "Cuéntanos un poco más (al menos un par de frases) para proponer buenos roles."
     setErrors(e)
     if (Object.keys(e).length) return
-    const key = `${form.titulo}|${form.descripcion}|${form.integrantes}`
+    const key = JSON.stringify(form)
     if (key !== analyzedFor) {
       setRoles(null)
       setRequirements(null)
