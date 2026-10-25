@@ -1,55 +1,77 @@
-# 🚀 Formador de Equipos (Softtek)
+# Formador de Equipos (Softtek / Complementa)
 
-Plataforma para la creación y gestión inteligente de equipos de trabajo.
+Plataforma para crear equipos mediante perfiles, convocatorias y recomendaciones con IA.
 
----
+El [diagnóstico del 25 de octubre de 2026](docs/ESTADO_PROYECTO_2026-10-25.md) describe el estado integrado, las comprobaciones realizadas y el plan de cierre.
 
-## 🛠️ Requisitos Previos
+## Requisitos
 
-Antes de comenzar, asegúrate de contar con los siguientes elementos configurados en tu sistema:
-* **Python** (versión 3.10 o superior)
-* **Node.js** (versión LTS)
-* **MySQL** activo localmente
-* **Ollama** ejecutándose en segundo plano
+- Python 3.10 o superior.
+- Node.js LTS y npm.
+- MySQL activo y una base de desarrollo configurada.
+- Ollama con `llama3.1:8b` y `nomic-embed-text` para interpretar textos y generar embeddings.
 
----
+## Backend
 
-## ⚙️ Guía de Instalación y Ejecución
+Desde `backend/`, en PowerShell:
 
-### 🐍 1. Backend
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
 
-Todas las operaciones de esta sección se ejecutan desde la carpeta `/Backend`.
+La copia del archivo de entorno se hace solo en la configuración inicial. Completar `DATABASE_URL` y `AUTH_SECRET` en `.env`. Para generar un secreto:
 
-#### A. Setup Inicial (Solo la primera vez)
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
 
-1. **Crear el entorno virtual:**
-   ```powershell
-   python -m venv venv
--------------------- Backend-----------------------------
+Para una base nueva, ejecutar primero [database/db_actividad.sql](database/db_actividad.sql) con un cliente MySQL. Para una existente, respaldar e inspeccionar el esquema antes de migrar; el SQL inicial no actualiza tablas existentes.
 
-# Crear el entorno virtual si es la primera vez que se ejecutara el proyecto
-python -m venv venv
+Desde `backend/`, con el entorno activo y la estructura base disponible:
 
-# activar el entorno virtual para la instalacion de los requerimientos con los que trabaja la app
-.\venv\Scripts\Activate.ps1
-
-# Dentro de la carpeta /Backend,  Instalar dependencias (si es la primera vez)
-pip install -r requirements.txt
-
-# Crea el archivo .env donde pondras la url de tu database con user y password, dentro de /Backend
-
-///// Activacion /////
-# levantar el entorno virtual creado (venv), dentro de la carpeta /Backend
-.\venv\Scripts\Activate.ps1
-
-# Iniciar el servidor de backend
+```powershell
+python -m alembic -c alembic.ini upgrade head
 uvicorn app.main:app --reload
+```
 
+La migración actual añade columnas IA a tablas existentes. FastAPI no crea las tablas al arrancar. En ejecuciones posteriores solo es necesario activar el entorno y arrancar el servidor. Documentación de la API: [Swagger local](http://127.0.0.1:8000/docs).
 
----------------------Frontend--------------------------
+## Frontend
 
-# Dentro de la carpeta /Frontend, Instalar dependencias (si es la primera vez)
-npm install
+Desde `frontend/`:
 
-# Iniciar el servidor de desarrollo
+```powershell
+npm ci
 npm run dev
+```
+
+La API usa `http://127.0.0.1:8000` por defecto; puede configurarse con `VITE_API_URL`. Utilizar la dirección que muestre Vite al arrancar.
+
+## Comprobaciones
+
+Desde `backend/`, con el entorno activo:
+
+```powershell
+python -m pytest -q
+python -m pip check
+```
+
+Desde `frontend/`:
+
+```powershell
+npm run build
+npm run lint
+```
+
+La suite usa SQLite y respuestas simuladas para las pruebas automáticas de API/IA. La validación con MySQL y los modelos locales es adicional.
+
+## Guías
+
+- [Estado actual y pendientes](docs/ESTADO_PROYECTO_2026-10-25.md).
+- [Operación de perfiles y proyectos con IA](docs/RUNBOOK_FASE6A.md).
+- [Operación de recomendaciones](docs/RUNBOOK_FASE6B.md).
+
+Las recomendaciones necesitan perfiles revisados, consentimiento explícito y eventos abiertos. Pueden trabajar con evidencia declarada aunque un embedding esté pendiente. Reuniones y algunos elementos heredados siguen siendo demostraciones; consultar el diagnóstico antes de considerarlos implementados.

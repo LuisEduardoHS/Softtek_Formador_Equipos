@@ -1,5 +1,7 @@
 # Operación de Fase 6A: perfiles y eventos con IA
 
+Estado actualizado: consultar el [diagnóstico del 25 de octubre](ESTADO_PROYECTO_2026-10-25.md). Las recomendaciones ya están conectadas mediante Fase 6B; la sección histórica de límites al final describe únicamente la entrega original de 6A. La edición de proyectos incorporada desde Isaac invalida requisitos y embeddings anteriores y necesita reconfirmación; el modal todavía no ofrece ese paso.
+
 ## Preparación
 
 1. Desde `backend/`, crear el entorno e instalar `requirements.txt`. Configurar `DATABASE_URL` y un `AUTH_SECRET` aleatorio de 32 caracteres o más en `.env` a partir de `.env.example`. No compartir ni registrar ese secreto. El servidor no inicia cambios de esquema automáticamente.
