@@ -2,6 +2,8 @@
 
 Plataforma para crear equipos mediante perfiles, convocatorias y recomendaciones con IA.
 
+El [cierre funcional del MVP](docs/CIERRE_MVP_2026-10-25.md) registra las correcciones de equipos, edición y revisión de IA, pruebas y límites de operación.
+
 El [diagnóstico del 25 de octubre de 2026](docs/ESTADO_PROYECTO_2026-10-25.md) describe el estado integrado, las comprobaciones realizadas y el plan de cierre.
 
 ## Requisitos

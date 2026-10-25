@@ -1,6 +1,6 @@
 # Operación de Fase 6A: perfiles y eventos con IA
 
-Estado actualizado: consultar el [diagnóstico del 25 de octubre](ESTADO_PROYECTO_2026-10-25.md). Las recomendaciones ya están conectadas mediante Fase 6B; la sección histórica de límites al final describe únicamente la entrega original de 6A. La edición de proyectos incorporada desde Isaac invalida requisitos y embeddings anteriores y necesita reconfirmación; el modal todavía no ofrece ese paso.
+Estado actualizado: consultar el [diagnóstico del 25 de octubre](ESTADO_PROYECTO_2026-10-25.md). Las recomendaciones ya están conectadas mediante Fase 6B; la sección histórica de límites al final describe únicamente la entrega original de 6A. La edición de proyectos incorporada desde Isaac invalida requisitos y embeddings anteriores; el detalle ya permite revisar/reconfirmar y reintentar el embedding. Perfil también muestra estado y reintento. Consultar el [cierre del MVP](CIERRE_MVP_2026-10-25.md).
 
 ## Preparación
 

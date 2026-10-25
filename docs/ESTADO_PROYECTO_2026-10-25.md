@@ -2,6 +2,8 @@
 
 Fecha: 25 de octubre de 2026. Revisión del código integrado en `feat/ai-matching`.
 
+**Actualización posterior:** los cuatro bloques solicitados de participación e IA se implementaron y verificaron en el [cierre del MVP](CIERRE_MVP_2026-10-25.md). El análisis siguiente conserva el diagnóstico previo; consultar el cierre para conocer las correcciones y límites vigentes.
+
 ## Conclusión
 
 El proyecto ya tiene un MVP de IA conectado entre React, FastAPI y el motor de recomendaciones. Existen extracción de perfiles y proyectos con Ollama, revisión humana, almacenamiento ORM, embeddings, autenticación con JWT y consultas reales de recomendaciones. La integración técnica principal está bastante avanzada; todavía faltan preparación de MySQL, cierre de flujos de edición/reintento y reglas de participación para considerar terminado el producto.
