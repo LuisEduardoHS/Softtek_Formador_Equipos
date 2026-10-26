@@ -1,0 +1,14 @@
+{
+  "profile_states": {
+    "listo": 46,
+    "sin_contenido": 1,
+    "obsoleto": 1
+  },
+  "event_states": {
+    "listo": 20
+  },
+  "profile_vectors": 46,
+  "event_vectors": 20,
+  "invalid_profile_vectors": [],
+  "invalid_event_vectors": []
+}

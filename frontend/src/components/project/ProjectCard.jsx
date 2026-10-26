@@ -6,9 +6,11 @@ import { ComplementLevel } from "../recommendation/RecommendationCard"
 import { coverage, formatDate } from "../../lib/projects"
 
 export function TypeBadge({ tipo }) {
+  const labels = { academico: "Académico", personal: "Personal", deportivo: "Deportivo",
+    videojuegos: "Videojuegos", general: "General" }
   return (
     <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-medium text-ink-2">
-      {tipo === "academico" ? "Académico" : "Personal"}
+      {labels[tipo] ?? tipo}
     </span>
   )
 }
@@ -60,7 +62,7 @@ export default function ProjectCard({ project, suggestion, className = "" }) {
       )}
       <div className="mt-auto flex items-center justify-between gap-3 border-t border-line pt-4 text-xs text-ink-2">
         <span className="flex items-center gap-3">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1" aria-label={`Capacidad: ${project.integrantes} personas`}>
             <Users aria-hidden="true" className="size-3.5" /> {project.integrantes}
           </span>
           {project.fechaLimite && (

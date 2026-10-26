@@ -9,7 +9,10 @@ export default function Carousel({ label, children }) {
   const ref = useRef(null)
   const scroll = (dir) => {
     const el = ref.current
-    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" })
+    const item = el.firstElementChild
+    if (!item) return
+    const gap = Number.parseFloat(getComputedStyle(el).columnGap) || 0
+    el.scrollBy({ left: dir * (item.getBoundingClientRect().width + gap), behavior: "smooth" })
   }
 
   return (
@@ -33,7 +36,7 @@ export default function Carousel({ label, children }) {
 }
 
 export function CarouselItem({ children }) {
-  return <div className="w-[85%] max-w-[360px] shrink-0 snap-start sm:w-[340px]">{children}</div>
+  return <div className="w-full shrink-0 snap-start sm:w-[calc((100%-1rem)/2)]">{children}</div>
 }
 
 function ArrowButton({ onClick, label, children }) {

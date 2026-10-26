@@ -6,13 +6,15 @@ import Card from "../components/ui/Card"
 import ProgressSteps from "../components/ui/ProgressSteps"
 import AvailabilityGrid from "../components/ui/AvailabilityGrid"
 import TagEditor from "../components/ui/TagEditor"
-import { LevelPicker } from "../components/ui/Controls"
+import { LevelPicker, Switch } from "../components/ui/Controls"
 import AIBadge, { LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
 import { Logo } from "../components/layout/AppLayout"
 import ProfileSetupForm from "../components/profile/ProfileSetupForm"
-import { guardarPerfil, interpretarPerfil } from "../services/api"
+import ProfileConsentConfirmation from "../components/profile/ProfileConsentConfirmation"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
+import { confirmarPerfil, interpretarPerfil } from "../services/api"
 import { DIAS, DIAS_LABEL, FRANJAS, FRANJAS_LABEL } from "../data/mockData"
 import { getSessionUser } from "../lib/session"
 
@@ -87,7 +89,7 @@ function summarize(blocks) {
   }).filter(Boolean)
 }
 
-function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailability }) {
+function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailability, consent, setConsent }) {
   const [state, setState] = useState(perfil ? "ready" : "loading")
   const [msg, setMsg] = useState(0)
   const [attempt, setAttempt] = useState(0)
@@ -115,6 +117,10 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
       <div className="space-y-4" aria-busy="true">
         <AILoading text={`La IA está analizando tu perfil… ${ANALYSIS_MESSAGES[msg]}`} />
         <LocalProcessing />
+        <Button variant="secondary" onClick={() => {
+          setPerfil({ fortalezas: [], reforzar: [], intereses: [], experiencia: [], resumen_publico: "" })
+          setState("ready")
+        }}>Revisar manualmente</Button>
         {[0, 1, 2].map((i) => (
           <div key={i} className="space-y-3 rounded-2xl border border-line bg-surface p-5">
             <Skeleton className="h-5 w-40" />
@@ -131,14 +137,14 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
 
   if (state === "error") {
     return (
-      <ErrorState
-        message="No pudimos analizar tu perfil en este momento. Tus respuestas siguen guardadas."
-        onRetry={() => {
-          setState("loading")
-          setMsg(0)
-          setAttempt((a) => a + 1)
-        }}
-      />
+      <div className="space-y-3">
+        <ErrorState message="No pudimos analizar tu perfil. Tus respuestas siguen guardadas."
+          onRetry={() => { setState("loading"); setMsg(0); setAttempt((a) => a + 1) }} />
+        <Button variant="secondary" onClick={() => {
+          setPerfil({ fortalezas: [], reforzar: [], intereses: [], experiencia: [], resumen_publico: "" })
+          setState("ready")
+        }}>Revisar manualmente</Button>
+      </div>
     )
   }
 
@@ -152,7 +158,7 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
         nombre: n,
         nivel:
           p.fortalezas.find((f) => f.nombre === n)?.nivel ??
-          (names.length === p.fortalezas.length ? p.fortalezas[i].nivel : "intermedio"),
+          (names.length === p.fortalezas.length ? p.fortalezas[i].nivel : null),
       })),
     }))
 
@@ -163,13 +169,13 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
     <div className="space-y-4">
       <div className="flex flex-col gap-2 rounded-xl border border-ai-line bg-ai-soft p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink">
-          <span className="font-semibold text-ai-ink">Así entendimos tu perfil.</span> Revisa, corrige lo que no encaje y confirma. Nada se
+          <span className="font-semibold text-ai-ink">{perfil.origen === "ia_sin_confirmar" ? "Así entendimos tu perfil." : "Revisa tu perfil."}</span> Revisa, corrige lo que no encaje y confirma. Nada se
           publica hasta que lo hagas.
         </p>
         <LocalProcessing className="shrink-0" />
       </div>
 
-      <ReviewBlock title="Fortalezas" desc="Indica tu nivel en cada una. Pulsa una etiqueta para corregirla." badge={<AIBadge label="Interpretado por IA" />}>
+      <ReviewBlock title="Fortalezas" desc="Indica tu nivel en cada una. Pulsa una etiqueta para corregirla." badge={perfil.origen === "ia_sin_confirmar" ? <AIBadge label="Interpretado por IA" /> : null}>
         <TagEditor
           items={fortalezaNames}
           onChange={setFortalezas}
@@ -194,8 +200,24 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
         <TagEditor items={perfil.reforzar} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
       </ReviewBlock>
 
-      <ReviewBlock title="Intereses" desc="Temas en los que te gustaría trabajar." badge={<AIBadge label="Interpretado por IA" />}>
+      <ReviewBlock title="Intereses" desc="Temas en los que te gustaría trabajar." badge={perfil.origen === "ia_sin_confirmar" ? <AIBadge label="Interpretado por IA" /> : null}>
         <TagEditor items={perfil.intereses} onChange={set("intereses")} placeholder="Agregar, p. ej. Fintech" />
+      </ReviewBlock>
+
+      <ReviewBlock title="Experiencia" desc="Conserva solo experiencias que hayas tenido.">
+        <TagEditor items={perfil.experiencia ?? []} onChange={set("experiencia")} placeholder="Agregar experiencia real" />
+      </ReviewBlock>
+
+      <ReviewBlock title="Resumen público" desc="Comprueba que el texto sea fiel a tu perfil.">
+        <textarea rows={3} value={perfil.resumen_publico ?? ""}
+          onChange={(event) => set("resumen_publico")(event.target.value)}
+          className="w-full rounded-lg border border-line bg-surface p-3 text-sm" />
+      </ReviewBlock>
+
+      <ReviewBlock title="Recomendaciones" desc="Tú decides si tu perfil puede aparecer en sugerencias para organizadores y recibir proyectos sugeridos.">
+        {!consent && <p className="mb-3 font-semibold text-warn-ink">Están desactivadas: aunque confirmes el análisis, no aparecerás como candidato ni recibirás proyectos recomendados.</p>}
+        <p role="note" className="text-sm text-warn-ink">El resumen público puede revelar habilidades u otros datos aunque después ocultes campos individuales. Revisa el texto antes de confirmar.</p>
+        <Switch label="Activar recomendaciones y aparecer en el directorio" checked={consent} onChange={setConsent} />
       </ReviewBlock>
 
       <ReviewBlock
@@ -220,20 +242,21 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
 
 /* --------------------------- Pantalla de éxito --------------------------- */
 
-function Done() {
+function Done({ consent }) {
   const navigate = useNavigate()
   return (
     <div className="flex animate-scale-in flex-col items-center py-16 text-center">
       <span className="grid size-20 animate-pop place-items-center rounded-full bg-success-soft">
         <CircleCheck aria-hidden="true" className="size-10 text-success" />
       </span>
-      <h1 className="mt-6 text-h1 font-bold">¡Tu perfil está listo!</h1>
+      <h1 className="mt-6 text-h1 font-bold">{consent ? "¡Tu perfil está listo!" : "Perfil guardado sin recomendaciones"}</h1>
       <p className="mt-2 max-w-md text-ink-2">
-        Ya estamos buscando personas y proyectos que complementen lo que sabes hacer. Te avisaremos cuando encontremos algo.
+        Tu perfil confirmado está guardado. Ya puedes explorar personas y proyectos.
       </p>
+      {!consent && <div className="mt-5 max-w-xl text-left"><RecommendationConsentStatus consent={false} /></div>}
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <Button size="lg" onClick={() => navigate("/match")}>
-          Ver mi primera coincidencia <ArrowRight aria-hidden="true" className="size-4" />
+          Explorar <ArrowRight aria-hidden="true" className="size-4" />
         </Button>
         <Button size="lg" variant="secondary" onClick={() => navigate("/inicio")}>
           Ir al inicio
@@ -251,10 +274,12 @@ export default function ProfileSetupPage() {
   const [textos, setTextos] = useState({ nombre: "", foto: null, idiomas: "", fortalezas: "", reforzar: "", intereses: "" })
   const [disponibilidad, setDisponibilidad] = useState([])
   const [perfil, setPerfil] = useState(null)
+  const [consent, setConsent] = useState(false)
   const [analyzedFor, setAnalyzedFor] = useState(null)
   const [errors, setErrors] = useState({})
   const [done, setDone] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [confirmWithoutConsent, setConfirmWithoutConsent] = useState(false)
 
   const go = (n) => {
     setStep(n)
@@ -285,26 +310,34 @@ export default function ProfileSetupPage() {
     go(step + 1)
   }
 
-  const confirm = async () => {
+  const confirm = async (confirmedConsent = consent) => {
+    if (saving) return
     const usuarioLocal = getSessionUser()
     const datosPerfil = {
-      ...perfil,
       nombre: textos.nombre.trim(),
       carrera: usuarioLocal.carrera || "",
+      fortalezas: perfil.fortalezas,
+      reforzar: perfil.reforzar,
+      intereses: perfil.intereses,
+      experiencia: perfil.experiencia ?? [],
+      resumen_publico: perfil.resumen_publico ?? "",
       disponibilidad,
       visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
       pausado: false,
+      consentimiento_recomendaciones: confirmedConsent,
     }
 
     setSaving(true)
     try {
-      const guardado = await guardarPerfil(datosPerfil)
-      localStorage.setItem("usuario", JSON.stringify({
+      const guardado = await confirmarPerfil(datosPerfil)
+      sessionStorage.setItem("usuario", JSON.stringify({
         ...usuarioLocal,
         nombre: guardado.nombre,
         carrera: guardado.carrera,
       }))
       toast("Perfil guardado")
+      setConsent(guardado.consentimiento_recomendaciones === true)
+      setConfirmWithoutConsent(false)
       setDone(true)
     } catch (error) {
       console.error("No se pudo guardar el perfil:", error)
@@ -330,7 +363,7 @@ export default function ProfileSetupPage() {
 
       <main className="mx-auto max-w-3xl px-4 pt-6 pb-32 sm:px-8 sm:pt-10">
         {done ? (
-          <Done />
+          <Done consent={consent} />
         ) : (
           <>
             <div className="mb-8">
@@ -364,6 +397,8 @@ export default function ProfileSetupPage() {
                     disponibilidad={disponibilidad}
                     perfil={perfil}
                     setPerfil={setPerfil}
+                    consent={consent}
+                    setConsent={setConsent}
                     onEditAvailability={() => go(1)}
                   />
                 </div>
@@ -385,13 +420,16 @@ export default function ProfileSetupPage() {
                 Continuar <ArrowRight aria-hidden="true" className="size-4" />
               </Button>
             ) : (
-              <Button onClick={confirm} disabled={saving || !perfil || perfil.fortalezas.length === 0} className="min-w-36">
+              <Button onClick={() => consent ? confirm(true) : setConfirmWithoutConsent(true)} disabled={saving || !perfil || perfil.fortalezas.length === 0} className="min-w-36">
                 <Check aria-hidden="true" className="size-4" /> {saving ? "Guardando…" : "Confirmar perfil"}
               </Button>
             )}
           </div>
         </div>
       )}
+      <ProfileConsentConfirmation open={confirmWithoutConsent} busy={saving}
+        onClose={() => { if (!saving) setConfirmWithoutConsent(false) }}
+        onEnable={() => confirm(true)} onKeepDisabled={() => confirm(false)} />
     </div>
   )
 }

@@ -1,0 +1,751 @@
+{
+  "baseline_regressions": {
+    "head": "568026a",
+    "cases": 57,
+    "failed": 51,
+    "passed": 6,
+    "seconds": 19.14
+  },
+  "initial": {
+    "qa_database": "softtek_formador_equipos_qa_fix_20261025_29e772",
+    "principal_before": {
+      "counts": {
+        "usuarios": 1,
+        "perfiles_usuarios": 1,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "checksums": {
+        "usuarios": 101962764,
+        "perfiles_usuarios": 2746401420,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+      "alembic": [
+        "20261022_6a"
+      ]
+    },
+    "qa_created_empty": true
+  },
+  "final": {
+    "principal_after": {
+      "counts": {
+        "usuarios": 1,
+        "perfiles_usuarios": 1,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "checksums": {
+        "usuarios": 101962764,
+        "perfiles_usuarios": 2746401420,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+      "alembic": [
+        "20261022_6a"
+      ]
+    },
+    "principal_unchanged": true,
+    "qa_database": "softtek_formador_equipos_qa_fix_20261025_29e772",
+    "qa_counts": {
+      "usuarios": 6,
+      "perfiles_usuarios": 6,
+      "eventos": 5,
+      "solicitudes_equipo": 2,
+      "participantes_evento": 2
+    },
+    "react_publication": {
+      "event_id": 5,
+      "state": "listo",
+      "dimensions": 768,
+      "source_matches": true,
+      "has_creation_key": true,
+      "has_payload_hash": true,
+      "count_with_title": 1
+    }
+  },
+  "checks": [
+    {
+      "name": "pytest",
+      "seconds": 37.07,
+      "exit_code": 0,
+      "output": "........................................................................ [ 24%]\n........................................................................ [ 48%]\n........................................................................ [ 72%]\n........................................................................ [ 96%]\n.........                                                                [100%]\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  D:\\projects\\Softtek_Formador_Equipos\\backend\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n297 passed, 1 warning in 34.99s\n"
+    },
+    {
+      "name": "pip_check",
+      "seconds": 1.01,
+      "exit_code": 0,
+      "output": "No broken requirements found.\n"
+    },
+    {
+      "name": "build",
+      "seconds": 2.03,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 build\n> vite build\n\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 1989 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.80 kB │ gzip:   0.44 kB\ndist/assets/index-DLKJuhXE.css   54.51 kB │ gzip:  10.14 kB\ndist/assets/index-LMir2-nX.js   484.17 kB │ gzip: 139.88 kB\n\n✓ built in 663ms\n"
+    },
+    {
+      "name": "lint",
+      "seconds": 6.08,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 lint\n> eslint .\n\n\nD:\\projects\\Softtek_Formador_Equipos\\frontend\\src\\components\\auth\\RequireSession.jsx\n  29:6  warning  React Hook useEffect has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps\n\n✖ 1 problem (0 errors, 1 warning)\n\n"
+    }
+  ],
+  "real_cases": [
+    {
+      "id": "register-owner-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "register-member-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "register-third-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "register-legacy-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "password-policy-empty",
+      "status": "PASS",
+      "evidence": {
+        "http": 422,
+        "echoes_input": false
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "password-policy-short",
+      "status": "PASS",
+      "evidence": {
+        "http": 422,
+        "echoes_input": false
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "password-policy-too-long",
+      "status": "PASS",
+      "evidence": {
+        "http": 422,
+        "echoes_input": false
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "mysql-length-name",
+      "status": "PASS",
+      "evidence": {
+        "http": 422
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "mysql-length-career",
+      "status": "PASS",
+      "evidence": {
+        "http": 422
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "password-no-truncation-long-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          200,
+          401
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "password-no-truncation-unicode-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          200,
+          401
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-short-migrated",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "hash_scheme_migrated": true
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-ambiguous-rejected",
+      "status": "PASS",
+      "evidence": {
+        "http": 422,
+        "hash_unchanged": true
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-13",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-14",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-15",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-16",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-17",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-invalid-18",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          422,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-profile-defensive",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          200,
+          200
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-read-no-write",
+      "status": "PASS",
+      "evidence": {},
+      "source": "results.json"
+    },
+    {
+      "id": "nomic-profile-owner-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "seconds": 2.621,
+        "dimensions": 768
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "nomic-profile-member-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "seconds": 0.599,
+        "dimensions": 768
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "nomic-profile-third-fix",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "seconds": 0.548,
+        "dimensions": 768
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "offline-interpretation-preserves-confirmed",
+      "status": "PASS",
+      "evidence": {
+        "http": 503,
+        "seconds": 2.726,
+        "restored": true
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "offline-event-interpretation",
+      "status": "PASS",
+      "evidence": {
+        "http": 503,
+        "seconds": 2.646
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "offline-profile-confirmed",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "pendiente_embedding",
+        "seconds": 2.623
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "profile-retry-real",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "dimensions": 768
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "role-object-rejected-no-insert",
+      "status": "PASS",
+      "evidence": {
+        "http": 422,
+        "event_counts": [
+          0,
+          0
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "offline-create-replay-no-duplicate",
+      "status": "PASS",
+      "evidence": {
+        "http": [
+          201,
+          201
+        ],
+        "event_id": 1,
+        "event_count": 1,
+        "state": "pendiente_embedding"
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "key-payload-conflict",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "offline-event-confirmed",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "event-retry-real",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "dimensions": 768
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "mysql-concurrent-create-idempotent",
+      "status": "PASS",
+      "evidence": {
+        "responses": [
+          {
+            "http": 201,
+            "id": 2
+          },
+          {
+            "http": 201,
+            "id": 2
+          }
+        ],
+        "event_count": 1
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "recommendations-real-evidence",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "candidate_ids": [
+          3,
+          4
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "invitation",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "invitation-duplicate",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "recommendations-pending-excluded",
+      "status": "PASS",
+      "evidence": {},
+      "source": "results.json"
+    },
+    {
+      "id": "invitation-accepted",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "application",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "application-accepts-requester",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "member_ids": [
+          3,
+          4
+        ]
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "double-acceptance-rejected",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "teams-persist-real",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "authorization-43",
+      "status": "PASS",
+      "evidence": {
+        "http": 403
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "authorization-44",
+      "status": "PASS",
+      "evidence": {
+        "http": 403
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-event-defensive",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "role": {
+          "id": "backend",
+          "nombre": "Backend",
+          "habilidades": [
+            "Python"
+          ],
+          "indispensable": false,
+          "vacantes": 1,
+          "ocupados": 0,
+          "integrantesIds": [],
+          "cubiertoPor": null
+        }
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "legacy-vacancies-recommendations-survive",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "llama-online-profile",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "seconds": 16.397
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "llama-online-event",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "seconds": 4.182
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "owner-reconfirmed-after-llama",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "principal-unchanged",
+      "status": "PASS",
+      "evidence": {
+        "counts": {
+          "usuarios": 1,
+          "perfiles_usuarios": 1,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "checksums": {
+          "usuarios": 101962764,
+          "perfiles_usuarios": 2746401420,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe"
+      },
+      "source": "results.json"
+    },
+    {
+      "id": "final-mysql-concurrent-key",
+      "status": "PASS",
+      "http": [
+        201,
+        201
+      ],
+      "event_count": 1,
+      "source": "extra_results.json"
+    },
+    {
+      "id": "replay-does-not-wait-event-lock",
+      "status": "PASS",
+      "http": 201,
+      "seconds": 0.376,
+      "source": "extra_results.json"
+    },
+    {
+      "id": "final-role-422-2",
+      "status": "PASS",
+      "http": 422,
+      "source": "extra_results.json"
+    },
+    {
+      "id": "final-role-422-3",
+      "status": "PASS",
+      "http": 422,
+      "source": "extra_results.json"
+    },
+    {
+      "id": "final-role-422-4",
+      "status": "PASS",
+      "http": 422,
+      "source": "extra_results.json"
+    },
+    {
+      "id": "latest-legacy-structured-read",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "stored_fixture_unchanged": true
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "latest-offline-confirm",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "latest-retry-real-nomic",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "dimensions": 768
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "latest-failed-analysis-keeps-confirmation",
+      "status": "PASS",
+      "evidence": {
+        "http": 503
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "latest-review-invalid-level",
+      "status": "PASS",
+      "evidence": {
+        "http": 422
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "react-publication-key-persistence",
+      "status": "PASS",
+      "evidence": {
+        "event_id": 5,
+        "state": "listo",
+        "dimensions": 768,
+        "source_matches": true,
+        "has_creation_key": true,
+        "has_payload_hash": true,
+        "count_with_title": 1
+      },
+      "source": "final_results.json"
+    },
+    {
+      "id": "final-principal-unchanged",
+      "status": "PASS",
+      "evidence": {
+        "counts": {
+          "usuarios": 1,
+          "perfiles_usuarios": 1,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "checksums": {
+          "usuarios": 101962764,
+          "perfiles_usuarios": 2746401420,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+        "alembic": [
+          "20261022_6a"
+        ]
+      },
+      "source": "final_results.json"
+    }
+  ],
+  "browser": {
+    "cases": [
+      {
+        "id": "UI01",
+        "status": "PASS",
+        "title": "Login real de cuenta QA"
+      },
+      {
+        "id": "UI02",
+        "status": "PASS",
+        "title": "Detalle legado malformado sin ErrorBoundary y candidatos cargados"
+      },
+      {
+        "id": "UI03",
+        "status": "PASS",
+        "title": "Directorio y perfil legado cargados con privacidad cerrada"
+      },
+      {
+        "id": "UI04",
+        "status": "PASS",
+        "title": "Publicar desde React, abrir y recargar; análisis listo"
+      }
+    ],
+    "console_errors": [],
+    "event_id": 5
+  },
+  "git_head": "568026a",
+  "git_branch": "feat/ai-matching",
+  "original_audit_evidence_sha256": "67283badf9039f37f9897ad35dd3ca38c574c7f028b0ab081a9d59686e378e88"
+}

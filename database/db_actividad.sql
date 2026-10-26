@@ -24,6 +24,14 @@ CREATE TABLE perfiles_usuarios(
     resumen_publico_ia TEXT,
     perfil_estructurado_ia JSON,
     embedding_perfil JSON, -- Usamos JSON para guardar el arreglo de floats de Nomic
+    perfil_borrador_ia JSON,
+    perfil_estado_ia VARCHAR(32),
+    perfil_fuente_revision VARCHAR(64),
+    perfil_embedding_model VARCHAR(100),
+    perfil_embedding_pipeline VARCHAR(60),
+    perfil_embedding_fuente_revision VARCHAR(64),
+    perfil_confirmado_at DATETIME,
+    perfil_procesado_at DATETIME,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
@@ -37,6 +45,14 @@ CREATE TABLE eventos(
     detalles_especificos JSON,
     requisitos_ia JSON, 
     embedding_requisitos JSON,
+    requisitos_borrador_ia JSON,
+    estado_ia VARCHAR(32),
+    requisitos_fuente_revision VARCHAR(64),
+    embedding_model VARCHAR(100),
+    embedding_pipeline VARCHAR(60),
+    embedding_fuente_revision VARCHAR(64),
+    requisitos_confirmados_at DATETIME,
+    procesado_at DATETIME,
     estado VARCHAR(30) DEFAULT 'Abierto',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (creador_id) REFERENCES usuarios(id_usuario) ON DELETE CASCADE

@@ -1,6 +1,6 @@
 import { useId, useState, useEffect } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Eye, Lock, PauseCircle, Pencil, RefreshCw, Send, UserX } from "lucide-react"
+import { ArrowLeft, Eye, Lock, Pencil, RefreshCw, Send, UserX } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import TagEditor from "../components/ui/TagEditor"
@@ -8,11 +8,14 @@ import AvailabilityGrid from "../components/ui/AvailabilityGrid"
 import { EmptyState, Skeleton } from "../components/ui/Feedback"
 import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls"
 import { useToast } from "../components/ui/Toast"
+import AIStatus from "../components/ui/AIStatus"
 import PublicProfile from "../components/profile/PublicProfile"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import InviteModal from "../components/invite/InviteModal"
-import { guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
+import { activarRecomendaciones, confirmarPerfil, reintentarEmbeddingPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 import { getSessionUser } from "../lib/session"
+import { availableRoles as usableRoles, reviewedSummary } from "../lib/contracts"
 
 // Estructura por defecto para evitar errores si la base de datos devuelve nulos en cuentas nuevas
 const PERFIL_DEFAULT = {
@@ -25,6 +28,7 @@ const PERFIL_DEFAULT = {
   grupoExterno: "",
   visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
   pausado: false,
+  consentimiento_recomendaciones: false,
 }
 
 /* ------------------------------ Edición ------------------------------ */
@@ -44,10 +48,10 @@ function Section({ title, desc, badge, children }) {
   )
 }
 
-const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad"]
+const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad", "bio"]
 
-function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
-  const ids = { c: useId(), s: useId(), g: useId(), e: useId() }
+function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, saving }) {
+  const ids = { n: useId(), c: useId(), s: useId(), g: useId(), e: useId() }
   const set = (k) => (v) => setPerfil((p) => ({ ...p, [k]: v }))
   const setVis = (k) => (v) => setPerfil((p) => ({ ...p, visibilidad: { ...p.visibilidad, [k]: v } }))
 
@@ -56,30 +60,24 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       ...p,
       fortalezas: names.map((n) => ({
         nombre: n,
-        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? "intermedio",
+        nivel: p.fortalezas.find((f) => f.nombre === n)?.nivel ?? null,
       })),
     }))
 
   return (
     <div className="space-y-4">
-      {perfil.pausado && (
-        <div className="flex animate-fade-up items-start gap-3 rounded-xl border border-warn-line bg-warn-soft p-4 text-sm">
-          <PauseCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-warn-ink" />
-          <p>
-            <span className="font-semibold">Tu perfil está en pausa.</span> No aparecerás en recomendaciones de otras personas, pero conservas tus equipos e invitaciones.
-          </p>
-        </div>
-      )}
-
       {aiDirty && (
         <div role="status" className="flex animate-fade-up items-center gap-3 rounded-xl border border-ai-line bg-ai-soft p-4 text-sm text-ink">
           <RefreshCw aria-hidden="true" className="size-4 shrink-0 text-ai-ink" />
-          Actualizaremos tus recomendaciones con estos cambios al guardar.
+          Confirmaremos los datos que cambiaste y actualizaremos su vector si Ollama está disponible.
         </div>
       )}
 
       <Section title="Información básica">
-        <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
+        <div className="grid gap-4 sm:grid-cols-[1fr_1fr_140px]">
+          <Field id={ids.n} label="Nombre">
+            <input id={ids.n} value={perfil.nombre || ""} onChange={(e) => set("nombre")(e.target.value)} className={inputCls()} />
+          </Field>
           <Field id={ids.c} label="Carrera">
             <input id={ids.c} value={perfil.carrera || ""} onChange={(e) => set("carrera")(e.target.value)} className={inputCls()} />
           </Field>
@@ -109,7 +107,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
         />
       </Section>
 
-      <Section title="Quiero reforzar" desc="La IA lo usa para encontrar quién te complementa." badge={<span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2"><Lock className="size-3" /> {perfil.visibilidad?.reforzar ? "Visible" : "Privado"}</span>}>
+      <Section title="Quiero reforzar" desc="Estas áreas no se consideran habilidades adquiridas." badge={<span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-xs font-medium text-ink-2"><Lock className="size-3" /> {perfil.visibilidad?.reforzar ? "Visible" : "Privado"}</span>}>
         <TagEditor items={perfil.reforzar || []} onChange={set("reforzar")} variant="private" placeholder="Agregar, p. ej. Hablar en público" />
       </Section>
 
@@ -117,11 +115,17 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
         <TagEditor items={perfil.intereses || []} onChange={set("intereses")} placeholder="Agregar interés" />
       </Section>
 
+      <Section title="Biografía pública" desc="Este texto es público aunque ocultes campos individuales. Puedes corregirlo o vaciarlo.">
+        <label className="sr-only" htmlFor="public-bio">Biografía pública</label>
+        <textarea id="public-bio" rows={3} maxLength={1000} value={perfil.bio ?? perfil.resumen_publico ?? ""}
+          onChange={(event) => set("bio")(event.target.value)} className="w-full rounded-lg border border-line bg-surface p-3 text-sm" />
+      </Section>
+
       <Section title="Disponibilidad" desc="Toca los bloques en los que sueles estar libre.">
         <AvailabilityGrid value={perfil.disponibilidad || []} onChange={set("disponibilidad")} />
       </Section>
 
-      <Section title="Contacto" desc="Solo lo verán los integrantes de tus equipos.">
+      <Section title="Contacto" desc="Tu correo solo se publica si activas su visibilidad, tanto en el perfil público como en los equipos.">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id={ids.e} label="Correo institucional" hint="Lo tomamos de tu cuenta universitaria.">
             <input id={ids.e} value={perfil.correo || ""} readOnly className={`${inputCls()} bg-surface-2 text-ink-2`} />
@@ -133,13 +137,15 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
       </Section>
 
       <Section title="Privacidad" desc="Decide qué ven las demás personas.">
+        <p role="note" className="mb-3 text-sm text-warn-ink">Tu biografía o resumen público sigue visible aunque ocultes fortalezas, intereses u otros campos. Revisa el texto y elimina cualquier dato que no quieras publicar.</p>
         <div className="divide-y divide-line">
           <Switch label="Mostrar mis fortalezas" checked={perfil.visibilidad?.fortalezas ?? true} onChange={setVis("fortalezas")} />
           <Switch label="Mostrar mis intereses" checked={perfil.visibilidad?.intereses ?? true} onChange={setVis("intereses")} />
           <Switch label="Mostrar mi disponibilidad" checked={perfil.visibilidad?.disponibilidad ?? true} onChange={setVis("disponibilidad")} />
           <Switch label="Mostrar «Quiero reforzar»" description="Privado por defecto." checked={perfil.visibilidad?.reforzar ?? false} onChange={setVis("reforzar")} />
-          <Switch label="Compartir mi correo con mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
+          <Switch label="Mostrar mi correo en mi perfil público y mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
           <Switch label="Pausar mi perfil" checked={perfil.pausado ?? false} onChange={set("pausado")} />
+          <Switch label="Activar recomendaciones" description="Permite aparecer en el directorio y las recomendaciones, y mostrarte proyectos." checked={perfil.consentimiento_recomendaciones ?? false} onChange={set("consentimiento_recomendaciones")} />
         </div>
       </Section>
 
@@ -149,7 +155,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard }) {
             <p className="text-sm text-ink-2">Tienes cambios sin guardar</p>
             <div className="flex gap-2">
               <Button variant="ghost" onClick={onDiscard}>Descartar</Button>
-              <Button onClick={onSave}>Guardar cambios</Button>
+              <Button onClick={onSave} disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
             </div>
           </div>
         </div>
@@ -166,6 +172,10 @@ function MyProfile() {
   const [saved, setSaved] = useState(null)
   const [perfil, setPerfil] = useState(null)
   const [mode, setMode] = useState("editar")
+  const [saving, setSaving] = useState(false)
+  const [reviewing, setReviewing] = useState(false)
+  const [reviewed, setReviewed] = useState(false)
+  const [operationError, setOperationError] = useState("")
 
   useEffect(() => {
     obtenerPerfil()
@@ -184,19 +194,69 @@ function MyProfile() {
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
 
+  if (!perfil) return <div role="alert" className="p-8">No pudimos cargar tu perfil. Recarga para reintentar.</div>
+
   const dirty = JSON.stringify(perfil) !== JSON.stringify(saved)
   const aiDirty = AI_FIELDS.some((k) => JSON.stringify(perfil[k]) !== JSON.stringify(saved[k]))
 
-  const save = async () => {
+  const save = async (confirmReview = false) => {
+    if (saving) return
+    if (!perfil.nombre?.trim()) {
+      toast("El nombre no puede quedar vacío.", "error")
+      return
+    }
+
+    setSaving(true)
+    setOperationError("")
     try {
-      const actualizado = await guardarPerfil(perfil)
+      let actualizado
+      if (aiDirty || confirmReview === true) {
+        const confirmado = await confirmarPerfil({
+          nombre: perfil.nombre, carrera: perfil.carrera, fortalezas: perfil.fortalezas,
+          reforzar: perfil.reforzar, intereses: perfil.intereses,
+          experiencia: perfil.experiencia ?? [], resumen_publico: reviewedSummary(perfil, saved, aiDirty || perfil.perfil_estado_ia === "obsoleto"),
+          disponibilidad: perfil.disponibilidad, visibilidad: perfil.visibilidad,
+          pausado: perfil.pausado, consentimiento_recomendaciones: perfil.consentimiento_recomendaciones,
+        })
+        actualizado = await guardarPerfil({ ...confirmado, semestre: perfil.semestre,
+          grupoExterno: perfil.grupoExterno })
+      } else actualizado = await guardarPerfil(perfil)
       setSaved(actualizado)
       setPerfil(actualizado)
-      toast(aiDirty ? "Perfil guardado y recomendaciones actualizadas en MySQL." : "Perfil guardado en base de datos.", "success")
+      setReviewing(false)
+      setReviewed(false)
+      sessionStorage.setItem("usuario", JSON.stringify({ ...getSessionUser(), nombre: actualizado.nombre }))
+      toast(aiDirty ? "Perfil confirmado; recomendaciones disponibles según tus permisos." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
+      setOperationError(error.message || "Error al guardar el perfil.")
       toast(error.message || "Error al guardar el perfil.", "error")
-    }
+    } finally { setSaving(false) }
+  }
+
+  const retry = async () => {
+    setSaving(true)
+    setOperationError("")
+    try {
+      const updated = await reintentarEmbeddingPerfil()
+      setPerfil(updated)
+      setSaved(updated)
+    } catch (error) { setOperationError(error.message) }
+    finally { setSaving(false) }
+  }
+
+  const enableRecommendations = async () => {
+    if (saving || dirty) return
+    setSaving(true)
+    setOperationError("")
+    try {
+      const updated = await activarRecomendaciones()
+      setPerfil(updated)
+      setSaved(updated)
+      toast("Recomendaciones activadas y guardadas. Se usarán tus datos confirmados y permitidos.", "success")
+    } catch (error) {
+      setOperationError(error.message || "No pudimos activar las recomendaciones.")
+    } finally { setSaving(false) }
   }
 
   return (
@@ -217,9 +277,22 @@ function MyProfile() {
         />
       </header>
 
+      <div className="mb-5 space-y-3">
+        <RecommendationConsentStatus consent={saved.consentimiento_recomendaciones} paused={saved.pausado}
+          onEnable={enableRecommendations} disabled={dirty} busy={saving} />
+        <AIStatus state={aiDirty ? "obsoleto" : saved.perfil_estado_ia} busy={saving} disabled={dirty} onRetry={retry}
+          onReview={() => { setMode("editar"); setReviewing(true); setReviewed(false) }} />
+        {reviewing && <Card className="space-y-3 p-4">
+          <p className="text-sm">Revisa las fortalezas, intereses, biografía pública, disponibilidad y permisos del formulario antes de confirmar.</p>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={reviewed}
+            onChange={(event) => setReviewed(event.target.checked)} />He revisado mis datos y quiero confirmar esta versión.</label>
+          <Button disabled={!reviewed || saving} onClick={() => save(true)}>Confirmar y generar análisis</Button>
+        </Card>}
+        {operationError && <p role="alert" className="text-sm text-danger">{operationError}</p>}
+      </div>
       <div key={mode} className="animate-fade-in">
         {mode === "editar" ? (
-          <EditProfile perfil={perfil} setPerfil={setPerfil} dirty={dirty} aiDirty={aiDirty} onSave={save} onDiscard={() => setPerfil(saved)} />
+          <fieldset disabled={saving}><EditProfile perfil={perfil} setPerfil={setPerfil} dirty={dirty} aiDirty={aiDirty} saving={saving} onSave={() => save()} onDiscard={() => setPerfil(saved)} /></fieldset>
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-ink-2">Así ven tu perfil las demás personas{dirty && " (incluye cambios sin guardar)"}.</p>
@@ -259,7 +332,7 @@ function OtherProfile({ id }) {
   useEffect(() => {
     let usuarioLocal = {}
     try {
-      usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+      usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
     } catch (error) {
       console.error("No se pudo leer el usuario de la sesión:", error)
     }
@@ -286,8 +359,7 @@ function OtherProfile({ id }) {
   }, [])
 
   const selectedProject = projects.find((project) => project.id === projectId)
-  const openRoles = selectedProject?.roles.filter((role) => !role.cubiertoPor) ?? []
-  const availableRoles = openRoles.length > 0 ? openRoles : selectedProject?.roles ?? []
+  const availableRoles = usableRoles(selectedProject)
   const selectedRole = availableRoles.find((role) => role.id === roleId) ?? availableRoles[0]
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
@@ -349,10 +421,11 @@ function OtherProfile({ id }) {
           </div>
           <Button
             onClick={() => setInviting(true)}
-            disabled={projectsLoading || projectsError || projects.length === 0}
+            disabled={projectsLoading || projectsError || !selectedRole}
           >
             <Send aria-hidden="true" className="size-4" /> Invitar
           </Button>
+          {selectedProject && !selectedRole && <p role="status" className="text-sm text-ink-2">{selectedProject.motivo_no_disponible || "No hay vacantes utilizables."}</p>}
         </section>
         <InviteModal
           open={inviting}

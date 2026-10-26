@@ -4,6 +4,7 @@ import unicodedata
 from typing import Mapping
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from app.services.ai.skill_catalog import CATALOG_VERSION, SKILL_ALIASES
 
 
 def normalize_term(term: str) -> str:
@@ -50,8 +51,8 @@ class EquivalenceCatalog(BaseModel):
 
 
 DEFAULT_EQUIVALENCES = EquivalenceCatalog(
-    version="2026-10-21.v1",
-    aliases={"UE5": "Unreal Engine 5"},
+    version=CATALOG_VERSION,
+    aliases=SKILL_ALIASES,
 )
 
 

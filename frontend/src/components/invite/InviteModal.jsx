@@ -3,18 +3,16 @@ import { CircleCheck, Send } from "lucide-react"
 import Modal from "../ui/Modal"
 import Button from "../ui/Button"
 import Avatar from "../ui/Avatar"
-import AIBadge from "../ui/AIBadge"
 import { useToast } from "../ui/Toast"
 import { enviarInvitacion } from "../../services/api"
 
 function mensajeSugerido(student, project, rol) {
   const nombre = student.nombre.split(" ")[0]
-  return `¡Hola ${nombre}! Estoy formando un equipo para «${project.titulo}» y creo que tu experiencia en ${rol.nombre.toLowerCase()} sería justo lo que nos falta. ¿Te gustaría sumarte?`
+  return `¡Hola ${nombre}! Estoy formando un equipo para «${project.titulo}» y quisiera invitarte para conversar sobre el rol ${rol.nombre}. ¿Te gustaría participar?`
 }
 
 /**
- * Modal para invitar a alguien a un proyecto. El mensaje viene prellenado
- * por la IA y es totalmente editable.
+ * Modal para invitar a alguien a un proyecto con una plantilla editable.
  */
 export default function InviteModal(props) {
   if (!props.open || !props.student) return null
@@ -89,7 +87,7 @@ function InviteDialog({ open, onClose, student, project, rol, onSent }) {
               <label htmlFor={fieldId} className="text-sm font-semibold">
                 Mensaje <span className="font-normal text-ink-2">(opcional)</span>
               </label>
-              <AIBadge label="Borrador de la IA" />
+              <span className="text-xs text-ink-2">Plantilla editable</span>
             </div>
             <textarea
               id={fieldId}

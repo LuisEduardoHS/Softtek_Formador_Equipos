@@ -1,0 +1,52 @@
+"""Fictitious, predeclared QA expectations; no calls to models during pytest."""
+SCENARIOS = [
+    dict(id='web', category='Academico', owner=['Python','FastAPI'], required=['SQL','Figma'], preferred=['Git'],
+         roles=['especialista en bases de datos','diseñador UX/UI'], candidates=[['SQL','Git'],['UX/UI','Figma']]),
+    dict(id='videojuegos', category='Videojuegos', owner=['Unreal Engine 5'], required=['Blender','diseño de niveles'], preferred=[],
+         roles=['artista 3D','diseñador de niveles'], candidates=[['Blender'],['diseño de niveles']]),
+    dict(id='datos', category='Academico', owner=['Python'], required=['SQL','visualización'], preferred=['Python'],
+         roles=['analista'], candidates=[['SQL','visualización'],['Python']]),
+    dict(id='interfaz', category='Personal', owner=['UX/UI'], required=['Figma'], preferred=['prototipado'],
+         roles=['diseñador'], candidates=[['UX/UI','Figma','prototipado'],['SQL']]),
+    dict(id='futbol', category='Deportivo', owner=['delantero'], required=['portero'], preferred=['defensa'],
+         roles=['portero','defensa'], candidates=[['portero'],['defensa']]),
+    dict(id='gamejam', category='Videojuegos', owner=['Unreal Engine 5'], required=['Blender'], preferred=['diseño de niveles'],
+         roles=['artista 3D','diseñador'], candidates=[['Blender'],['diseño de niveles']]),
+    dict(id='escolar', category='General', owner=['redacción'], required=['organización'], preferred=['presentaciones'],
+         roles=['coordinador'], candidates=[['organización'],['presentaciones']]),
+    dict(id='obligatorias', category='Academico', owner=['Python'], required=['SQL'], preferred=['Git'],
+         roles=['backend'], candidates=[['SQL'],['Git']]),
+    dict(id='interes', category='Personal', owner=['SQL'], required=['Python'], preferred=[],
+         roles=['programador'], candidates=[[],['Python']], interests=['Python']),
+    dict(id='negacion', category='Academico', owner=['Python'], required=['SQL'], preferred=[],
+         roles=['bases de datos'], candidates=[[],['SQL']], negative_text='No sé SQL.'),
+    dict(id='incompleto', category='General', owner=['Python'], required=['SQL'], preferred=[],
+         roles=['colaborador'], candidates=[[],['SQL']], unconfirmed_first=True),
+    dict(id='vacantes', category='Academico', owner=['Python'], required=['SQL'], preferred=[],
+         roles=['backend'], candidates=[['SQL'],['SQL']], slots=2),
+    dict(id='privacidad', category='Personal', owner=['Python'], required=['Figma'], preferred=[],
+         roles=['diseñador'], candidates=[['Figma'],['Figma']], no_consent_first=True),
+    dict(id='horarios', category='Academico', owner=['Python'], required=['SQL'], preferred=[],
+         roles=['analista'], candidates=[['SQL'],['SQL']], constraint='lunes 16:00 a 18:00'),
+]
+
+PROFILE_CORPUS = [
+    ('sql', 'Sé programar con SQL y trabajo con Python.', {'SQL','Python'}, set()),
+    ('herramientas', 'Tengo experiencia en Blender y Unreal Engine 5.', {'Blender','Unreal Engine 5'}, set()),
+    ('interfaz', 'Diseño interfaces UX/UI en Figma. Hago prototipado.', {'UX/UI','Figma','prototipado'}, set()),
+    ('negacion', 'No sé SQL. Sé Python.', {'Python'}, {'SQL'}),
+    ('objetivo', 'Quiero aprender Docker. Sé SQL.', {'SQL'}, {'Docker'}),
+    ('interes', 'Me interesa Python. No sé programar en Python.', set(), {'Python'}),
+    ('ambiguo', 'Tal vez pueda ayudar en algo, todavía no sé.', set(), {'Python','SQL','Docker','Figma'}),
+    ('deporte', 'Juego de portero y defensa. No tengo experiencia profesional.', {'portero','defensa'}, set()),
+    ('no_experiencia', 'No tengo experiencia profesional. Quiero aprender SQL.', set(), {'SQL'}),
+    ('largo', 'Sé programar en Python y con SQL. Trabajo con Git. Uso FastAPI. Tengo experiencia en Blender y UE5. Quiero aprender Docker. Me interesa la educación. No sé Figma.',
+        {'Python','SQL','Git','FastAPI','Blender','Unreal Engine 5'}, {'Docker','Figma'}),
+]
+
+EVENT_CORPUS = [
+    ('por_rol', 'Aplicación web. Buscamos especialista en bases de datos: SQL obligatorio y Git deseable. Buscamos diseñador UX/UI: Figma obligatorio.', {'SQL','Figma'}, {'Git'}),
+    ('juego', 'Videojuego con Unreal Engine 5 obligatorio. Buscamos artista 3D con Blender obligatorio y diseñador de niveles.', {'Unreal Engine 5','Blender'}, set()),
+    ('futbol', 'Equipo de fútbol. Buscamos portero, defensa y delantero. Se requiere saber jugar de portero.', {'portero'}, set()),
+    ('opcionales', 'SQL obligatorio. Python no es obligatorio. Docker y Git son opcionales.', {'SQL'}, {'Docker','Git'}),
+]

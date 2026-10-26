@@ -1,0 +1,60 @@
+
+> frontend@0.0.0 test
+> node --test tests/*.test.js
+
+WebSocket server error: Port 24678 is already in use
+1:41:00 a.m. [vite] (client) Re-optimizing dependencies because vite config has changed
+✔ QA-08: unknown viewer never claims shared interests or schedules (476.6765ms)
+✔ QA-07: missing coverage never claims the team covers everything (13.1442ms)
+✔ QA-07: global confirmed requirements are visible even with empty role skills (4.1212ms)
+✔ QA-08: real viewer with empty schedule has no invented overlap (7.0091ms)
+✔ QA-08: real shared schedule and interest remain visible (8.4085ms)
+✔ QA-08: recommendation never trusts demo common-block counts (28.0184ms)
+✔ QA-06: spare global capacity never restores occupied roles (0.8595ms)
+✔ QA-06: partially occupied roles display actual slot counts (10.0622ms)
+✔ QA-12: search sends filters to the server before pagination (1.464ms)
+✔ QA-16: acceptance message addresses the recipient of each request type (0.1715ms)
+✔ QA-17: meeting route clearly unavailable and contains no send action (8.649ms)
+✔ empty candidate list explains opt-in without exposing excluded accounts (8.9685ms)
+✔ a role without a vacancy explains availability instead of claiming no profiles exist (1.2974ms)
+✔ QA-10: explicitly corrected or cleared biography is confirmed; old semantic summaries remain invalidated (1.0881ms)
+✔ QA-09: project confirmation sends the reviewed fingerprint and refuses a missing one (0.9924ms)
+✖ publishing role skills never repeats obligatory skills as desirable (1.7561ms)
+1:41:00 a.m. [vite] (client) Re-optimizing dependencies because vite config has changed
+✔ StrictMode subscriptions share one profile interpretation; later attempts are fresh (295.791ms)
+✔ failed interpretation releases its slot and a real retry can recover (1.0487ms)
+✔ different texts or sessions must not reuse an in-flight interpretation (0.5233ms)
+✔ project interpretation also shares StrictMode subscribers (0.4517ms)
+✔ tab identity follows its own session, not another tab shared localStorage (1.7234ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 950.4241
+
+✖ failing tests:
+
+test at tests\contracts.test.js:142:1
+✖ publishing role skills never repeats obligatory skills as desirable (1.7561ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      'Git',
+  +   'SQL',
+  +   'Figma'
+    ]
+
+      at TestContext.<anonymous> (file:///D:/projects/Softtek_Formador_Equipos/frontend/tests/contracts.test.js:152:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'Git', 'SQL', 'Figma' ],
+    expected: [ 'Git' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

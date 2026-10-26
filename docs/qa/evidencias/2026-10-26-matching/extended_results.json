@@ -1,0 +1,96 @@
+[
+  {
+    "id": "required-preferred-overlap-real",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "positive-sql-before-privacy",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "paused-excluded-real",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "hidden-sql-does-not-prove-sql",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "inactive-excluded-real",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "inactive-token-forbidden-real",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompatible-vector-still-explicit-sql",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "edit-invalidates-profile-vector",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "offline-confirmation-recovers-not-500",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "offline-interpretation-503",
+    "status": "PASS",
+    "evidence": {
+      "http": 503
+    }
+  },
+  {
+    "id": "offline-interpretation-keeps-confirmed-source",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "real-nomic-retry",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "offline-project-idempotent",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "offline-project-embedding-recovered",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "innodb-concurrent-last-slot",
+    "status": "PASS",
+    "evidence": {
+      "statuses": [
+        200,
+        409
+      ]
+    }
+  },
+  {
+    "id": "innodb-exactly-one-member",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "full-team-no-candidates",
+    "status": "PASS",
+    "evidence": {}
+  }
+]

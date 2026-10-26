@@ -32,7 +32,8 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
     const password = String(formData.get("password") ?? "")
     const errs = {}
     if (!EMAIL_VALIDATION.test(email)) errs.email = "Ingresa un correo válido."
-    if (password.length < 8) errs.password = "La contraseña debe tener al menos 8 caracteres."
+    if (!password.trim()) errs.password = "Escribe tu contraseña."
+    if ([...password].length > 128) errs.password = "La contraseña admite hasta 128 caracteres."
     setErrors(errs)
     if (Object.keys(errs).length) return
     onSignIn?.({ email, password })
@@ -50,10 +51,10 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
     const confirmPassword = String(formData.get("confirmPassword") ?? "")
 
     const errs = {}
-    if (!nombre) errs.nombre = "Escribe tu nombre completo."
+    if (!nombre || [...nombre].length > 150) errs.nombre = "Escribe un nombre de hasta 150 caracteres."
     if (!EMAIL_VALIDATION.test(email)) errs.email = "Ingresa un correo válido."
-    if (!carrera) errs.carrera = "Selecciona o escribe tu carrera."
-    if (password.length < 8) errs.password = "La contraseña debe tener al menos 8 caracteres."
+    if (!carrera || [...carrera].length > 100) errs.carrera = "Escribe una carrera de hasta 100 caracteres."
+    if ([...password].length < 8 || [...password].length > 128 || !password.trim()) errs.password = "Usa entre 8 y 128 caracteres."
     if (password !== confirmPassword) errs.confirmPassword = "Las contraseñas no coinciden."
 
     setErrors(errs)
@@ -85,6 +86,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
               type="text"
               autoComplete="name"
               placeholder="Tu nombre completo"
+              maxLength={150}
               error={errors.nombre}
               required
             />
@@ -94,6 +96,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
               type="email"
               autoComplete="email"
               placeholder="nombre@ejemplo.com"
+              maxLength={100}
               error={errors.email}
               required
             />
@@ -103,6 +106,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
               type="text"
               autoComplete="organization-title"
               placeholder="Ej. Ingeniería en Sistemas"
+              maxLength={100}
               error={errors.carrera}
               required
             />
@@ -113,6 +117,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
                 type="text"
                 optional
                 placeholder="Ej. Jalisco"
+                maxLength={50}
               />
               <Input
                 label="Municipio"
@@ -120,6 +125,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
                 type="text"
                 optional
                 placeholder="Ej. Guadalajara"
+                maxLength={50}
               />
             </div>
             <Input
@@ -131,6 +137,7 @@ export default function AuthCard({ systemName = "Complementa", initialMode = "lo
               required
               trailing={<PasswordToggle show={showPassword} onToggle={() => setShowPassword((s) => !s)} label="contraseña" />}
             />
+            <p className="-mt-2 text-xs text-ink-2">Usa entre 8 y 128 caracteres.</p>
             <Input
               label="Confirmar contraseña"
               name="confirmPassword"

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "pytest",
+    "seconds": 33.5,
+    "exit_code": 0,
+    "output": "........................................................................ [ 19%]\n........................................................................ [ 39%]\n........................................................................ [ 59%]\n........................................................................ [ 78%]\n........................................................................ [ 98%]\n.....                                                                    [100%]\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  D:\\projects\\Softtek_Formador_Equipos\\backend\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n365 passed, 1 warning in 32.15s\n"
+  },
+  {
+    "name": "pip_check",
+    "seconds": 0.47,
+    "exit_code": 0,
+    "output": "No broken requirements found.\n"
+  },
+  {
+    "name": "frontend_tests",
+    "seconds": 1.97,
+    "exit_code": 0,
+    "output": "\n> frontend@0.0.0 test\n> node --test tests/*.test.js\n\nWebSocket server error: Port 24678 is already in use\n\u2714 QA-08: unknown viewer never claims shared interests or schedules (436.8234ms)\n\u2714 QA-07: missing coverage never claims the team covers everything (10.2647ms)\n\u2714 QA-07: global confirmed requirements are visible even with empty role skills (2.891ms)\n\u2714 QA-08: real viewer with empty schedule has no invented overlap (6.1099ms)\n\u2714 QA-08: real shared schedule and interest remain visible (7.4652ms)\n\u2714 QA-08: recommendation never trusts demo common-block counts (25.4145ms)\n\u2714 QA-06: spare global capacity never restores occupied roles (0.5636ms)\n\u2714 QA-06: partially occupied roles display actual slot counts (8.9121ms)\n\u2714 QA-12: search sends filters to the server before pagination (1.2122ms)\n\u2714 QA-16: acceptance message addresses the recipient of each request type (0.2057ms)\n\u2714 QA-17: meeting route clearly unavailable and contains no send action (8.2818ms)\n\u2714 empty candidate list explains opt-in without exposing excluded accounts (8.477ms)\n\u2714 a role without a vacancy explains availability instead of claiming no profiles exist (1.1834ms)\n\u2714 QA-10: explicitly corrected or cleared biography is confirmed; old semantic summaries remain invalidated (0.1597ms)\n\u2714 QA-09: project confirmation sends the reviewed fingerprint and refuses a missing one (0.9737ms)\n\u2714 publishing role skills never repeats obligatory skills as desirable (0.769ms)\n2:24:39 a.m. [vite] (client) Re-optimizing dependencies because vite config has changed\n\u2714 StrictMode subscriptions share one profile interpretation; later attempts are fresh (287.7281ms)\n\u2714 failed interpretation releases its slot and a real retry can recover (1.1258ms)\n\u2714 different texts or sessions must not reuse an in-flight interpretation (0.6803ms)\n\u2714 project interpretation also shares StrictMode subscribers (0.5884ms)\n\u2714 tab identity follows its own session, not another tab shared localStorage (1.2655ms)\n\u2139 tests 21\n\u2139 suites 0\n\u2139 pass 21\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1509.6535\n"
+  },
+  {
+    "name": "build",
+    "seconds": 0.99,
+    "exit_code": 0,
+    "output": "\n> frontend@0.0.0 build\n> vite build\n\nvite v8.3.4 building client environment for production...\ntransforming...\n\u2713 1991 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.80 kB \u2502 gzip:   0.44 kB\ndist/assets/index-Dq6ivlMH.css   54.18 kB \u2502 gzip:  10.09 kB\ndist/assets/index-BEPSciEq.js   484.89 kB \u2502 gzip: 140.26 kB\n\n\u2713 built in 262ms\n"
+  },
+  {
+    "name": "lint",
+    "seconds": 3.57,
+    "exit_code": 0,
+    "output": "\n> frontend@0.0.0 lint\n> eslint .\n\n\nD:\\projects\\Softtek_Formador_Equipos\\frontend\\src\\components\\auth\\RequireSession.jsx\n  29:6  warning  React Hook useEffect has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps\n\n\u2716 1 problem (0 errors, 1 warning)\n\n"
+  }
+]

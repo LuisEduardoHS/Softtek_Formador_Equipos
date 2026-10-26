@@ -1,0 +1,481 @@
+{
+  "qa_database": "softtek_formador_equipos_qa_web_20261026_6a486f",
+  "counts": {
+    "usuarios": 3,
+    "perfiles_usuarios": 3,
+    "eventos": 2,
+    "solicitudes_equipo": 2,
+    "participantes_evento": 2
+  },
+  "checks": [
+    {
+      "id": "profile-5-facts",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-5-permissions",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-5-nomic",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-6-facts",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-6-permissions",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-6-nomic",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-7-facts",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-7-permissions",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "profile-7-nomic",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-confirmed-facts",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-nomic",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "two-real-accepted-members",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "actual-role-assignments",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "second-project-reviewed-requirements",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "second-project-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "login-final.owner.qa26",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "identity-5",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "persisted-team-5",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "full-project-no-impossible-candidates",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "members-can-be-recommended-for-another-project",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "login-final.sql.qa26",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "identity-6",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "persisted-team-6",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "member-excluded-from-projects-6",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "only-owner-can-read-candidates-6",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "login-final.design.qa26",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "identity-7",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "persisted-team-7",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "member-excluded-from-projects-7",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "only-owner-can-read-candidates-7",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "principal-unchanged",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "one-analysis-per-ui-input",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "five-real-nomic-calls",
+      "status": "PASS",
+      "evidence": {}
+    }
+  ],
+  "profiles": [
+    {
+      "id": 5,
+      "name": "QA Final Organizador",
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n",
+          "aplicaciones web"
+        ],
+        "experiencia": [
+          "trabajo con FastAPI para crear aplicaciones web"
+        ],
+        "habilidades": [
+          "Python",
+          "FastAPI",
+          "Git"
+        ],
+        "areas_mejora": [
+          "dise\u00f1o UX/UI"
+        ],
+        "resumen_publico": "Habilidades declaradas: Python, FastAPI, Git. Intereses: educaci\u00f3n, aplicaciones web. Experiencia: trabajo con FastAPI para crear aplicaciones web"
+      },
+      "dimensions": 768,
+      "model": "nomic-embed-text",
+      "revision_current": true
+    },
+    {
+      "id": 6,
+      "name": "QA Final SQL",
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n",
+          "aplicaciones web"
+        ],
+        "experiencia": [],
+        "habilidades": [
+          "SQL",
+          "Git"
+        ],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "resumen_publico": "Habilidades declaradas: SQL, Git. Intereses: educaci\u00f3n, aplicaciones web"
+      },
+      "dimensions": 768,
+      "model": "nomic-embed-text",
+      "revision_current": true
+    },
+    {
+      "id": 7,
+      "name": "QA Final Dise\u00f1o",
+      "structured": {
+        "intereses": [
+          "Educaci\u00f3n",
+          "Aplicaciones web"
+        ],
+        "experiencia": [
+          "UX/UI",
+          "Figma",
+          "Prototipado de aplicaciones web"
+        ],
+        "habilidades": [
+          "UX/UI",
+          "Figma",
+          "prototipado"
+        ],
+        "areas_mejora": [
+          "Blender"
+        ],
+        "resumen_publico": "Habilidades declaradas: UX/UI, Figma, prototipado. Intereses: Educaci\u00f3n, Aplicaciones web. Experiencia: UX/UI, Figma, Prototipado de aplicaciones web"
+      },
+      "dimensions": 768,
+      "model": "nomic-embed-text",
+      "revision_current": true
+    }
+  ],
+  "event_id": 2,
+  "confirmed_requirements": {
+    "resumen": "Habilidades obligatorias: SQL, Figma. Habilidades deseables: Git. Roles buscados: especialista en bases de datos, dise\u00f1ador UX/UI",
+    "categoria": "Academico",
+    "roles_buscados": [
+      "especialista en bases de datos",
+      "dise\u00f1ador UX/UI"
+    ],
+    "titulo_normalizado": "",
+    "habilidades_deseables": [
+      "Git"
+    ],
+    "intereses_relacionados": [],
+    "habilidades_obligatorias": [
+      "SQL",
+      "Figma"
+    ],
+    "restricciones_explicitas": []
+  },
+  "participants": [
+    {
+      "id": 6,
+      "role": "especialista en bases de datos"
+    },
+    {
+      "id": 7,
+      "role": "dise\u00f1ador UX/UI"
+    }
+  ],
+  "team_coverage": {
+    "estado": "conocida",
+    "total": 3,
+    "cubiertas": [
+      "Figma",
+      "SQL",
+      "Git"
+    ],
+    "por_acreditar": []
+  },
+  "other_open_project": {
+    "id": 3,
+    "recommendations": [
+      {
+        "event_id": 3,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 2,
+          "unknown": 3,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: SQL.",
+            "Evidencia confirmada para habilidad deseable: Git.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Figma.",
+            "Por verificar rol solicitado: especialista en bases de datos.",
+            "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: Figma.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: SQL.",
+            "Por verificar habilidad deseable: Git.",
+            "Por verificar rol solicitado: especialista en bases de datos.",
+            "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ]
+  },
+  "principal_before": {
+    "counts": {
+      "usuarios": 4,
+      "perfiles_usuarios": 4,
+      "eventos": 1,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 3844398997,
+      "perfiles_usuarios": 4192465674,
+      "eventos": 897947035,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "fb8d8647973fdda177c17a2e4deabc571886f26ba2160e6055f8a12a52dd9128",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_after": {
+    "counts": {
+      "usuarios": 4,
+      "perfiles_usuarios": 4,
+      "eventos": 1,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 3844398997,
+      "perfiles_usuarios": 4192465674,
+      "eventos": 897947035,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "fb8d8647973fdda177c17a2e4deabc571886f26ba2160e6055f8a12a52dd9128",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_unchanged": true,
+  "llama_calls": [
+    {
+      "seconds": 5.921,
+      "status": "OK",
+      "metadata": {
+        "total_duration": 5895730500,
+        "load_duration": 3345755300,
+        "prompt_eval_duration": 271698000,
+        "eval_duration": 2273146000,
+        "prompt_eval_count": 410,
+        "eval_count": 96,
+        "done_reason": "stop"
+      }
+    },
+    {
+      "seconds": 1.452,
+      "status": "OK",
+      "metadata": {
+        "total_duration": 1449487000,
+        "load_duration": 6943400,
+        "prompt_eval_duration": 76297000,
+        "eval_duration": 1361484000,
+        "prompt_eval_count": 410,
+        "eval_count": 55,
+        "done_reason": "stop"
+      }
+    },
+    {
+      "seconds": 2.032,
+      "status": "OK",
+      "metadata": {
+        "total_duration": 2029829400,
+        "load_duration": 7069900,
+        "prompt_eval_duration": 257055000,
+        "eval_duration": 1734403000,
+        "prompt_eval_count": 550,
+        "eval_count": 68,
+        "done_reason": "stop"
+      }
+    },
+    {
+      "seconds": 2.677,
+      "status": "OK",
+      "metadata": {
+        "total_duration": 2674565000,
+        "load_duration": 6978500,
+        "prompt_eval_duration": 49822000,
+        "eval_duration": 2569108000,
+        "prompt_eval_count": 412,
+        "eval_count": 106,
+        "done_reason": "stop"
+      }
+    }
+  ],
+  "embedding_calls": [
+    {
+      "seconds": 0.69,
+      "status": "OK",
+      "dimensions": [
+        768
+      ]
+    },
+    {
+      "seconds": 0.025,
+      "status": "OK",
+      "dimensions": [
+        768
+      ]
+    },
+    {
+      "seconds": 0.029,
+      "status": "OK",
+      "dimensions": [
+        768
+      ]
+    },
+    {
+      "seconds": 0.018,
+      "status": "OK",
+      "dimensions": [
+        768
+      ]
+    },
+    {
+      "seconds": 1.291,
+      "status": "OK",
+      "dimensions": [
+        768
+      ]
+    }
+  ]
+}

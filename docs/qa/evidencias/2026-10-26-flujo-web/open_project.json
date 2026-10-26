@@ -1,0 +1,59 @@
+{
+  "event_id": 3,
+  "status": 201,
+  "recommendations": [
+    {
+      "event_id": 3,
+      "candidate_id": 6,
+      "eligibility": "needs_review",
+      "evidence_group": "sufficient_evidence",
+      "evidence_coverage": {
+        "known": 2,
+        "unknown": 3,
+        "not_applicable": 0
+      },
+      "explanation": {
+        "strengths": [
+          "Evidencia confirmada para habilidad obligatoria: SQL.",
+          "Evidencia confirmada para habilidad deseable: Git.",
+          "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante."
+        ],
+        "gaps": [],
+        "unknowns": [
+          "Por verificar habilidad obligatoria: Figma.",
+          "Por verificar rol solicitado: especialista en bases de datos.",
+          "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+          "Hay requisitos sin evidencia suficiente."
+        ]
+      },
+      "policy_version": "2026-10-21.v1"
+    },
+    {
+      "event_id": 3,
+      "candidate_id": 7,
+      "eligibility": "needs_review",
+      "evidence_group": "sufficient_evidence",
+      "evidence_coverage": {
+        "known": 1,
+        "unknown": 4,
+        "not_applicable": 0
+      },
+      "explanation": {
+        "strengths": [
+          "Evidencia confirmada para habilidad obligatoria: Figma.",
+          "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante."
+        ],
+        "gaps": [],
+        "unknowns": [
+          "Por verificar habilidad obligatoria: SQL.",
+          "Por verificar habilidad deseable: Git.",
+          "Por verificar rol solicitado: especialista en bases de datos.",
+          "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+          "Hay requisitos sin evidencia suficiente."
+        ]
+      },
+      "policy_version": "2026-10-21.v1"
+    }
+  ],
+  "fixture": "reviewed HTTP, no new Llama call"
+}

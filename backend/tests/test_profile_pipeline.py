@@ -30,11 +30,11 @@ def ai():
 
 def test_structured_call_and_profile(ai):
     ai.client.chat.return_value.message.content = profile_json()
-    profile = ProfileParser(ai).parse_profile("Sé Python; debo aprender electrónica.")
+    profile = ProfileParser(ai).parse_profile("Sé Python y C++; debo aprender electrónica.")
     assert profile.habilidades == ["Python", "C++"]
     kwargs = ai.client.chat.call_args.kwargs
     assert kwargs["format"] == StructuredProfile.model_json_schema()
-    assert kwargs["options"] == {"temperature": 0}
+    assert kwargs["options"] == {"temperature": 0, "num_predict": 1024}
     assert [m["role"] for m in kwargs["messages"]] == ["system", "user"]
     assert "electrónica" not in build_profile_embedding_text(profile)
 

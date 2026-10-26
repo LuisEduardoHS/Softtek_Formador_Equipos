@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { responseMessage } from "../lib/contracts"
 import { Link } from "react-router-dom"
 import { ArrowRight, Compass, Inbox, Plus, UserPen, Users } from "lucide-react"
 import Button from "../components/ui/Button"
@@ -10,12 +11,15 @@ import Carousel, { CarouselItem } from "../components/ui/Carousel"
 import InvitationItem from "../components/invite/InvitationItem"
 import TeamSummaryCard from "../components/team/TeamSummaryCard"
 import StudentSearch from "../components/search/StudentSearch"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import useAsync from "../hooks/useAsync"
 import {
   obtenerEquipos,
   obtenerInvitaciones,
   responderInvitacion,
   obtenerPerfil,
+  obtenerProyectos,
+  obtenerRecomendaciones,
 } from "../services/api"
 import { firstName } from "../lib/projects"
 import { getSessionUser } from "../lib/session"
@@ -43,9 +47,20 @@ function SectionHeader({ title, desc, action, id }) {
 
 /* ------------------------- Perfil completo ------------------------- */
 
-function ProfileProgress({ value = 75 }) {
+function ProfileProgress({ value, status }) {
   const r = 22
   const c = 2 * Math.PI * r
+  const progress = value ?? 0
+  const message = status === "loading"
+    ? "Calculando el avance de tu perfil…"
+    : status === "error"
+      ? "No pudimos calcular el avance de tu perfil."
+      : progress === 100
+        ? "¡Tu perfil está completo!"
+        : progress >= 60
+          ? "Tu perfil está casi listo"
+          : "Completa tu perfil"
+
   return (
     <Card className="flex items-center gap-4 p-4 sm:p-5">
       <div className="relative grid size-14 shrink-0 place-items-center">
@@ -59,16 +74,20 @@ function ProfileProgress({ value = 75 }) {
             strokeWidth="5"
             strokeLinecap="round"
             strokeDasharray={c}
-            strokeDashoffset={c * (1 - value / 100)}
+            strokeDashoffset={c * (1 - progress / 100)}
             className="stroke-success transition-[stroke-dashoffset] duration-700"
           />
         </svg>
-        <span className="absolute text-xs font-bold">{value}%</span>
+        <span className="absolute text-xs font-bold">{value === null ? "—" : `${value}%`}</span>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-ink">Tu perfil está casi listo</p>
+        <p className="font-semibold text-ink">{message}</p>
         <p className="text-sm text-ink-2">
-          Agrega tus habilidades y tecnologías para que la IA encuentre tu equipo ideal.
+          {status === "success"
+            ? "Revisa los campos de tu perfil y confirma la información que quieras compartir."
+            : status === "loading"
+              ? "Estamos revisando los datos que has completado."
+              : "Vuelve a cargar la página para intentarlo de nuevo."}
         </p>
       </div>
       <Button variant="secondary" size="sm" as={Link} to="/perfil" className="shrink-0">
@@ -85,7 +104,7 @@ function ColdStart() {
   return (
     <EmptyState
       icon={Compass}
-      title="Aún no hay proyectos o recomendaciones"
+      title="Aún no hay recomendaciones para tu perfil"
       actions={
         <>
           <Button as={Link} to="/perfil">
@@ -97,7 +116,7 @@ function ColdStart() {
         </>
       }
     >
-      Actualmente no hay proyectos publicados en tu universidad. ¡Sé el primero en crear una convocatoria o completa tu perfil!
+      No encontramos proyectos recomendables para ti en este momento. Puedes explorar los proyectos existentes o revisar tu perfil.
     </EmptyState>
   )
 }
@@ -107,30 +126,25 @@ function ColdStart() {
 function Recommendations() {
   const [proyectos, setProyectos] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [tab, setTab] = useState("proyectos")
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/eventos/")
-      .then((res) => {
-        if (!res.ok) throw new Error("Error en la API")
-        return res.json()
-      })
-      .then((data) => {
-        setProyectos(data)
+    let active = true
+    Promise.all([obtenerRecomendaciones(), obtenerProyectos()])
+      .then(([resultado, eventos]) => {
+        if (!active) return
+        const byId = new Map(eventos.map((evento) => [evento.id, evento]))
+        setProyectos(resultado.proyectos.map((rec) => ({ ...rec, proyecto: byId.get(String(rec.event_id)) })))
         setLoading(false)
       })
-      .catch((err) => {
-        console.error("Error al obtener eventos:", err)
-        setError(true)
-        setLoading(false)
-      })
+      .catch((err) => { if (active) { setError(err); setLoading(false) } })
+    return () => { active = false }
   }, [])
 
   if (loading) {
     return (
       <div className="flex gap-4 overflow-hidden" aria-busy="true">
-        <span className="sr-only">Cargando proyectos desde MySQL…</span>
+        <span className="sr-only">Cargando recomendaciones…</span>
         {[0, 1, 2].map((i) => (
           <CardSkeleton key={i} className="w-[85%] max-w-[360px] shrink-0 sm:w-[340px]" />
         ))}
@@ -139,54 +153,38 @@ function Recommendations() {
   }
 
   if (error) {
-    return <ErrorState message="No pudimos conectar con la base de datos de eventos." />
+    return error.status === 403
+      ? <EmptyState icon={Compass} title="Activa las recomendaciones">Confirma tu perfil y activa el consentimiento de recomendaciones desde Perfil.</EmptyState>
+      : <ErrorState message="No pudimos cargar las recomendaciones." />
   }
 
   if (!proyectos.length) return <ColdStart />
 
-  const tabs = [
-    { id: "proyectos", label: "Proyectos en MySQL", count: proyectos.length }
-  ]
-
   return (
     <>
-      <div role="tablist" aria-label="Tipo de recomendación" className="mb-4 inline-flex rounded-lg bg-surface-2 p-1">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            type="button"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className="min-h-9 cursor-pointer rounded-md bg-surface px-4 text-sm font-semibold text-ink shadow-card"
-          >
-            {t.label} <span className="font-normal text-ink-2">{t.count}</span>
-          </button>
-        ))}
-      </div>
-
       <div className="animate-fade-in" role="tabpanel">
-        <Carousel label="Proyectos en tu Universidad">
-          {proyectos.map((evento) => (
-            <CarouselItem key={evento.id_evento}>
+        <Carousel label="Proyectos recomendados">
+          {proyectos.map(({ proyecto, ...rec }) => (
+            <CarouselItem key={rec.event_id}>
               <Card className="flex h-full flex-col justify-between p-6 shadow-sm">
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary uppercase tracking-wider">
-                      {evento.categoria_principal}
+                      {proyecto?.tipo || "Proyecto"}
                     </span>
-                    <span className="text-xs text-ink-2">{evento.estado}</span>
+                    <span className="text-xs text-ink-2">{rec.eligibility === "needs_review" ? "Requiere revisión" : "Elegible por evidencias"}</span>
                   </div>
-                  <h3 className="mt-3 text-lg font-bold text-ink">{evento.titulo}</h3>
-                  <p className="mt-2 line-clamp-3 text-sm text-ink-2">{evento.descripcion_libre}</p>
+                  <h3 className="mt-3 text-lg font-bold text-ink">{proyecto?.titulo || `Proyecto ${rec.event_id}`}</h3>
+                  <p className="mt-1 text-xs text-ink-2">{proyecto?.acepta_participacion ? "Con vacantes de rol" : proyecto?.motivo_no_disponible || "Disponibilidad por verificar"}</p>
+                  <p className="mt-2 line-clamp-3 text-sm text-ink-2">{rec.explanation.strengths[0] || rec.explanation.unknowns[0] || "Revisa los requisitos del proyecto."}</p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-line flex items-center justify-between">
                   <span className="text-xs text-ink-2">
-                    {evento.detalles_especificos?.modalidad || "Presencial"}
+                    {rec.evidence_group === "insufficient_evidence" ? "Evidencia insuficiente" : "Basado en hechos confirmados"}
                   </span>
                   <Link
-                    to={`/proyectos/${evento.id_evento}`}
+                    to={`/proyectos/${rec.event_id}`}
                     className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                   >
                     Ver detalle <ArrowRight className="size-3" />
@@ -213,9 +211,9 @@ function PendingInvitations() {
     try {
       const result = await responderInvitacion(invitation.id, estado)
       inv.setData((list) => list.map((i) => (i.id === invitation.id ? { ...i, estado: result.estado } : i)))
-      toast(estado === "aceptada" ? `¡Te uniste al proyecto!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
-    } catch {
-      toast("No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
+      toast(responseMessage(invitation, estado), estado === "aceptada" ? "success" : "info")
+    } catch (error) {
+      toast(error.message || "No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
     } finally {
       setBusy(null)
     }
@@ -316,8 +314,8 @@ export default function HomePage() {
   const perfilQuery = useAsync(obtenerPerfil)
   const usuarioGuardado = getSessionUser()
   
-  const nombreReal = usuarioGuardado.nombre || perfilQuery.data?.nombre || "Estudiante"
-  const progresoReal = perfilQuery.data?.perfilCompleto || 20
+  const nombreReal = perfilQuery.data?.nombre || usuarioGuardado.nombre || "Estudiante"
+  const progresoReal = perfilQuery.status === "success" ? perfilQuery.data.perfilCompleto : null
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
@@ -336,14 +334,16 @@ export default function HomePage() {
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-10">
           <div className="animate-fade-up [animation-delay:60ms]">
-            <ProfileProgress value={progresoReal} />
+            <ProfileProgress value={progresoReal} status={perfilQuery.status} />
+            {perfilQuery.status === "success" && <div className="mt-3"><RecommendationConsentStatus
+              consent={perfilQuery.data.consentimiento_recomendaciones} paused={perfilQuery.data.pausado} /></div>}
           </div>
 
           <section aria-labelledby="rec-title" className="animate-fade-up [animation-delay:120ms]">
             <SectionHeader
               id="rec-title"
               title="Convocatorias Abiertas"
-              desc="Proyectos y eventos registrados en MySQL para formar equipo."
+              desc="Proyectos disponibles para formar tu próximo equipo"
               action={<LocalProcessing />}
             />
             <Recommendations />

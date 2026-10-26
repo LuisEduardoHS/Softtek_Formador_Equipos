@@ -3,7 +3,8 @@ import Avatar from "../ui/Avatar"
 import Card from "../ui/Card"
 import SkillChip from "../ui/SkillChip"
 import AvailabilityGrid from "../ui/AvailabilityGrid"
-import { currentUser } from "../../data/mockData"
+import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile"
+import { confirmedComparison } from "../../lib/contracts"
 
 const DEFAULT_VIS = { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: true }
 
@@ -28,10 +29,12 @@ function Hidden({ children }) {
  * Lo que otros ven de un perfil. Con `preview` (tu propio perfil) los bloques
  * ocultos aparecen indicados para que sepas qué no se muestra.
  */
-export default function PublicProfile({ student, preview = false, actions }) {
+export default function PublicProfile({ student, preview = false, actions, viewer }) {
+  const authenticatedProfile = useAuthenticatedProfile(!preview && !viewer)
+  const currentUser = confirmedComparison(viewer ?? authenticatedProfile)
   const vis = { ...DEFAULT_VIS, ...(student.visibilidad ?? {}), ...(student.correoVisible === false ? { correo: false } : {}) }
-  const esOtro = student.id !== currentUser.id
-  const intereses = new Set(currentUser.intereses)
+  const esOtro = !preview && currentUser && String(student.id) !== String(currentUser.id)
+  const intereses = new Set(currentUser?.intereses ?? [])
 
   return (
     <Card className="overflow-hidden">
@@ -83,7 +86,7 @@ export default function PublicProfile({ student, preview = false, actions }) {
                   <ul className="flex flex-wrap gap-1.5">
                     {(student.intereses ?? []).map((i) => (
                       <li key={i}>
-                        <SkillChip variant={esOtro && intereses.has(i) ? "match" : "neutral"}>{i}</SkillChip>
+                        <SkillChip variant={esOtro && intereses.has(i) ? "shared" : "neutral"}>{i}</SkillChip>
                       </li>
                     ))}
                   </ul>
@@ -93,7 +96,7 @@ export default function PublicProfile({ student, preview = false, actions }) {
               ) : (
                 <Hidden>Oculto para otras personas</Hidden>
               )}
-              {esOtro && vis.intereses && <p className="mt-2 text-xs text-ink-2">En verde, los intereses que compartes.</p>}
+              {esOtro && vis.intereses && (student.intereses ?? []).some((i) => intereses.has(i)) && <p className="mt-2 text-xs text-ink-2">En verde, los intereses que compartes.</p>}
             </Block>
 
             {(preview || vis.reforzar) && (
