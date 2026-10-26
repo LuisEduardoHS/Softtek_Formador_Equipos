@@ -1,6 +1,6 @@
 import { useCallback, useId, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, CalendarDays, CircleCheck, FileQuestion, Hand, Pencil, Plus, SearchX, Trash2, Users } from "lucide-react"
+import { ArrowLeft, CalendarDays, CircleCheck, FileQuestion, Hand, Pencil, Plus, Trash2, Users } from "lucide-react"
 import Avatar from "../components/ui/Avatar"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
@@ -20,6 +20,7 @@ import { coverage, formatDate } from "../lib/projects"
 import { getSessionUser } from "../lib/session"
 import { availableRoles } from "../lib/contracts"
 import { inputCls } from "../lib/ui"
+import CandidatesEmptyState from "../components/project/CandidatesEmptyState"
 
 /* ------------------------------ Encabezado ------------------------------ */
 
@@ -90,9 +91,8 @@ function Candidates({ project }) {
   if (cands.status === "error") return <ErrorState message="No pudimos cargar los candidatos." onRetry={cands.reload} />
   return (
     <div className="space-y-4">
-      {cands.data.length === 0 && <EmptyState icon={SearchX} title="Aún no hay candidatos recomendados">
-        Se mostrarán perfiles con consentimiento y evidencia confirmada cuando haya coincidencias elegibles.
-      </EmptyState>}
+      {cands.data.length === 0 && <CandidatesEmptyState available={project.acepta_participacion}
+        reason={project.motivo_no_disponible} onRefresh={cands.reload} />}
       {cands.data.map((rec) => <Card key={rec.candidate_id} className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

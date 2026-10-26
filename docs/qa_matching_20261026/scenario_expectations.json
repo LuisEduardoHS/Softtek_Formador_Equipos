@@ -1,0 +1,339 @@
+[
+  {
+    "id": "web",
+    "category": "Academico",
+    "owner": [
+      "Python",
+      "FastAPI"
+    ],
+    "required": [
+      "SQL",
+      "Figma"
+    ],
+    "preferred": [
+      "Git"
+    ],
+    "roles": [
+      "especialista en bases de datos",
+      "dise\u00f1ador UX/UI"
+    ],
+    "candidates": [
+      [
+        "SQL",
+        "Git"
+      ],
+      [
+        "UX/UI",
+        "Figma"
+      ]
+    ]
+  },
+  {
+    "id": "videojuegos",
+    "category": "Videojuegos",
+    "owner": [
+      "Unreal Engine 5"
+    ],
+    "required": [
+      "Blender",
+      "dise\u00f1o de niveles"
+    ],
+    "preferred": [],
+    "roles": [
+      "artista 3D",
+      "dise\u00f1ador de niveles"
+    ],
+    "candidates": [
+      [
+        "Blender"
+      ],
+      [
+        "dise\u00f1o de niveles"
+      ]
+    ]
+  },
+  {
+    "id": "datos",
+    "category": "Academico",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL",
+      "visualizaci\u00f3n"
+    ],
+    "preferred": [
+      "Python"
+    ],
+    "roles": [
+      "analista"
+    ],
+    "candidates": [
+      [
+        "SQL",
+        "visualizaci\u00f3n"
+      ],
+      [
+        "Python"
+      ]
+    ]
+  },
+  {
+    "id": "interfaz",
+    "category": "Personal",
+    "owner": [
+      "UX/UI"
+    ],
+    "required": [
+      "Figma"
+    ],
+    "preferred": [
+      "prototipado"
+    ],
+    "roles": [
+      "dise\u00f1ador"
+    ],
+    "candidates": [
+      [
+        "UX/UI",
+        "Figma",
+        "prototipado"
+      ],
+      [
+        "SQL"
+      ]
+    ]
+  },
+  {
+    "id": "futbol",
+    "category": "Deportivo",
+    "owner": [
+      "delantero"
+    ],
+    "required": [
+      "portero"
+    ],
+    "preferred": [
+      "defensa"
+    ],
+    "roles": [
+      "portero",
+      "defensa"
+    ],
+    "candidates": [
+      [
+        "portero"
+      ],
+      [
+        "defensa"
+      ]
+    ]
+  },
+  {
+    "id": "gamejam",
+    "category": "Videojuegos",
+    "owner": [
+      "Unreal Engine 5"
+    ],
+    "required": [
+      "Blender"
+    ],
+    "preferred": [
+      "dise\u00f1o de niveles"
+    ],
+    "roles": [
+      "artista 3D",
+      "dise\u00f1ador"
+    ],
+    "candidates": [
+      [
+        "Blender"
+      ],
+      [
+        "dise\u00f1o de niveles"
+      ]
+    ]
+  },
+  {
+    "id": "escolar",
+    "category": "General",
+    "owner": [
+      "redacci\u00f3n"
+    ],
+    "required": [
+      "organizaci\u00f3n"
+    ],
+    "preferred": [
+      "presentaciones"
+    ],
+    "roles": [
+      "coordinador"
+    ],
+    "candidates": [
+      [
+        "organizaci\u00f3n"
+      ],
+      [
+        "presentaciones"
+      ]
+    ]
+  },
+  {
+    "id": "obligatorias",
+    "category": "Academico",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL"
+    ],
+    "preferred": [
+      "Git"
+    ],
+    "roles": [
+      "backend"
+    ],
+    "candidates": [
+      [
+        "SQL"
+      ],
+      [
+        "Git"
+      ]
+    ]
+  },
+  {
+    "id": "interes",
+    "category": "Personal",
+    "owner": [
+      "SQL"
+    ],
+    "required": [
+      "Python"
+    ],
+    "preferred": [],
+    "roles": [
+      "programador"
+    ],
+    "candidates": [
+      [],
+      [
+        "Python"
+      ]
+    ],
+    "interests": [
+      "Python"
+    ]
+  },
+  {
+    "id": "negacion",
+    "category": "Academico",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL"
+    ],
+    "preferred": [],
+    "roles": [
+      "bases de datos"
+    ],
+    "candidates": [
+      [],
+      [
+        "SQL"
+      ]
+    ],
+    "negative_text": "No s\u00e9 SQL."
+  },
+  {
+    "id": "incompleto",
+    "category": "General",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL"
+    ],
+    "preferred": [],
+    "roles": [
+      "colaborador"
+    ],
+    "candidates": [
+      [],
+      [
+        "SQL"
+      ]
+    ],
+    "unconfirmed_first": true
+  },
+  {
+    "id": "vacantes",
+    "category": "Academico",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL"
+    ],
+    "preferred": [],
+    "roles": [
+      "backend"
+    ],
+    "candidates": [
+      [
+        "SQL"
+      ],
+      [
+        "SQL"
+      ]
+    ],
+    "slots": 2
+  },
+  {
+    "id": "privacidad",
+    "category": "Personal",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "Figma"
+    ],
+    "preferred": [],
+    "roles": [
+      "dise\u00f1ador"
+    ],
+    "candidates": [
+      [
+        "Figma"
+      ],
+      [
+        "Figma"
+      ]
+    ],
+    "no_consent_first": true
+  },
+  {
+    "id": "horarios",
+    "category": "Academico",
+    "owner": [
+      "Python"
+    ],
+    "required": [
+      "SQL"
+    ],
+    "preferred": [],
+    "roles": [
+      "analista"
+    ],
+    "candidates": [
+      [
+        "SQL"
+      ],
+      [
+        "SQL"
+      ]
+    ],
+    "constraint": "lunes 16:00 a 18:00"
+  }
+]

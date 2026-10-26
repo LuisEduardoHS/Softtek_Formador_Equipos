@@ -1,0 +1,1047 @@
+[
+  {
+    "id": "web",
+    "event_id": 2,
+    "expected": {
+      "id": "web",
+      "category": "Academico",
+      "owner": [
+        "Python",
+        "FastAPI"
+      ],
+      "required": [
+        "SQL",
+        "Figma"
+      ],
+      "preferred": [
+        "Git"
+      ],
+      "roles": [
+        "especialista en bases de datos",
+        "dise\u00f1ador UX/UI"
+      ],
+      "candidates": [
+        [
+          "SQL",
+          "Git"
+        ],
+        [
+          "UX/UI",
+          "Figma"
+        ]
+      ]
+    },
+    "candidate_assessments": [
+      {
+        "account": "web.candidate0",
+        "id": 6,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "SQL",
+            "kind": "required_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "Figma",
+            "kind": "required_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "Git",
+            "kind": "preferred_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "especialista en bases de datos",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "dise\u00f1ador UX/UI",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          }
+        ]
+      },
+      {
+        "account": "web.candidate1",
+        "id": 7,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "SQL",
+            "kind": "required_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "Figma",
+            "kind": "required_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "Git",
+            "kind": "preferred_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "especialista en bases de datos",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "dise\u00f1ador UX/UI",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          }
+        ]
+      }
+    ],
+    "before_recommendations": [
+      {
+        "event_id": 2,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 2,
+          "unknown": 3,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: SQL.",
+            "Evidencia confirmada para habilidad deseable: Git.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Figma.",
+            "Por verificar rol solicitado: especialista en bases de datos.",
+            "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 2,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: Figma.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: SQL.",
+            "Por verificar habilidad deseable: Git.",
+            "Por verificar rol solicitado: especialista en bases de datos.",
+            "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "after_recommendations": [
+      {
+        "event_id": 2,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: Figma.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: SQL.",
+            "Por verificar habilidad deseable: Git.",
+            "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "selected_for_manual_invitation": "web.candidate0",
+    "team": {
+      "estado": "conocida",
+      "total": 3,
+      "cubiertas": [
+        "SQL",
+        "Git"
+      ],
+      "por_acreditar": [
+        "Figma"
+      ]
+    }
+  },
+  {
+    "id": "videojuegos",
+    "event_id": 3,
+    "expected": {
+      "id": "videojuegos",
+      "category": "Videojuegos",
+      "owner": [
+        "Unreal Engine 5"
+      ],
+      "required": [
+        "Blender",
+        "dise\u00f1o de niveles"
+      ],
+      "preferred": [],
+      "roles": [
+        "artista 3D",
+        "dise\u00f1ador de niveles"
+      ],
+      "candidates": [
+        [
+          "Blender"
+        ],
+        [
+          "dise\u00f1o de niveles"
+        ]
+      ]
+    },
+    "candidate_assessments": [
+      {
+        "account": "videojuegos.candidate0",
+        "id": 9,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "Blender",
+            "kind": "required_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "dise\u00f1o de niveles",
+            "kind": "required_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "artista 3D",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "dise\u00f1ador de niveles",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          }
+        ]
+      },
+      {
+        "account": "videojuegos.candidate1",
+        "id": 10,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "Blender",
+            "kind": "required_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "dise\u00f1o de niveles",
+            "kind": "required_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "artista 3D",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "dise\u00f1ador de niveles",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          }
+        ]
+      }
+    ],
+    "before_recommendations": [
+      {
+        "event_id": 3,
+        "candidate_id": 9,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 3,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: Blender.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: artista 3D.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 10,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 3,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: dise\u00f1o de niveles.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar rol solicitado: artista 3D.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: artista 3D.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 5,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: artista 3D.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: artista 3D.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "after_recommendations": [
+      {
+        "event_id": 3,
+        "candidate_id": 10,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 1,
+          "unknown": 2,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: dise\u00f1o de niveles.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 5,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 3,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Blender.",
+            "Por verificar habilidad obligatoria: dise\u00f1o de niveles.",
+            "Por verificar rol solicitado: dise\u00f1ador de niveles.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "selected_for_manual_invitation": "videojuegos.candidate0",
+    "team": {
+      "estado": "conocida",
+      "total": 2,
+      "cubiertas": [
+        "Blender"
+      ],
+      "por_acreditar": [
+        "dise\u00f1o de niveles"
+      ]
+    }
+  },
+  {
+    "id": "futbol",
+    "event_id": 4,
+    "expected": {
+      "id": "futbol",
+      "category": "Deportivo",
+      "owner": [
+        "delantero"
+      ],
+      "required": [
+        "portero"
+      ],
+      "preferred": [
+        "defensa"
+      ],
+      "roles": [
+        "portero",
+        "defensa"
+      ],
+      "candidates": [
+        [
+          "portero"
+        ],
+        [
+          "defensa"
+        ]
+      ]
+    },
+    "candidate_assessments": [
+      {
+        "account": "futbol.candidate0",
+        "id": 12,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "portero",
+            "kind": "required_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "defensa",
+            "kind": "preferred_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "portero",
+            "kind": "open_role",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "defensa",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          }
+        ]
+      },
+      {
+        "account": "futbol.candidate1",
+        "id": 13,
+        "visible": "visible",
+        "confirmed": true,
+        "embedding": true,
+        "assessments": [
+          {
+            "requirement": "portero",
+            "kind": "required_skill",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "defensa",
+            "kind": "preferred_skill",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          },
+          {
+            "requirement": "portero",
+            "kind": "open_role",
+            "status": "unknown",
+            "reason": "evidencia_de_candidato_pendiente"
+          },
+          {
+            "requirement": "defensa",
+            "kind": "open_role",
+            "status": "met",
+            "reason": "evidencia_positiva_confirmada"
+          }
+        ]
+      }
+    ],
+    "before_recommendations": [
+      {
+        "event_id": 4,
+        "candidate_id": 12,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 2,
+          "unknown": 2,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad obligatoria: portero.",
+            "Evidencia confirmada para rol solicitado: portero.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 13,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 2,
+          "unknown": 2,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad deseable: defensa.",
+            "Evidencia confirmada para rol solicitado: defensa.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar rol solicitado: portero.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 10,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 8,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 9,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 5,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 4,
+          "not_applicable": 0
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: portero.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "after_recommendations": [
+      {
+        "event_id": 4,
+        "candidate_id": 13,
+        "eligibility": "needs_review",
+        "evidence_group": "sufficient_evidence",
+        "evidence_coverage": {
+          "known": 2,
+          "unknown": 1,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Evidencia confirmada para habilidad deseable: defensa.",
+            "Evidencia confirmada para rol solicitado: defensa.",
+            "Aporta una capacidad que cubre un requisito o rol a\u00fan vacante.",
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 10,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 7,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 8,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 6,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 9,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      },
+      {
+        "event_id": 4,
+        "candidate_id": 5,
+        "eligibility": "needs_review",
+        "evidence_group": "insufficient_evidence",
+        "evidence_coverage": {
+          "known": 0,
+          "unknown": 3,
+          "not_applicable": 1
+        },
+        "explanation": {
+          "strengths": [
+            "Hay coincidencia textual de intereses o preferencias con el evento."
+          ],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: portero.",
+            "Por verificar habilidad deseable: defensa.",
+            "Por verificar rol solicitado: defensa.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        },
+        "policy_version": "2026-10-21.v1"
+      }
+    ],
+    "selected_for_manual_invitation": "futbol.candidate0",
+    "team": {
+      "estado": "conocida",
+      "total": 2,
+      "cubiertas": [
+        "portero"
+      ],
+      "por_acreditar": [
+        "defensa"
+      ]
+    }
+  }
+]

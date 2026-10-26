@@ -102,15 +102,15 @@ def test_explicit_goalkeeper_survives_inconsistent_model_responses():
     assert "funciones pedidas explícitamente" in ai.generate_structured.call_args.kwargs["prompt"]
 
 
-@pytest.mark.parametrize("description", [
-    "Ya tenemos portero para el equipo amateur.",
-    "No buscamos portero; necesitamos defensa.",
+@pytest.mark.parametrize("description,expected", [
+    ("Ya tenemos portero para el equipo amateur.", []),
+    ("No buscamos portero; necesitamos defensa.", ["defensa"]),
 ])
-def test_goalkeeper_is_not_added_without_explicit_vacancy(description):
+def test_goalkeeper_is_not_added_without_explicit_vacancy(description, expected):
     ai = MagicMock()
     ai.generate_structured.return_value = json.dumps({"roles_buscados": []})
     parsed = EventParser(ai).parse_event(description, categoria_principal="Deportivo")
-    assert parsed.roles_buscados == []
+    assert parsed.roles_buscados == expected
 
 
 def test_game_jam_rejects_foreign_requirements_and_covered_role():

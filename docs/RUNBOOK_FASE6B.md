@@ -1,5 +1,7 @@
 # Fase 6B MVP: recomendaciones conectadas
 
+Estado operativo actual y evidencia real: [QA de escenarios del 26 de octubre](QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md). La base principal tiene esquema y servicios disponibles; las observaciones de indisponibilidad más abajo son históricas. Se verificaron tres recorridos visuales completos y 14 escenarios en QA, con límites explícitos de ranking y horarios.
+
 ## Requisitos previos
 
 Seguir `RUNBOOK_FASE6A.md`: configurar `DATABASE_URL` y `AUTH_SECRET`, aplicar la revisión Alembic `20261022_6a` con respaldo previo y arrancar FastAPI, MySQL y React. Esta fase no cambia el esquema ni necesita Ollama en tiempo de consulta. El motor usa hechos confirmados aunque falten embeddings; solo usa un vector cuando modelo, pipeline y revisión de origen son válidos. La suite automatizada usa SQLite temporal.
@@ -26,6 +28,8 @@ python -c "from sqlalchemy import text; from app.db.database import engine; c=en
 ```
 
 Después iniciar sesión con una cuenta de prueba, confirmar perfil/consentimiento y consultar ambos endpoints con su Bearer. Usar un evento propio abierto y hechos confirmados; comprobar que otro actor recibe 403 en candidatos y que la respuesta carece de `profile_embedding` y `ranking_score`. No compartir token ni cadena de conexión en logs o capturas. La observación original de esta entrega encontró una base sin tablas. En la revisión del 25 de octubre de 2026, este equipo tiene `MySQL80` detenido y no dispone de `backend/.env`; no se verificó el esquema real. Consultar el [diagnóstico actualizado](ESTADO_PROYECTO_2026-10-25.md) y preparar la estructura siguiendo 6A antes del smoke contra MySQL.
+
+Ese recorrido con registro, confirmación e invitaciones escribe datos: ejecutarlo **solo en una base QA aislada**, con su backend configurado y cuentas ficticias. El smoke SELECT anterior sí es de solo lectura. No activar consentimiento de cuentas reales para poblar recomendaciones. Un resultado vacío puede ser correcto por privacidad; la UI permite actualizar y explica las condiciones sin divulgar perfiles excluidos.
 
 ## Límites del MVP
 

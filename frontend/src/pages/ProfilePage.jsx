@@ -233,7 +233,7 @@ function MyProfile() {
       setPerfil(actualizado)
       setReviewing(false)
       setReviewed(false)
-      localStorage.setItem("usuario", JSON.stringify({ ...getSessionUser(), nombre: actualizado.nombre }))
+      sessionStorage.setItem("usuario", JSON.stringify({ ...getSessionUser(), nombre: actualizado.nombre }))
       toast(aiDirty ? "Perfil confirmado; recomendaciones disponibles según tus permisos." : "Perfil guardado en base de datos.", "success")
     } catch (error) {
       console.error(error)
@@ -324,7 +324,7 @@ function OtherProfile({ id }) {
   useEffect(() => {
     let usuarioLocal = {}
     try {
-      usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+      usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
     } catch (error) {
       console.error("No se pudo leer el usuario de la sesión:", error)
     }

@@ -101,7 +101,7 @@ def test_normalization_preserves_symbols_and_uses_versioned_alias():
     assert normalize_term("  ÁRTE   3D  ") == "arte 3d"
     assert normalize_term("C++") != normalize_term("C#")
     assert apply_equivalence(" UE5 ") == apply_equivalence("Unreal Engine 5")
-    assert DEFAULT_EQUIVALENCES.version == "2026-10-25.v3"
+    assert DEFAULT_EQUIVALENCES.version == "2026-10-26.v4"
     assert apply_equivalence("fútbol") == "futbol"
     assert apply_equivalence("portero") != apply_equivalence("defensa")
 

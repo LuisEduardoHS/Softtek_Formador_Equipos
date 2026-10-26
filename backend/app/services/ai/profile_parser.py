@@ -32,14 +32,15 @@ def _intent_fragments(clauses, pattern):
     return fragments
 
 
-def _intent_labels(fragments):
+def _intent_labels(fragments, pattern=GOAL):
     values = []
     for fragment in fragments:
         for item in re.split(r",|\s+(?:y|e|ni)\s+", fragment, flags=re.I):
             item = item.strip()
-            prefix = GOAL.match(folded(item))
-            if prefix:
+            prefix = pattern.match(folded(item))
+            while prefix:
                 item = item[prefix.end():].strip(" :-")
+                prefix = pattern.match(folded(item))
             item = re.sub(r"^(?:a\s+)?(?:los|las|el|la)\s+", "", item, flags=re.I)
             if item and len(item) <= 200 and not DENIAL.search(folded(item)):
                 values.append(canonical_skill(item))
@@ -68,8 +69,8 @@ def _clean_profile(profile, description):
         _intent_labels([v for v in profile.areas_mejora if _grounded(v, goals) and not DENIAL.search(folded(v))])
         + _intent_labels(goals))
     profile.intereses = reviewed_skills(
-        [canonical_skill(v) for v in profile.intereses if _grounded(v, interests) and not DENIAL.search(folded(v))]
-        + _intent_labels(interests))
+        _intent_labels([v for v in profile.intereses if _grounded(v, interests) and not DENIAL.search(folded(v))], INTEREST)
+        + _intent_labels(interests, INTEREST))
     experience = [c for c in clauses if not any(p.search(folded(c)) for p in (DENIAL, GOAL, INTEREST))]
     profile.experiencia = [v for v in profile.experiencia if not DENIAL.search(folded(v)) and _grounded(v, experience)]
     if not profile.experiencia:

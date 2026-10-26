@@ -37,7 +37,7 @@ export default function AppLayout() {
 
   function cerrarSesion() {
     sessionStorage.removeItem("access_token")
-    localStorage.removeItem("usuario")
+    sessionStorage.removeItem("usuario")
     navigate("/", { replace: true })
   }
 

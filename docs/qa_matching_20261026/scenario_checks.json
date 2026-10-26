@@ -1,0 +1,1523 @@
+[
+  {
+    "id": "web.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "web.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "web.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "web.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "web-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "web-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "web-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "web-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "videojuegos.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "videojuegos.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "videojuegos.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "videojuegos-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "videojuegos-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "videojuegos-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "videojuegos-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "datos.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "datos.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "datos.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "datos-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "datos-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "datos-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "datos-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interfaz.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interfaz.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interfaz.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "interfaz-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interfaz-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interfaz-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interfaz-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "futbol.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "futbol.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "futbol.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "futbol-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "futbol-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "futbol-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "futbol-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "gamejam.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "gamejam.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "gamejam.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "gamejam-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "gamejam-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "gamejam-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "gamejam-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "escolar.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "escolar.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "escolar.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "escolar-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "escolar-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "escolar-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "escolar-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "obligatorias.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "obligatorias.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "obligatorias.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "obligatorias-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "obligatorias-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "obligatorias-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "obligatorias-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interes.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interes.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interes.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "interes-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interes-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "interes-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "interes-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "negacion.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "negacion.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "negacion.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "negacion-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "negacion-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "negacion-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "negacion-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "incompleto.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto.candidate0-unconfirmed",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "incompleto.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "incompleto-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-without-vector",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-retry-vector",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "incompleto-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "incompleto-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "incompleto-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "vacantes.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "vacantes.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "vacantes.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "vacantes-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "vacantes-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "vacantes-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-multiple-slots",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-application",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "vacantes-full-after-second",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "privacidad.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "privacidad.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "privacidad.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "privacidad-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.candidate0-privacy-excluded",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "privacidad-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "privacidad-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "privacidad-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios.owner-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "horarios.owner-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios.candidate0-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "horarios.candidate0-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios.candidate1-confirmed",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "horarios.candidate1-nomic",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-created",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "horarios-idempotency",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-endpoint",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-top1",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios.candidate0-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios.candidate1-facts",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-project-recommendation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-invite",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "horarios-pending-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "horarios-actual-roster",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-member-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "horarios-member-project-exclusion",
+    "status": "PASS",
+    "evidence": {}
+  }
+]

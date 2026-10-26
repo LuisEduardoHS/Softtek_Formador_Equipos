@@ -13,7 +13,7 @@ import { availableRoles as usableRoles } from "../lib/contracts"
 
 function getUsuarioActual() {
   try {
-    return JSON.parse(localStorage.getItem("usuario") || "{}")
+    return JSON.parse(sessionStorage.getItem("usuario") || "{}")
   } catch (error) {
     console.error("No se pudo leer el usuario de la sesión:", error)
     return {}

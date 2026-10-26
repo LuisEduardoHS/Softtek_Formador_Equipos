@@ -1,6 +1,7 @@
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from app.schemas.profile_data import Text150, Text200
+from app.services.ai.skill_terms import reviewed_skills, folded
 
 
 class _CleanSchema(BaseModel):
@@ -56,3 +57,11 @@ class StructuredEventRequirements(_CleanSchema):
     roles_buscados: list[Text150] = Field(default_factory=list, max_length=100, description="Funciones o posiciones que faltan y se buscan; nunca integrantes ya presentes.")
     intereses_relacionados: list[Text200] = Field(default_factory=list, max_length=100, description="Temas o actividades relevantes sin afirmar habilidad.")
     restricciones_explicitas: list[Text200] = Field(default_factory=list, max_length=100, description="Condiciones logísticas o de participación declaradas, como lugar u horario; no habilidades.")
+
+    @model_validator(mode="after")
+    def distinct_skill_requirements(self):
+        self.habilidades_obligatorias = reviewed_skills(self.habilidades_obligatorias)
+        required = {folded(skill) for skill in self.habilidades_obligatorias}
+        self.habilidades_deseables = [skill for skill in reviewed_skills(self.habilidades_deseables)
+                                     if folded(skill) not in required]
+        return self

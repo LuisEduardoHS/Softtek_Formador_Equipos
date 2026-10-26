@@ -1,0 +1,75 @@
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_________ test_actual_long_output_keeps_working_with_git_and_fastapi __________
+tests\test_matching_real_regressions.py:16: in test_actual_long_output_keeps_working_with_git_and_fastapi
+    assert set(p.habilidades)=={'Python','SQL','Git','FastAPI'}
+E   AssertionError: assert {'Python', 'SQL'} == {'FastAPI', '...ython', 'SQL'}
+E
+E     Extra items in the right set:
+E     'FastAPI'
+E     'Git'
+E     Use -v to get more diff
+_ test_actual_model_omitted_sport_skills_are_recovered_only_from_explicit_source _
+tests\test_matching_real_regressions.py:20: in test_actual_model_omitted_sport_skills_are_recovered_only_from_explicit_source
+    assert set(p.habilidades)=={'portero','defensa'}
+E   AssertionError: assert set() == {'defensa', 'portero'}
+E
+E     Extra items in the right set:
+E     'portero'
+E     'defensa'
+E     Use -v to get more diff
+________ test_actual_model_interest_wrapper_does_not_duplicate_a_label ________
+tests\test_matching_real_regressions.py:27: in test_actual_model_interest_wrapper_does_not_duplicate_a_label
+    assert p.intereses==['educación']
+E   AssertionError: assert ['educación',...la educación'] == ['educación']
+E
+E     Left contains one more item: 'Me interesa la educación'
+E     Use -v to get more diff
+______ test_explicit_prototyping_survives_a_separate_affirmative_clause _______
+tests\test_matching_real_regressions.py:31: in test_explicit_prototyping_survives_a_separate_affirmative_clause
+    assert set(p.habilidades)=={'UX/UI','Figma','prototipado'}
+E   AssertionError: assert {'Figma', 'UX/UI'} == {'Figma', 'UX...'prototipado'}
+E
+E     Extra items in the right set:
+E     'prototipado'
+E     Use -v to get more diff
+_ test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[uso de FastAPI-FastAPI] _
+tests\test_matching_real_regressions.py:35: in test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent
+    assert apply_equivalence(alias)==apply_equivalence(canonical)
+E   AssertionError: assert 'uso de fastapi' == 'fastapi'
+E
+E     - fastapi
+E     + uso de fastapi
+_ test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[trabajar con Git-Git] _
+tests\test_matching_real_regressions.py:35: in test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent
+    assert apply_equivalence(alias)==apply_equivalence(canonical)
+E   AssertionError: assert 'trabajar con git' == 'git'
+E
+E     - git
+E     + trabajar con git
+_ test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[Juego de portero-portero] _
+tests\test_matching_real_regressions.py:35: in test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent
+    assert apply_equivalence(alias)==apply_equivalence(canonical)
+E   AssertionError: assert 'juego de portero' == 'portero'
+E
+E     - portero
+E     + juego de portero
+___ test_actual_football_model_omission_keeps_the_full_requested_role_list ____
+tests\test_matching_real_regressions.py:42: in test_actual_football_model_omission_keeps_the_full_requested_role_list
+    assert set(p.roles_buscados)=={'portero','defensa','delantero'}
+E   AssertionError: assert {'portero'} == {'defensa', '...o', 'portero'}
+E
+E     Extra items in the right set:
+E     'delantero'
+E     'defensa'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/test_matching_real_regressions.py::test_actual_long_output_keeps_working_with_git_and_fastapi
+FAILED tests/test_matching_real_regressions.py::test_actual_model_omitted_sport_skills_are_recovered_only_from_explicit_source
+FAILED tests/test_matching_real_regressions.py::test_actual_model_interest_wrapper_does_not_duplicate_a_label
+FAILED tests/test_matching_real_regressions.py::test_explicit_prototyping_survives_a_separate_affirmative_clause
+FAILED tests/test_matching_real_regressions.py::test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[uso de FastAPI-FastAPI]
+FAILED tests/test_matching_real_regressions.py::test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[trabajar con Git-Git]
+FAILED tests/test_matching_real_regressions.py::test_reviewed_usage_labels_match_exact_catalog_without_stripping_intent[Juego de portero-portero]
+FAILED tests/test_matching_real_regressions.py::test_actual_football_model_omission_keeps_the_full_requested_role_list
+8 failed in 0.75s

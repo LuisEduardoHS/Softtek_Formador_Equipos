@@ -11,14 +11,14 @@ export default function RequireSession() {
     verificarSesion().then(
       (user) => {
         if (!alive) return
-        localStorage.setItem("usuario", JSON.stringify(user))
+        sessionStorage.setItem("usuario", JSON.stringify(user))
         setState("ready")
       },
       (error) => {
         if (!alive) return
         if (error.status === 401 || error.status === 403) {
           sessionStorage.removeItem("access_token")
-          localStorage.removeItem("usuario")
+          sessionStorage.removeItem("usuario")
           setState("denied")
         } else setState("error")
       },

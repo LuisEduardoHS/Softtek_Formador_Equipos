@@ -324,7 +324,7 @@ export default function ProfileSetupPage() {
     setSaving(true)
     try {
       const guardado = await confirmarPerfil(datosPerfil)
-      localStorage.setItem("usuario", JSON.stringify({
+      sessionStorage.setItem("usuario", JSON.stringify({
         ...usuarioLocal,
         nombre: guardado.nombre,
         carrera: guardado.carrera,

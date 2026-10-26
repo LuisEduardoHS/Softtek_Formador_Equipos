@@ -1,0 +1,165 @@
+[
+  {
+    "kind": "profile",
+    "id": "deporte",
+    "source": "Juego de portero y defensa. No tengo experiencia profesional.",
+    "expected": [
+      "defensa",
+      "portero"
+    ],
+    "forbidden": [],
+    "processed": {
+      "habilidades": [
+        "portero",
+        "defensa"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [
+        "Juego de portero y defensa"
+      ],
+      "resumen_publico": "Habilidades declaradas: portero, defensa. Experiencia: Juego de portero y defensa"
+    },
+    "status": "PASS",
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": [\"Juego de portero y defensa\"]\n}",
+    "metadata": {
+      "load_duration": 5712500,
+      "total_duration": 1242457000,
+      "eval_count": 48,
+      "done_reason": "stop"
+    },
+    "seconds": 1.251
+  },
+  {
+    "kind": "profile",
+    "id": "largo",
+    "source": "S\u00e9 programar en Python y con SQL. Trabajo con Git. Uso FastAPI. Tengo experiencia en Blender y UE5. Quiero aprender Docker. Me interesa la educaci\u00f3n. No s\u00e9 Figma.",
+    "expected": [
+      "Blender",
+      "FastAPI",
+      "Git",
+      "Python",
+      "SQL",
+      "Unreal Engine 5"
+    ],
+    "forbidden": [
+      "Docker",
+      "Figma"
+    ],
+    "processed": {
+      "habilidades": [
+        "Python",
+        "SQL",
+        "Git",
+        "FastAPI",
+        "Blender",
+        "Unreal Engine 5"
+      ],
+      "intereses": [
+        "educaci\u00f3n"
+      ],
+      "areas_mejora": [
+        "Docker"
+      ],
+      "experiencia": [
+        "Blender",
+        "UE5"
+      ],
+      "resumen_publico": "Habilidades declaradas: Python, SQL, Git, FastAPI, Blender, Unreal Engine 5. Intereses: educaci\u00f3n. Experiencia: Blender, UE5"
+    },
+    "status": "PASS",
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"programar en Python\", \"con SQL\", \"trabajar con Git\", \"usar FastAPI\"],\n  \"intereses\": [\"educaci\u00f3n\"],\n  \"areas_mejora\": [\"Docker\"],\n  \"experiencia\": [\"Blender\", \"UE5\"]\n}",
+    "metadata": {
+      "load_duration": 6823200,
+      "total_duration": 1537735100,
+      "eval_count": 74,
+      "done_reason": "stop"
+    },
+    "seconds": 1.563
+  },
+  {
+    "kind": "event",
+    "id": "por_rol",
+    "source": "Aplicaci\u00f3n web. Buscamos especialista en bases de datos: SQL obligatorio y Git deseable. Buscamos dise\u00f1ador UX/UI: Figma obligatorio.",
+    "expected": [
+      "Figma",
+      "SQL"
+    ],
+    "expected_preferred": [
+      "Git"
+    ],
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: SQL, Figma. Habilidades deseables: Git. Roles buscados: Especialista en bases de datos, Dise\u00f1ador UX/UI",
+      "habilidades_obligatorias": [
+        "SQL",
+        "Figma"
+      ],
+      "habilidades_deseables": [
+        "Git"
+      ],
+      "roles_buscados": [
+        "Especialista en bases de datos",
+        "Dise\u00f1ador UX/UI"
+      ],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "status": "PASS",
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"habilidades_obligatorias\": [\"SQL\"],\n  \"habilidades_deseables\": [\"Git\"],\n  \"roles_buscados\": [\"Especialista en bases de datos\", \"Dise\u00f1ador UX/UI\"],\n  \"restricciones_explicitas\": [\"Figma obligatorio\"]\n}",
+    "metadata": {
+      "load_duration": 5870800,
+      "total_duration": 1783315000,
+      "eval_count": 77,
+      "done_reason": "stop"
+    },
+    "seconds": 1.793
+  },
+  {
+    "kind": "event",
+    "id": "futbol",
+    "source": "Equipo de f\u00fatbol. Buscamos portero, defensa y delantero. Se requiere saber jugar de portero.",
+    "expected": [
+      "portero"
+    ],
+    "expected_preferred": [],
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: portero. Roles buscados: portero, defensa, delantero",
+      "habilidades_obligatorias": [
+        "portero"
+      ],
+      "habilidades_deseables": [],
+      "roles_buscados": [
+        "portero",
+        "defensa",
+        "delantero"
+      ],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "status": "PASS",
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"restricciones_explicitas\": [\"Se requiere saber jugar de portero.\"]\n}",
+    "metadata": {
+      "load_duration": 6549300,
+      "total_duration": 812453800,
+      "eval_count": 33,
+      "done_reason": "stop"
+    },
+    "seconds": 0.818
+  }
+]

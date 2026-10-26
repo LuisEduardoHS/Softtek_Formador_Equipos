@@ -54,6 +54,7 @@ async def interpretar_perfil(payload: ProfileInterpretRequest,
     perfil.perfil_borrador_ia = None
     previous_state = perfil.perfil_estado_ia
     previous_revision = perfil.perfil_fuente_revision
+    analysis_source = content_revision(payload.model_dump())
     perfil.perfil_estado_ia = "interpretando"
     db.commit()
     description = (f"Habilidades declaradas: {payload.fortalezas}\n"
@@ -66,13 +67,15 @@ async def interpretar_perfil(payload: ProfileInterpretRequest,
     except OllamaServiceError as error:
         db.refresh(perfil, with_for_update=True)
         # Do not overwrite a confirmation made while this request was running.
-        if perfil.perfil_estado_ia == "interpretando" and perfil.perfil_fuente_revision == previous_revision:
+        if (perfil.perfil_estado_ia == "interpretando" and perfil.perfil_fuente_revision == previous_revision
+                and content_revision(safe_profile_data(perfil.datos_crudos).get("borrador_texto_ia")) == analysis_source):
             perfil.perfil_estado_ia = (previous_state if previous_state in PROFILE_CONFIRMED_STATES
                                       else "interpretacion_pendiente")
         db.commit()
         raise HTTPException(status_code=503, detail="La interpretación no está disponible. Conservamos el borrador; puedes revisar manualmente y reintentar.") from error
     db.refresh(perfil, with_for_update=True)
-    if perfil.perfil_estado_ia != "interpretando" or perfil.perfil_fuente_revision != previous_revision:
+    if (perfil.perfil_estado_ia != "interpretando" or perfil.perfil_fuente_revision != previous_revision
+            or content_revision(safe_profile_data(perfil.datos_crudos).get("borrador_texto_ia")) != analysis_source):
         raise HTTPException(409, "El perfil cambió durante el análisis. Conservamos los datos actuales; revisa o reintenta.")
     perfil.perfil_borrador_ia = parsed.model_dump(mode="json")
     perfil.perfil_estado_ia = "pendiente_revision"

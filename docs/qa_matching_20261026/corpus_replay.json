@@ -1,0 +1,352 @@
+[
+  {
+    "kind": "profile",
+    "id": "sql",
+    "source": "S\u00e9 programar con SQL y trabajo con Python.",
+    "original_seconds": 1.209,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"programar con SQL\", \"trabajo con Python\"],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": [\"trabajo con Python\"]\n}",
+    "processed": {
+      "habilidades": [
+        "SQL",
+        "Python"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [
+        "trabajo con Python"
+      ],
+      "resumen_publico": "Habilidades declaradas: SQL, Python. Experiencia: trabajo con Python"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "herramientas",
+    "source": "Tengo experiencia en Blender y Unreal Engine 5.",
+    "original_seconds": 1.309,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"Blender\", \"Unreal Engine 5\"],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": [\"Blender\", \"Unreal Engine 5\"]\n}",
+    "processed": {
+      "habilidades": [
+        "Blender",
+        "Unreal Engine 5"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [
+        "Blender",
+        "Unreal Engine 5"
+      ],
+      "resumen_publico": "Habilidades declaradas: Blender, Unreal Engine 5. Experiencia: Blender, Unreal Engine 5"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "interfaz",
+    "source": "Dise\u00f1o interfaces UX/UI en Figma. Hago prototipado.",
+    "original_seconds": 1.479,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"Dise\u00f1o interfaces UX/UI\", \"Figma\", \"Prototipado\"],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": [\"Dise\u00f1o interfaces UX/UI en Figma\", \"Prototipado\"]\n}",
+    "processed": {
+      "habilidades": [
+        "UX/UI",
+        "Figma",
+        "prototipado"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [
+        "Dise\u00f1o interfaces UX/UI en Figma",
+        "Prototipado"
+      ],
+      "resumen_publico": "Habilidades declaradas: UX/UI, Figma, prototipado. Experiencia: Dise\u00f1o interfaces UX/UI en Figma, Prototipado"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "negacion",
+    "source": "No s\u00e9 SQL. S\u00e9 Python.",
+    "original_seconds": 0.938,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"Python\"],\n  \"intereses\": [],\n  \"areas_mejora\": [\"SQL\"],\n  \"experiencia\": []\n}",
+    "processed": {
+      "habilidades": [
+        "Python"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [],
+      "resumen_publico": "Habilidades declaradas: Python"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "objetivo",
+    "source": "Quiero aprender Docker. S\u00e9 SQL.",
+    "original_seconds": 1.029,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"SQL\"],\n  \"intereses\": [\"Docker\"],\n  \"areas_mejora\": [\"Docker\"],\n  \"experiencia\": []\n}",
+    "processed": {
+      "habilidades": [
+        "SQL"
+      ],
+      "intereses": [],
+      "areas_mejora": [
+        "Docker"
+      ],
+      "experiencia": [],
+      "resumen_publico": "Habilidades declaradas: SQL"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "interes",
+    "source": "Me interesa Python. No s\u00e9 programar en Python.",
+    "original_seconds": 0.985,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [],\n  \"intereses\": [\"Python\"],\n  \"areas_mejora\": [\"programaci\u00f3n en Python\"],\n  \"experiencia\": []\n}",
+    "processed": {
+      "habilidades": [],
+      "intereses": [
+        "Python"
+      ],
+      "areas_mejora": [],
+      "experiencia": [],
+      "resumen_publico": "Intereses: Python"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "ambiguo",
+    "source": "Tal vez pueda ayudar en algo, todav\u00eda no s\u00e9.",
+    "original_seconds": 0.865,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": []\n}",
+    "processed": {
+      "habilidades": [],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [],
+      "resumen_publico": ""
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "deporte",
+    "source": "Juego de portero y defensa. No tengo experiencia profesional.",
+    "original_seconds": 1.081,
+    "original_status": "FAIL",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [],\n  \"intereses\": [],\n  \"areas_mejora\": [],\n  \"experiencia\": [\"Juego de portero y defensa\"]\n}",
+    "processed": {
+      "habilidades": [
+        "portero",
+        "defensa"
+      ],
+      "intereses": [],
+      "areas_mejora": [],
+      "experiencia": [
+        "Juego de portero y defensa"
+      ],
+      "resumen_publico": "Habilidades declaradas: portero, defensa. Experiencia: Juego de portero y defensa"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "no_experiencia",
+    "source": "No tengo experiencia profesional. Quiero aprender SQL.",
+    "original_seconds": 1.025,
+    "original_status": "PASS",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [],\n  \"intereses\": [],\n  \"areas_mejora\": [\"SQL\"],\n  \"experiencia\": [\"No tengo experiencia profesional\"]\n}",
+    "processed": {
+      "habilidades": [],
+      "intereses": [],
+      "areas_mejora": [
+        "SQL"
+      ],
+      "experiencia": [],
+      "resumen_publico": ""
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "profile",
+    "id": "largo",
+    "source": "S\u00e9 programar en Python y con SQL. Trabajo con Git. Uso FastAPI. Tengo experiencia en Blender y UE5. Quiero aprender Docker. Me interesa la educaci\u00f3n. No s\u00e9 Figma.",
+    "original_seconds": 1.55,
+    "original_status": "FAIL",
+    "raw": "{\n  \"resumen_publico\": \"\",\n  \"habilidades\": [\"programar en Python\", \"con SQL\", \"trabajar con Git\", \"usar FastAPI\"],\n  \"intereses\": [\"educaci\u00f3n\"],\n  \"areas_mejora\": [\"Docker\"],\n  \"experiencia\": [\"Blender\", \"UE5\"]\n}",
+    "processed": {
+      "habilidades": [
+        "Python",
+        "SQL",
+        "Git",
+        "FastAPI",
+        "Blender",
+        "Unreal Engine 5"
+      ],
+      "intereses": [
+        "educaci\u00f3n"
+      ],
+      "areas_mejora": [
+        "Docker"
+      ],
+      "experiencia": [
+        "Blender",
+        "UE5"
+      ],
+      "resumen_publico": "Habilidades declaradas: Python, SQL, Git, FastAPI, Blender, Unreal Engine 5. Intereses: educaci\u00f3n. Experiencia: Blender, UE5"
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "event",
+    "id": "por_rol",
+    "source": "Aplicaci\u00f3n web. Buscamos especialista en bases de datos: SQL obligatorio y Git deseable. Buscamos dise\u00f1ador UX/UI: Figma obligatorio.",
+    "original_seconds": 1.87,
+    "original_status": "PASS",
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"habilidades_obligatorias\": [\"SQL\"],\n  \"habilidades_deseables\": [\"Git\"],\n  \"roles_buscados\": [\"Especialista en bases de datos\", \"Dise\u00f1ador UX/UI\"],\n  \"restricciones_explicitas\": [\"Figma obligatorio\"]\n}",
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: SQL, Figma. Habilidades deseables: Git. Roles buscados: Especialista en bases de datos, Dise\u00f1ador UX/UI",
+      "habilidades_obligatorias": [
+        "SQL",
+        "Figma"
+      ],
+      "habilidades_deseables": [
+        "Git"
+      ],
+      "roles_buscados": [
+        "Especialista en bases de datos",
+        "Dise\u00f1ador UX/UI"
+      ],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "event",
+    "id": "juego",
+    "source": "Videojuego con Unreal Engine 5 obligatorio. Buscamos artista 3D con Blender obligatorio y dise\u00f1ador de niveles.",
+    "original_seconds": 1.409,
+    "original_status": "PASS",
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"habilidades_obligatorias\": [\"Unreal Engine 5\", \"Blender\"],\n  \"roles_buscados\": [\"artista 3D\", \"dise\u00f1ador de niveles\"],\n  \"restricciones_explicitas\": []\n}",
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: Unreal Engine 5, Blender. Roles buscados: artista 3D, dise\u00f1ador de niveles",
+      "habilidades_obligatorias": [
+        "Unreal Engine 5",
+        "Blender"
+      ],
+      "habilidades_deseables": [],
+      "roles_buscados": [
+        "artista 3D",
+        "dise\u00f1ador de niveles"
+      ],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "event",
+    "id": "futbol",
+    "source": "Equipo de f\u00fatbol. Buscamos portero, defensa y delantero. Se requiere saber jugar de portero.",
+    "original_seconds": 0.806,
+    "original_status": "PASS",
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"restricciones_explicitas\": [\"Se requiere saber jugar de portero.\"]\n}",
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: portero. Roles buscados: portero, defensa, delantero",
+      "habilidades_obligatorias": [
+        "portero"
+      ],
+      "habilidades_deseables": [],
+      "roles_buscados": [
+        "portero",
+        "defensa",
+        "delantero"
+      ],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  },
+  {
+    "kind": "event",
+    "id": "opcionales",
+    "source": "SQL obligatorio. Python no es obligatorio. Docker y Git son opcionales.",
+    "original_seconds": 1.428,
+    "original_status": "PASS",
+    "raw": "{\n  \"categoria\": \"Academico\",\n  \"habilidades_obligatorias\": [\"SQL\"],\n  \"habilidades_deseables\": [\"Python\", \"Docker\", \"Git\"],\n  \"roles_buscados\": [\"Desarrollador\"],\n  \"restricciones_explicitas\": []\n}",
+    "processed": {
+      "categoria": "Academico",
+      "titulo_normalizado": "",
+      "resumen": "Habilidades obligatorias: SQL. Habilidades deseables: Docker, Git",
+      "habilidades_obligatorias": [
+        "SQL"
+      ],
+      "habilidades_deseables": [
+        "Docker",
+        "Git"
+      ],
+      "roles_buscados": [],
+      "intereses_relacionados": [],
+      "restricciones_explicitas": []
+    },
+    "missing": [],
+    "false_skills": [],
+    "preferred_missing": [],
+    "status": "PASS"
+  }
+]

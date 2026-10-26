@@ -8,6 +8,20 @@ const CATEGORIES = { academico: "Academico", personal: "Personal", deportivo: "D
   videojuegos: "Videojuegos", general: "General" }
 const toCategory = (tipo) => CATEGORIES[tipo] ?? "General"
 
+// StrictMode can subscribe twice to an effect. Share only the active request,
+// scoped to its authenticated session and exact input; never cache its result.
+const activeInterpretations = new Map()
+function interpretOnce(path, body) {
+  const key = JSON.stringify([sessionStorage.getItem("access_token"), path, body])
+  if (activeInterpretations.has(key)) return activeInterpretations.get(key)
+  const pending = request(path, { method: "POST", body })
+  activeInterpretations.set(key, pending)
+  pending.finally(() => {
+    if (activeInterpretations.get(key) === pending) activeInterpretations.delete(key)
+  }).catch(() => {})
+  return pending
+}
+
 // Cliente HTTP conectado a tu backend local
 async function request(path, { method = "GET", body, idempotencyKey } = {}) {
   const token = sessionStorage.getItem("access_token")
@@ -21,7 +35,7 @@ async function request(path, { method = "GET", body, idempotencyKey } = {}) {
   if (!res.ok) {
     if (res.status === 401 && !path.startsWith("/auth/")) {
       sessionStorage.removeItem("access_token")
-      localStorage.removeItem("usuario")
+      sessionStorage.removeItem("usuario")
       window.dispatchEvent(new Event("session-expired"))
     }
     const errorData = await res.json().catch(() => ({}));
@@ -67,7 +81,7 @@ export function verificarSesion() {
 /* ---------------------------- Perfil ---------------------------- */
 
 export async function obtenerPerfil() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}");
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.");
   }
@@ -129,7 +143,7 @@ export async function obtenerPerfilUsuario(id) {
 }
 
 export async function guardarPerfil(perfil) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -228,11 +242,17 @@ export function obtenerProyectos() {
 }
 
 export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles, requirements, idempotencyKey }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   const creadorId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(creadorId) || creadorId <= 0) {
     throw new Error("Inicia sesión para poder publicar un proyecto.")
   }
+  const required = [...new Set([...(requirements?.habilidades_obligatorias ?? []),
+    ...roles.filter((role) => role.indispensable).flatMap((role) => role.habilidades)])]
+  const requiredNames = new Set(required.map((skill) => skill.trim().toLowerCase()))
+  const preferred = [...new Set([...(requirements?.habilidades_deseables ?? []),
+    ...roles.filter((role) => !role.indispensable).flatMap((role) => role.habilidades)])]
+    .filter((skill) => !requiredNames.has(skill.trim().toLowerCase()))
 
   return request("/eventos/", {
     method: "POST",
@@ -253,10 +273,8 @@ export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes,
         ...requirements,
         categoria: toCategory(tipo),
         roles_buscados: roles.map((r) => r.nombre.trim()).filter(Boolean),
-        habilidades_obligatorias: [...new Set([...(requirements.habilidades_obligatorias ?? []),
-          ...roles.filter((r) => r.indispensable).flatMap((r) => r.habilidades)])],
-        habilidades_deseables: [...new Set([...(requirements.habilidades_deseables ?? []),
-          ...roles.filter((r) => !r.indispensable).flatMap((r) => r.habilidades)])],
+        habilidades_obligatorias: required,
+        habilidades_deseables: preferred,
       } : null,
       confirmado_por_creador: Boolean(requirements),
     },
@@ -268,7 +286,7 @@ export async function obtenerProyecto(id) {
 }
 
 export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles, fuente_revision }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   const usuarioId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
     throw new Error("Inicia sesión para editar este proyecto.")
@@ -313,13 +331,13 @@ export function reintentarEmbeddingProyecto(id) {
 // ============================================================================
 
 export function interpretarPerfil(textos) {
-  return request("/perfil/interpretar", { method: "POST", body: {
+  return interpretOnce("/perfil/interpretar", {
     fortalezas: textos.fortalezas, reforzar: textos.reforzar, intereses: textos.intereses,
-  } })
+  })
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("Inicia sesión para solicitar unirte a un evento.")
   }
@@ -331,16 +349,16 @@ export function solicitarUnirse(projectId, { rolId, mensaje }) {
 }
 
 export function interpretarProyecto(proyecto) {
-  return request("/eventos/interpretar", { method: "POST", body: {
+  return interpretOnce("/eventos/interpretar", {
     descripcion_libre: proyecto.descripcion,
     categoria_principal: toCategory(proyecto.tipo),
     detalles_especificos: { titulo: proyecto.titulo, materia: proyecto.materia,
       integrantes: proyecto.integrantes, fechaLimite: proyecto.fechaLimite || null },
-  } })
+  })
 }
 
 export async function obtenerRecomendaciones(topN = 10) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) throw new Error("No hay usuario autenticado.")
   const proyectos = await request(`/recomendaciones/usuarios/${encodeURIComponent(usuarioLocal.id_usuario)}/proyectos?top_n=${topN}`)
   return { proyectos }
@@ -351,7 +369,7 @@ export function obtenerCandidatos(projectId, topN = 10) {
 }
 
 export function obtenerInvitaciones() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -359,7 +377,7 @@ export function obtenerInvitaciones() {
 }
 
 export function obtenerNotificaciones() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -367,7 +385,7 @@ export function obtenerNotificaciones() {
 }
 
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -391,7 +409,7 @@ export function responderInvitacion(id, estado) {
 }
 
 export function obtenerEquipos() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }

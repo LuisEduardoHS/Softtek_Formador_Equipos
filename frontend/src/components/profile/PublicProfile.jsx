@@ -86,7 +86,7 @@ export default function PublicProfile({ student, preview = false, actions, viewe
                   <ul className="flex flex-wrap gap-1.5">
                     {(student.intereses ?? []).map((i) => (
                       <li key={i}>
-                        <SkillChip variant={esOtro && intereses.has(i) ? "match" : "neutral"}>{i}</SkillChip>
+                        <SkillChip variant={esOtro && intereses.has(i) ? "shared" : "neutral"}>{i}</SkillChip>
                       </li>
                     ))}
                   </ul>

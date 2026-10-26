@@ -7,7 +7,7 @@ import { MemoryRouter } from "react-router-dom"
 import { availableRoles, responseMessage, reviewedSummary } from "../src/lib/contracts.js"
 
 let server
-before(async () => { server = await createServer({ server: { middlewareMode: true }, appType: "custom" }) })
+before(async () => { server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" }) })
 after(async () => { await server?.close() })
 async function render(path, props) {
   const { default: Component } = await server.ssrLoadModule(`/src/${path}.jsx`)
@@ -51,6 +51,7 @@ test("QA-08: real shared schedule and interest remain visible", async () => {
   }, student: { id: "qa", nombre: "Persona QA", fortalezas: [], intereses: ["web"],
     disponibilidad: ["lun-tarde"], reforzar: [] } })
   assert.match(html, /en común/)
+  assert.doesNotMatch(html, /Coincide con el proyecto/)
 })
 
 test("QA-08: recommendation never trusts demo common-block counts", async () => {
@@ -103,6 +104,19 @@ test("QA-17: meeting route clearly unavailable and contains no send action", asy
   assert.doesNotMatch(html, /Enviar propuesta|Propuesta enviada|Equipo Hábitos/)
 })
 
+test('empty candidate list explains opt-in without exposing excluded accounts', async () => {
+  const html=await render('components/project/CandidatesEmptyState',{available:true})
+  assert.match(html,/activen Recomendaciones/)
+  assert.match(html,/Actualizar candidatos/)
+  assert.doesNotMatch(html,/Hay \d+ perfiles|anonymous-|QA Web/)
+})
+
+test('a role without a vacancy explains availability instead of claiming no profiles exist', async () => {
+  const html=await render('components/project/CandidatesEmptyState',{available:false,reason:'No hay vacantes de rol disponibles.'})
+  assert.match(html,/No hay vacantes de rol disponibles/)
+  assert.doesNotMatch(html,/Pide a quienes/)
+})
+
 test("QA-10: explicitly corrected or cleared biography is confirmed; old semantic summaries remain invalidated", () => {
   const previous = { bio: 'Domino Python', resumen_publico: 'Domino Python' }
   assert.equal(reviewedSummary({ ...previous, bio: 'Texto revisado' }, previous, true), 'Texto revisado')
@@ -124,4 +138,17 @@ test("QA-09: project confirmation sends the reviewed fingerprint and refuses a m
   await confirmarProyecto({ id: '1', tipo: 'academico', fuente_revision: 'a'.repeat(64) }, {})
   assert.equal(body.fuente_revision, 'a'.repeat(64))
   assert.equal(body.confirmado_por_creador, true)
+})
+
+test('publishing role skills never repeats obligatory skills as desirable', async (t) => {
+  const { crearProyecto }=await server.ssrLoadModule('/src/services/api.js')
+  const previous=Object.getOwnPropertyDescriptor(globalThis,'sessionStorage')
+  Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:{getItem:(key)=>key==='usuario'?JSON.stringify({id_usuario:5}):null}})
+  t.after(()=>{if(previous)Object.defineProperty(globalThis,'sessionStorage',previous);else delete globalThis.sessionStorage})
+  let body
+  t.mock.method(globalThis,'fetch',async(_url,options)=>{body=JSON.parse(options.body);return {ok:true,json:async()=>({id_evento:1})}})
+  await crearProyecto({titulo:'QA',descripcion:'SQL y Figma',tipo:'academico',integrantes:3,
+    roles:[{nombre:'Backend',habilidades:['SQL'],indispensable:false},{nombre:'Diseñador',habilidades:['Figma'],indispensable:false}],
+    requirements:{habilidades_obligatorias:['SQL','Figma'],habilidades_deseables:['Git']}})
+  assert.deepEqual(body.requisitos_confirmados.habilidades_deseables,['Git'])
 })

@@ -36,6 +36,8 @@ def _valid_restrictions(items: list[str], source: str) -> list[str]:
     valid = []
     for item in items:
         normalized = item.strip().casefold()
+        if re.match(r"ya\s+(?:incorporamos|tenemos)\b", folded(item)):
+            continue  # Team composition is not a condition imposed on an applicant.
         if re.search(r"\b(?:no (?:hemos|han) decidido|todavia no|por definir|no obligatori[oa]s?)\b", folded(item)):
             continue
         if skill_mentions(item) and not re.search(
@@ -116,6 +118,14 @@ Responde únicamente con el objeto JSON solicitado."""
         parsed.habilidades_obligatorias = _grounded(parsed.habilidades_obligatorias, source)
         parsed.habilidades_deseables = _grounded(parsed.habilidades_deseables, source)
         parsed.roles_buscados = _grounded(parsed.roles_buscados, source)
+        # A coordinated sports request is a literal list, not a guessed role.
+        for search in re.finditer(r"\b(?:buscamos|necesitamos|requerimos)\s+([^.;!?\n]+)", descripcion_libre, re.I):
+            if re.search(r"\bno\s+$", descripcion_libre[:search.start()], re.I):
+                continue
+            for part in re.split(r",|\s+y\s+", search[1], flags=re.I):
+                match = re.match(r"(?:un[ao]?\s+)?(portero|defensa|delantero)\b", part.strip(), re.I)
+                if match and not any(v.casefold() == match[1].casefold() for v in parsed.roles_buscados):
+                    parsed.roles_buscados.append(match[1].lower())
         # Recover only literal role spans after a positive search, never a role
         # guessed from technology or interest. Preserve existing role wording.
         for match in re.finditer(

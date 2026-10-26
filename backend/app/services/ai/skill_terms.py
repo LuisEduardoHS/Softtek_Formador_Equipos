@@ -13,7 +13,7 @@ _SPELLINGS = {folded(alias): name for name, aliases in SPELLINGS.items() for ali
 _SKILLS = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(s) for s in sorted(_SPELLINGS, key=len, reverse=True)) + r")(?!\w)")
 GOAL = re.compile(r"\b(?:(?:quiero|deseo|debo|necesito|busco|me gustaria)\s+(?:aprender|mejorar|reforzar|adquirir|ganar|obtener|desarrollar)|aprender|mejorar|reforzar|areas?\s+(?:que\s+desea\s+)?reforzar)\b")
 INTEREST = re.compile(r"\b(?:me\s+(?:interesa[n]?|gusta[n]?)|intereses?|tengo interes)\b")
-AFFIRM = re.compile(r"\b(?:se|domino|manejo|conozco|programo|uso|utilizo|diseno|juego|experiencia\s+(?:en|con)|habilidades\s+declaradas|habilidad\s+actual|he\s+(?:usado|trabajado|programado|disenado))\b")
+AFFIRM = re.compile(r"\b(?:se|domino|manejo|conozco|programo|uso|utilizo|diseno|juego|hago|trabajo\s+con|experiencia\s+(?:en|con)|habilidades\s+declaradas|habilidad\s+actual|he\s+(?:usado|trabajado|programado|disenado))\b")
 DENIAL = re.compile(r"\b(?:no|sin|nunca)\b")
 UNCERTAIN = re.compile(r"\b(?:tal vez|quiza[s]?|no estoy segur[oa]|podria|talvez)\b")
 
