@@ -12,6 +12,8 @@ import { AILoading, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
 import { Logo } from "../components/layout/AppLayout"
 import ProfileSetupForm from "../components/profile/ProfileSetupForm"
+import ProfileConsentConfirmation from "../components/profile/ProfileConsentConfirmation"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import { confirmarPerfil, interpretarPerfil } from "../services/api"
 import { DIAS, DIAS_LABEL, FRANJAS, FRANJAS_LABEL } from "../data/mockData"
 import { getSessionUser } from "../lib/session"
@@ -213,6 +215,7 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
       </ReviewBlock>
 
       <ReviewBlock title="Recomendaciones" desc="Tú decides si tu perfil puede aparecer en sugerencias para organizadores y recibir proyectos sugeridos.">
+        {!consent && <p className="mb-3 font-semibold text-warn-ink">Están desactivadas: aunque confirmes el análisis, no aparecerás como candidato ni recibirás proyectos recomendados.</p>}
         <p role="note" className="text-sm text-warn-ink">El resumen público puede revelar habilidades u otros datos aunque después ocultes campos individuales. Revisa el texto antes de confirmar.</p>
         <Switch label="Activar recomendaciones y aparecer en el directorio" checked={consent} onChange={setConsent} />
       </ReviewBlock>
@@ -239,17 +242,18 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
 
 /* --------------------------- Pantalla de éxito --------------------------- */
 
-function Done() {
+function Done({ consent }) {
   const navigate = useNavigate()
   return (
     <div className="flex animate-scale-in flex-col items-center py-16 text-center">
       <span className="grid size-20 animate-pop place-items-center rounded-full bg-success-soft">
         <CircleCheck aria-hidden="true" className="size-10 text-success" />
       </span>
-      <h1 className="mt-6 text-h1 font-bold">¡Tu perfil está listo!</h1>
+      <h1 className="mt-6 text-h1 font-bold">{consent ? "¡Tu perfil está listo!" : "Perfil guardado sin recomendaciones"}</h1>
       <p className="mt-2 max-w-md text-ink-2">
         Tu perfil confirmado está guardado. Ya puedes explorar personas y proyectos.
       </p>
+      {!consent && <div className="mt-5 max-w-xl text-left"><RecommendationConsentStatus consent={false} /></div>}
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <Button size="lg" onClick={() => navigate("/match")}>
           Explorar <ArrowRight aria-hidden="true" className="size-4" />
@@ -275,6 +279,7 @@ export default function ProfileSetupPage() {
   const [errors, setErrors] = useState({})
   const [done, setDone] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [confirmWithoutConsent, setConfirmWithoutConsent] = useState(false)
 
   const go = (n) => {
     setStep(n)
@@ -305,7 +310,8 @@ export default function ProfileSetupPage() {
     go(step + 1)
   }
 
-  const confirm = async () => {
+  const confirm = async (confirmedConsent = consent) => {
+    if (saving) return
     const usuarioLocal = getSessionUser()
     const datosPerfil = {
       nombre: textos.nombre.trim(),
@@ -318,7 +324,7 @@ export default function ProfileSetupPage() {
       disponibilidad,
       visibilidad: { fortalezas: true, intereses: true, disponibilidad: true, reforzar: false, correo: false },
       pausado: false,
-      consentimiento_recomendaciones: consent,
+      consentimiento_recomendaciones: confirmedConsent,
     }
 
     setSaving(true)
@@ -330,6 +336,8 @@ export default function ProfileSetupPage() {
         carrera: guardado.carrera,
       }))
       toast("Perfil guardado")
+      setConsent(guardado.consentimiento_recomendaciones === true)
+      setConfirmWithoutConsent(false)
       setDone(true)
     } catch (error) {
       console.error("No se pudo guardar el perfil:", error)
@@ -355,7 +363,7 @@ export default function ProfileSetupPage() {
 
       <main className="mx-auto max-w-3xl px-4 pt-6 pb-32 sm:px-8 sm:pt-10">
         {done ? (
-          <Done />
+          <Done consent={consent} />
         ) : (
           <>
             <div className="mb-8">
@@ -412,13 +420,16 @@ export default function ProfileSetupPage() {
                 Continuar <ArrowRight aria-hidden="true" className="size-4" />
               </Button>
             ) : (
-              <Button onClick={confirm} disabled={saving || !perfil || perfil.fortalezas.length === 0} className="min-w-36">
+              <Button onClick={() => consent ? confirm(true) : setConfirmWithoutConsent(true)} disabled={saving || !perfil || perfil.fortalezas.length === 0} className="min-w-36">
                 <Check aria-hidden="true" className="size-4" /> {saving ? "Guardando…" : "Confirmar perfil"}
               </Button>
             )}
           </div>
         </div>
       )}
+      <ProfileConsentConfirmation open={confirmWithoutConsent} busy={saving}
+        onClose={() => { if (!saving) setConfirmWithoutConsent(false) }}
+        onEnable={() => confirm(true)} onKeepDisabled={() => confirm(false)} />
     </div>
   )
 }

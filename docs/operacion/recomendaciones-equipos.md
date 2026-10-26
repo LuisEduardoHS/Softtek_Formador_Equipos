@@ -13,6 +13,8 @@ Requisitos: [perfiles y proyectos revisados](ia-perfiles-proyectos.md), autentic
 
 En el caso real «Gestor de tareas inteligente» se comprobó un vacío correcto por falta de consentimiento de los otros perfiles. No se habilita ese consentimiento automáticamente. La UI explica el vacío sin divulgar identidades ni cantidades de perfiles ocultos.
 
+Lo mismo se reprodujo al crear «MANUAL01 Gestor de tareas»: perfiles confirmados/listos seguían excluidos por consentimiento false. Mi perfil ofrece ahora **Activar y guardar recomendaciones**, que modifica únicamente ese permiso de la cuenta autenticada, sin recalcular el embedding ni quitar una pausa. Con cambios pendientes, guardar o descartar primero. Inicio muestra el aviso y las altas piden una elección explícita al confirmar sin recomendaciones. Ver [diagnóstico y evidencia](../qa/informes/2026-10-26-consentimiento-candidatos.md).
+
 ## API y explicaciones
 
 | Ruta | Quién / qué devuelve |

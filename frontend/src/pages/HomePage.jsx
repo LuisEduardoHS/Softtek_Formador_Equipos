@@ -11,6 +11,7 @@ import Carousel, { CarouselItem } from "../components/ui/Carousel"
 import InvitationItem from "../components/invite/InvitationItem"
 import TeamSummaryCard from "../components/team/TeamSummaryCard"
 import StudentSearch from "../components/search/StudentSearch"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import useAsync from "../hooks/useAsync"
 import {
   obtenerEquipos,
@@ -334,6 +335,8 @@ export default function HomePage() {
         <div className="min-w-0 space-y-10">
           <div className="animate-fade-up [animation-delay:60ms]">
             <ProfileProgress value={progresoReal} status={perfilQuery.status} />
+            {perfilQuery.status === "success" && <div className="mt-3"><RecommendationConsentStatus
+              consent={perfilQuery.data.consentimiento_recomendaciones} paused={perfilQuery.data.pausado} /></div>}
           </div>
 
           <section aria-labelledby="rec-title" className="animate-fade-up [animation-delay:120ms]">

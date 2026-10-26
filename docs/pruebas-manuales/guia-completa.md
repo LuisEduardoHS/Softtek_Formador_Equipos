@@ -4,6 +4,8 @@ Datos **ficticios** para rellenar cada campo y contrastar el resultado. Hay **12
 
 Para una prueba rápida usa **P01 + P02 + P03 + PR01**, siguiendo R01–R05. Después amplía a videojuegos, deporte, negaciones, privacidad, edición y recuperación. Instalación general: [README](../../README.md). Evidencia de recorridos anteriores: [validación real](../qa/informes/2026-10-26-flujo-web.md).
 
+**Si ya creaste P02/P03 y PR01 sigue vacío con «Análisis listo»:** entra en **cada cuenta candidata** (Beatriz y Carla), abre Perfil y pulsa **Activar y guardar recomendaciones** en el aviso superior. Regresa a Alex y actualiza los candidatos. El análisis listo no activa ese permiso; activar solo la cuenta organizadora no publica las demás. [Diagnóstico real](../qa/informes/2026-10-26-consentimiento-candidatos.md).
+
 ## Contenido
 
 - [Preparar una base y servidores QA](#preparacion).
@@ -98,6 +100,8 @@ Estos valores aplican a **cada perfil**, salvo las excepciones P10, P11 y P12. L
 | Pausar mi perfil | Desactivado, salvo el paso posterior de P11 |
 
 Foto e idiomas se dejan vacíos porque el contrato de confirmación actual no los persiste; esta batería no promete una subida de imágenes ni persistencia de idiomas. La disponibilidad se expresa en bloques, no demuestra horas exactas.
+
+Si llegas a Confirmar perfil con el interruptor apagado, aparece una elección explícita. Para los participantes elige **Activar recomendaciones y guardar perfil**. Para P10 elige **Guardar sin recomendaciones**; P12 continúa sin confirmarse por no tener fortalezas. Las cuentas existentes pueden usar el atajo superior de Mi perfil; el control de Privacidad y Guardar cambios sigue funcionando.
 
 **Cómo evaluar la IA:** una omisión o capacidad inventada es un fallo de extracción aunque luego puedas corregirla humanamente. Anota la salida original y después deja los hechos correctos antes de confirmar. El orden de etiquetas, mayúsculas iniciales o una paráfrasis fiel del resumen pueden variar; una meta convertida en fortaleza o una negación convertida en experiencia positiva no son variaciones aceptables. Si necesitas introducir muchas correcciones, no marques la extracción como aprobada solo porque la confirmación terminó guardándose.
 

@@ -1,6 +1,6 @@
 import { useId, useState, useEffect } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Eye, Lock, PauseCircle, Pencil, RefreshCw, Send, UserX } from "lucide-react"
+import { ArrowLeft, Eye, Lock, Pencil, RefreshCw, Send, UserX } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import TagEditor from "../components/ui/TagEditor"
@@ -10,8 +10,9 @@ import { Field, LevelPicker, Segmented, Switch } from "../components/ui/Controls
 import { useToast } from "../components/ui/Toast"
 import AIStatus from "../components/ui/AIStatus"
 import PublicProfile from "../components/profile/PublicProfile"
+import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import InviteModal from "../components/invite/InviteModal"
-import { confirmarPerfil, reintentarEmbeddingPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
+import { activarRecomendaciones, confirmarPerfil, reintentarEmbeddingPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 import { getSessionUser } from "../lib/session"
 import { availableRoles as usableRoles, reviewedSummary } from "../lib/contracts"
@@ -65,15 +66,6 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, sav
 
   return (
     <div className="space-y-4">
-      {perfil.pausado && (
-        <div className="flex animate-fade-up items-start gap-3 rounded-xl border border-warn-line bg-warn-soft p-4 text-sm">
-          <PauseCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-warn-ink" />
-          <p>
-            <span className="font-semibold">Tu perfil está en pausa.</span> No aparecerás en recomendaciones de otras personas, pero conservas tus equipos e invitaciones.
-          </p>
-        </div>
-      )}
-
       {aiDirty && (
         <div role="status" className="flex animate-fade-up items-center gap-3 rounded-xl border border-ai-line bg-ai-soft p-4 text-sm text-ink">
           <RefreshCw aria-hidden="true" className="size-4 shrink-0 text-ai-ink" />
@@ -253,6 +245,20 @@ function MyProfile() {
     finally { setSaving(false) }
   }
 
+  const enableRecommendations = async () => {
+    if (saving || dirty) return
+    setSaving(true)
+    setOperationError("")
+    try {
+      const updated = await activarRecomendaciones()
+      setPerfil(updated)
+      setSaved(updated)
+      toast("Recomendaciones activadas y guardadas. Se usarán tus datos confirmados y permitidos.", "success")
+    } catch (error) {
+      setOperationError(error.message || "No pudimos activar las recomendaciones.")
+    } finally { setSaving(false) }
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 pb-32 sm:px-8 sm:py-10">
       <header className="mb-6 flex animate-fade-up flex-wrap items-end justify-between gap-4">
@@ -272,6 +278,8 @@ function MyProfile() {
       </header>
 
       <div className="mb-5 space-y-3">
+        <RecommendationConsentStatus consent={saved.consentimiento_recomendaciones} paused={saved.pausado}
+          onEnable={enableRecommendations} disabled={dirty} busy={saving} />
         <AIStatus state={aiDirty ? "obsoleto" : saved.perfil_estado_ia} busy={saving} disabled={dirty} onRetry={retry}
           onReview={() => { setMode("editar"); setReviewing(true); setReviewed(false) }} />
         {reviewing && <Card className="space-y-3 p-4">

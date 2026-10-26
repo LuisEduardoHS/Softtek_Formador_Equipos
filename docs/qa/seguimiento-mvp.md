@@ -1,6 +1,6 @@
 # Seguimiento QA del MVP — 2026-10-25
 
-**Actualización 2026-10-26, cuarta ronda:** **365 pytest + 21 pruebas frontend aprobadas**, 14 escenarios MySQL, recorridos visuales completos de web/videojuegos/fútbol y repetición crítica en otra base vacía. Se corrigieron peticiones IA duplicadas, resultados antiguos, identidad entre pestañas, omisiones literales y requisitos duplicados. La principal conserva sus conteos/checksums/DDL/revisión. El cierre vigente y sus límites están en [QA de escenarios reales](informes/2026-10-26-escenarios-matching.md); las rondas anteriores conservan sus resultados históricos.
+**Actualización 2026-10-26:** **367 pytest + 27 pruebas frontend aprobadas**. El caso MANUAL01 vacío se explica por consentimiento desactivado en perfiles listos. Se añadieron avisos visibles, activación propia por un botón y elección explícita al confirmar; 29 comprobaciones reales QA aprobadas. Ver [diagnóstico de consentimiento](informes/2026-10-26-consentimiento-candidatos.md) y [escenarios amplios](informes/2026-10-26-escenarios-matching.md). Las rondas anteriores conservan sus resultados históricos.
 
 Repositorio: `D:\projects\Softtek_Formador_Equipos`. Rama: `feat/ai-matching`. La primera ronda partió de `568026a` y después se integró en el commit local `2157a43`. La segunda ronda semántica parte de `2157a43`; sus resultados y límites se detallan al final. No se hicieron push, merges ni cambios de rama.
 
@@ -335,3 +335,13 @@ Se repitió el flujo principal desde React en otra QA vacía, con tres cuentas n
 La suite volvió a pasar: **365 backend y 21 frontend**, pip check/build correctos y lint sin errores, con avisos previos conservados. Treinta y tres comprobaciones finales MySQL/HTTP aprobadas; principal intacta y servicios habituales preservados. Los detalles, tiempos, las incidencias exclusivas del arnés y las capturas están en [VALIDACION_FLUJO_WEB_2026-10-26.md](informes/2026-10-26-flujo-web.md).
 
 La corrección anterior quedó en `0c1085b`. Para esta entrega el usuario autorizó commit y push a la rama actual, `feat/ai-matching`; se publica la corrección junto con el commit de evidencia, sin merges ni force. Los límites de horarios, requisitos globales y variabilidad generativa del informe amplio siguen vigentes. Los perfiles reales sin consentimiento no se modificaron automáticamente.
+
+## Caso MANUAL01 vacío — consentimiento visible y activación propia
+
+Se inspeccionó el proyecto del usuario en lectura: abierto, listo, dos vacantes y sin integrantes/solicitudes para ese proyecto. Beatriz y Carla estaban confirmadas/listas, pero con consentimiento false; motor y endpoint devolvían 200 []. No se cambiaron sus permisos automáticamente ni se debilitó la política.
+
+Inicio/Mi perfil muestran aviso; Mi perfil permite **Activar y guardar recomendaciones** enviando solo el permiso propio y bloqueando el atajo con cambios pendientes. El onboarding exige elegir si se confirma con recomendaciones apagadas; ambas opciones se conservan. El vacío da la ruta exacta en cada cuenta.
+
+QA real: **0 → 1 → 2 candidatos** al activar SQL y diseño desde React, con dueño todavía sin consentimiento y sin cambiar requisitos/embeddings. Dos altas adicionales probaron guardar false y activar explícitamente true con Llama/Nomic reales; 29 comprobaciones HTTP/MySQL aprobadas, cinco perfiles y un proyecto ficticios. Los vectores existentes no cambiaron ni se regeneraron. Suite **367 backend + 27 frontend**, pip check/build correctos, lint sin errores y una advertencia previa.
+
+Desde el snapshot de preparación QA la principal conservó conteos/checksums/DDL/revisión; antes hubo un alta externa, documentada para no atribuirla a QA. Las escrituras del ensayo fueron exclusivamente en la base aislada. Sin cambios de prompts, ranking ni backend de producción. [Resultados y capturas](informes/2026-10-26-consentimiento-candidatos.md). Commit y push solicitados a feat/ai-matching.

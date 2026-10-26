@@ -11,6 +11,7 @@
 
 | Documento | Para qué sirve |
 | --- | --- |
+| [Candidatos vacíos y consentimiento](qa/informes/2026-10-26-consentimiento-candidatos.md) | Caso MANUAL01, permisos de Beatriz/Carla, atajo de activación y elección en registro |
 | [Seguimiento del MVP](qa/seguimiento-mvp.md) | Historial de correcciones y límites; las últimas secciones recogen el cierre más reciente |
 | [Validación final del flujo web](qa/informes/2026-10-26-flujo-web.md) | Perfil IA → candidatos reales → equipo; tres cuentas y otra convocatoria abierta |
 | [Escenarios reales de matching](qa/informes/2026-10-26-escenarios-matching.md) | 14 escenarios, tres dominios visuales, extracción, concurrencia y límites de ranking |

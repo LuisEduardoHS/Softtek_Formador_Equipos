@@ -20,7 +20,7 @@ export default function MatchPage() {
   if (result.loading) return <div className="mx-auto max-w-xl px-4 py-12"><CardSkeleton /></div>
   if (result.status === "error") return <div className="mx-auto max-w-xl px-4 py-12">
     {result.error.status === 403
-      ? <EmptyState icon={Compass} title="Activa las recomendaciones">Confirma tu perfil y activa el consentimiento desde Perfil.</EmptyState>
+      ? <EmptyState icon={Compass} title="Activa las recomendaciones" actions={<Button as={Link} to="/perfil">Configurar recomendaciones en mi perfil</Button>}>Confirma tu perfil y activa el consentimiento desde Perfil → Editar → Privacidad. Cada persona decide sobre su propia cuenta.</EmptyState>
       : <ErrorState message="No pudimos cargar tus coincidencias." onRetry={result.reload} />}
   </div>
   if (!result.data.length) return <div className="mx-auto max-w-xl px-4 py-16">

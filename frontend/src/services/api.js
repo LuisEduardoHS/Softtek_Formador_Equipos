@@ -169,6 +169,16 @@ export async function confirmarPerfil(perfil) {
   return mapPerfil(confirmado)
 }
 
+export async function activarRecomendaciones() {
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) throw new Error("No hay usuario autenticado.")
+  const actualizado = await request(`/perfil/${encodeURIComponent(usuarioLocal.id_usuario)}`, {
+    method: "PUT",
+    body: { datos_crudos: { consentimiento_recomendaciones: true } },
+  })
+  return mapPerfil(actualizado)
+}
+
 export async function reintentarEmbeddingPerfil() {
   return mapPerfil(await request("/perfil/embedding/reintentar", { method: "POST" }))
 }

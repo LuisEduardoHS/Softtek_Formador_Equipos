@@ -108,7 +108,56 @@ test('empty candidate list explains opt-in without exposing excluded accounts', 
   const html=await render('components/project/CandidatesEmptyState',{available:true})
   assert.match(html,/activen Recomendaciones/)
   assert.match(html,/Actualizar candidatos/)
+  assert.match(html,/Perfil.*Editar.*Privacidad/)
+  assert.match(html,/Análisis listo.*proyecto/)
   assert.doesNotMatch(html,/Hay \d+ perfiles|anonymous-|QA Web/)
+})
+
+test('saved opt-out is visible and offers an explicit self-service activation', async () => {
+  const html=await render('components/profile/RecommendationConsentStatus',{consent:false,paused:false,onEnable:()=>{}})
+  assert.match(html,/No apareces en recomendaciones/)
+  assert.match(html,/Activar y guardar recomendaciones/)
+  assert.match(html,/solo a tu cuenta/)
+})
+
+test('enabled and unpaused consent never displays an opt-out warning', async () => {
+  const html=await render('components/profile/RecommendationConsentStatus',{consent:true,paused:false})
+  assert.equal(html,'')
+})
+
+test('paused status keeps pause distinct from consent and does not promise activation', async () => {
+  const html=await render('components/profile/RecommendationConsentStatus',{consent:true,paused:true})
+  assert.match(html,/Tu perfil está en pausa/)
+  assert.doesNotMatch(html,/Activar y guardar recomendaciones/)
+  assert.match(html,/Pausar mi perfil/)
+})
+
+test('unsaved edits disable the consent shortcut instead of silently confirming or losing them', async () => {
+  const html=await render('components/profile/RecommendationConsentStatus',{consent:false,onEnable:()=>{},disabled:true})
+  assert.match(html,/<button[^>]*disabled=""[^>]*>Activar y guardar recomendaciones/)
+  assert.match(html,/Guarda o descarta/)
+})
+
+test('saving an opted-out onboarding requires an explicit choice with both alternatives', async () => {
+  const html=await render('components/profile/ProfileConsentConfirmation',{open:true,busy:false,onClose:()=>{},onEnable:()=>{},onKeepDisabled:()=>{}})
+  assert.match(html,/role="dialog"/)
+  assert.match(html,/Guardar sin recomendaciones/)
+  assert.match(html,/Activar recomendaciones y guardar perfil/)
+  assert.match(html,/no aparecerás como candidato/)
+})
+
+test('consent shortcut changes only the authenticated account permission, never profile facts', async (t) => {
+  const { activarRecomendaciones }=await server.ssrLoadModule('/src/services/api.js')
+  const previous=Object.getOwnPropertyDescriptor(globalThis,'sessionStorage')
+  Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:{getItem:(key)=>key==='usuario'?JSON.stringify({id_usuario:17}):'fictitious-token'}})
+  t.after(()=>{if(previous)Object.defineProperty(globalThis,'sessionStorage',previous);else delete globalThis.sessionStorage})
+  let path,request
+  t.mock.method(globalThis,'fetch',async(url,options)=>{path=url;request=options;return{ok:true,json:async()=>({usuario_id:17,datos_crudos:{consentimiento_recomendaciones:true},perfil_estado_ia:'listo'})}})
+  const result=await activarRecomendaciones()
+  assert.match(path,/\/perfil\/17$/)
+  assert.equal(request.method,'PUT')
+  assert.deepEqual(JSON.parse(request.body),{datos_crudos:{consentimiento_recomendaciones:true}})
+  assert.equal(result.consentimiento_recomendaciones,true)
 })
 
 test('a role without a vacancy explains availability instead of claiming no profiles exist', async () => {

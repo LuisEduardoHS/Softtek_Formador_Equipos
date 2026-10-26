@@ -156,7 +156,7 @@ npm run build
 npm run lint
 ```
 
-La última validación de código registró **365 pruebas backend y 21 frontend aprobadas**; consultar la [evidencia real](docs/qa/informes/2026-10-26-flujo-web.md) para distinguir SQLite/mocks de MySQL/Ollama/navegador. Pasar la suite no sustituye un recorrido real ni garantiza toda salida de Llama.
+La última validación de código registró **367 pruebas backend y 27 frontend aprobadas**; consultar el [caso de consentimiento](docs/qa/informes/2026-10-26-consentimiento-candidatos.md) y la [evidencia del flujo completo](docs/qa/informes/2026-10-26-flujo-web.md) para distinguir SQLite/mocks de MySQL/Ollama/navegador. Pasar la suite no sustituye un recorrido real ni garantiza toda salida de Llama.
 
 ## Estructura y documentación
 

@@ -1,0 +1,23 @@
+[
+  {
+    "id": 10,
+    "consent": false,
+    "source_unchanged": true,
+    "vector_unchanged": true,
+    "state": "listo"
+  },
+  {
+    "id": 11,
+    "consent": true,
+    "source_unchanged": true,
+    "vector_unchanged": true,
+    "state": "listo"
+  },
+  {
+    "id": 12,
+    "consent": true,
+    "source_unchanged": true,
+    "vector_unchanged": true,
+    "state": "listo"
+  }
+]
