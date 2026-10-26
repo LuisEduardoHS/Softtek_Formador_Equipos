@@ -84,7 +84,7 @@ class EventInterpretRequest(_Strict):
 class EventReviewed(_Strict):
     requirements: StructuredEventRequirements
     confirmado_por_creador: bool
-    fuente_revision: str | None = Field(default=None, min_length=64, max_length=64)
+    fuente_revision: str = Field(min_length=64, max_length=64, pattern=r"^[a-f0-9]{64}$")
 
     @model_validator(mode="after")
     def explicit_review(self):

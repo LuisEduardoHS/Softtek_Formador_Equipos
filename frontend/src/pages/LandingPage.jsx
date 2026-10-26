@@ -111,6 +111,7 @@ export default function LandingPage() {
     <div className="min-h-dvh bg-canvas">
       <Navbar onGetStarted={getStarted} />
       <main>
+        <p role="note" className="mx-auto max-w-6xl px-4 pt-4 text-sm text-ink-2 sm:px-8">Demostración visual: los perfiles, testimonios y cifras de esta portada son ilustrativos.</p>
         <Hero onGetStarted={getStarted} />
         <HowItWorks />
         <div className="pt-20">
@@ -168,7 +169,7 @@ export default function LandingPage() {
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ink-2 sm:flex-row sm:px-8">
           <Logo to="/" />
-          <p>Proyecto universitario · Los datos se procesan en servidores de la universidad.</p>
+          <p>Proyecto universitario · Los datos se procesan en el servidor configurado para esta aplicación.</p>
         </div>
       </footer>
     </div>

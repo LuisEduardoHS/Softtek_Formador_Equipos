@@ -62,7 +62,7 @@ export default function ProjectCard({ project, suggestion, className = "" }) {
       )}
       <div className="mt-auto flex items-center justify-between gap-3 border-t border-line pt-4 text-xs text-ink-2">
         <span className="flex items-center gap-3">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1" aria-label={`Capacidad: ${project.integrantes} personas`}>
             <Users aria-hidden="true" className="size-3.5" /> {project.integrantes}
           </span>
           {project.fechaLimite && (

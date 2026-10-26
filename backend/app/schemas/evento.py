@@ -53,5 +53,9 @@ class EventoOut(BaseModel):
     fuente_revision: str | None = None
     soy_integrante: bool = False
     cupos_disponibles: int = 0
+    acepta_participacion: bool = False
+    roles_disponibles: list[dict] = Field(default_factory=list)
+    motivo_no_disponible: str | None = None
+    puede_solicitar: bool = False
     estado: str
     fecha_creacion: datetime

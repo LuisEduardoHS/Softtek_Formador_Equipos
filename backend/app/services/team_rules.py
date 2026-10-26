@@ -100,6 +100,37 @@ def event_roles(event):
     return validated_roles(details)
 
 
+def participation_availability(event, members):
+    """Read-only availability. Eligibility scores never authorize enrollment."""
+    result = {"acepta_participacion": False, "roles_disponibles": [],
+              "motivo_no_disponible": None}
+    if event.estado != "Abierto":
+        return {**result, "motivo_no_disponible": "El proyecto no acepta integrantes."}
+    try:
+        details = event.detalles_especificos
+        if not isinstance(details, dict):
+            raise HTTPException(422, "Detalles inválidos")
+        remaining = capacity(details) - len({m.id_usuario for m in members} | {event.creador_id})
+        roles = event_roles(event)
+    except (HTTPException, TypeError, AttributeError):
+        return {**result, "motivo_no_disponible": "El creador debe revisar las vacantes del proyecto."}
+    if remaining <= 0:
+        return {**result, "motivo_no_disponible": "El equipo está lleno."}
+    if not roles:
+        roles = [{"id": "Participante", "nombre": "Participante", "habilidades": [],
+                  "vacantes": remaining, "indispensable": False}]
+        available = [{**roles[0], "vacantes_disponibles": remaining}]
+    else:
+        available = []
+        for role in roles:
+            occupied = sum(role_key(m.rol) == role_key(role["nombre"]) for m in members)
+            slots = min(remaining, role["vacantes"] - occupied)
+            if slots > 0:
+                available.append({**role, "vacantes_disponibles": slots})
+    return {"acepta_participacion": bool(available), "roles_disponibles": available,
+            "motivo_no_disponible": None if available else "No hay vacantes de rol disponibles."}
+
+
 def available_role(db, event, user_id, requested):
     if event.estado != "Abierto":
         raise HTTPException(409, "El evento ya no acepta integrantes.")

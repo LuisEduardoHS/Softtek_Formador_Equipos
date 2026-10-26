@@ -1,0 +1,248 @@
+[
+  {
+    "id": "profile-owner",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "profile-member",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "profile-viewer",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "profile-hidden",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "profile-paused",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "profile-no_consent",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "state": "listo"
+    }
+  },
+  {
+    "id": "directory-confirmed-visible-only",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "ids": [
+        4,
+        3,
+        2
+      ]
+    }
+  },
+  {
+    "id": "directory-catalog-alias",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "directory-name-paused",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "directory-name-no_consent",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "hidden-fields-remain-hidden",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "idempotency-Sin vacantes",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "idempotency-Con vacantes",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "idempotency-Sin revision",
+    "status": "PASS",
+    "evidence": {
+      "http": 201
+    }
+  },
+  {
+    "id": "recommendations-before-occupation",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "duplicate-invitation",
+    "status": "PASS",
+    "evidence": {
+      "http": 409
+    }
+  },
+  {
+    "id": "accept-invitation",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "double-accept",
+    "status": "PASS",
+    "evidence": {
+      "http": 409
+    }
+  },
+  {
+    "id": "spare-capacity-no-role",
+    "status": "PASS",
+    "evidence": {
+      "view": {
+        "cupos_disponibles": 2,
+        "acepta_participacion": false,
+        "puede_solicitar": false,
+        "motivo_no_disponible": "No hay vacantes de rol disponibles."
+      }
+    }
+  },
+  {
+    "id": "no-unusable-candidates",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "projects-usable-only",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "last-role-backend-still-rejects",
+    "status": "PASS",
+    "evidence": {
+      "http": 409
+    }
+  },
+  {
+    "id": "global-coverage-Con vacantes",
+    "status": "PASS",
+    "evidence": {
+      "coverage": {
+        "estado": "conocida",
+        "total": 2,
+        "cubiertas": [
+          "Python"
+        ],
+        "por_acreditar": [
+          "SQL"
+        ]
+      }
+    }
+  },
+  {
+    "id": "global-coverage-Sin vacantes",
+    "status": "PASS",
+    "evidence": {
+      "coverage": {
+        "estado": "conocida",
+        "total": 2,
+        "cubiertas": [
+          "SQL",
+          "Python"
+        ],
+        "por_acreditar": []
+      }
+    }
+  },
+  {
+    "id": "unreviewed-coverage-unknown",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "pending-action-disabled",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "pending-application-excluded",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "non-owner-candidates-forbidden",
+    "status": "PASS",
+    "evidence": {
+      "http": 403
+    }
+  },
+  {
+    "id": "missing-fingerprint",
+    "status": "PASS",
+    "evidence": {
+      "http": 422
+    }
+  },
+  {
+    "id": "stale-fingerprint",
+    "status": "PASS",
+    "evidence": {
+      "http": 409
+    }
+  },
+  {
+    "id": "current-fingerprint-nomic",
+    "status": "PASS",
+    "evidence": {
+      "http": 200
+    }
+  },
+  {
+    "id": "real-mysql-nomic-vectors",
+    "status": "PASS",
+    "evidence": {
+      "vectors": 8,
+      "dimensions": 768
+    }
+  },
+  {
+    "id": "actual-roster",
+    "status": "PASS",
+    "evidence": {
+      "participants": 1,
+      "requests": 2
+    }
+  }
+]

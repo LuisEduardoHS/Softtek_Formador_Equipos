@@ -14,6 +14,7 @@ import InviteModal from "../components/invite/InviteModal"
 import { confirmarPerfil, reintentarEmbeddingPerfil, guardarPerfil, obtenerPerfil, obtenerPerfilUsuario, obtenerProyectos } from "../services/api"
 import { inputCls } from "../lib/ui"
 import { getSessionUser } from "../lib/session"
+import { availableRoles as usableRoles, reviewedSummary } from "../lib/contracts"
 
 // Estructura por defecto para evitar errores si la base de datos devuelve nulos en cuentas nuevas
 const PERFIL_DEFAULT = {
@@ -46,7 +47,7 @@ function Section({ title, desc, badge, children }) {
   )
 }
 
-const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad"]
+const AI_FIELDS = ["fortalezas", "reforzar", "intereses", "disponibilidad", "bio"]
 
 function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, saving }) {
   const ids = { n: useId(), c: useId(), s: useId(), g: useId(), e: useId() }
@@ -122,11 +123,17 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, sav
         <TagEditor items={perfil.intereses || []} onChange={set("intereses")} placeholder="Agregar interés" />
       </Section>
 
+      <Section title="Biografía pública" desc="Este texto es público aunque ocultes campos individuales. Puedes corregirlo o vaciarlo.">
+        <label className="sr-only" htmlFor="public-bio">Biografía pública</label>
+        <textarea id="public-bio" rows={3} maxLength={1000} value={perfil.bio ?? perfil.resumen_publico ?? ""}
+          onChange={(event) => set("bio")(event.target.value)} className="w-full rounded-lg border border-line bg-surface p-3 text-sm" />
+      </Section>
+
       <Section title="Disponibilidad" desc="Toca los bloques en los que sueles estar libre.">
         <AvailabilityGrid value={perfil.disponibilidad || []} onChange={set("disponibilidad")} />
       </Section>
 
-      <Section title="Contacto" desc="Solo lo verán los integrantes de tus equipos.">
+      <Section title="Contacto" desc="Tu correo solo se publica si activas su visibilidad, tanto en el perfil público como en los equipos.">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id={ids.e} label="Correo institucional" hint="Lo tomamos de tu cuenta universitaria.">
             <input id={ids.e} value={perfil.correo || ""} readOnly className={`${inputCls()} bg-surface-2 text-ink-2`} />
@@ -138,14 +145,15 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, sav
       </Section>
 
       <Section title="Privacidad" desc="Decide qué ven las demás personas.">
+        <p role="note" className="mb-3 text-sm text-warn-ink">Tu biografía o resumen público sigue visible aunque ocultes fortalezas, intereses u otros campos. Revisa el texto y elimina cualquier dato que no quieras publicar.</p>
         <div className="divide-y divide-line">
           <Switch label="Mostrar mis fortalezas" checked={perfil.visibilidad?.fortalezas ?? true} onChange={setVis("fortalezas")} />
           <Switch label="Mostrar mis intereses" checked={perfil.visibilidad?.intereses ?? true} onChange={setVis("intereses")} />
           <Switch label="Mostrar mi disponibilidad" checked={perfil.visibilidad?.disponibilidad ?? true} onChange={setVis("disponibilidad")} />
           <Switch label="Mostrar «Quiero reforzar»" description="Privado por defecto." checked={perfil.visibilidad?.reforzar ?? false} onChange={setVis("reforzar")} />
-          <Switch label="Compartir mi correo con mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
+          <Switch label="Mostrar mi correo en mi perfil público y mis equipos" checked={perfil.visibilidad?.correo ?? false} onChange={setVis("correo")} />
           <Switch label="Pausar mi perfil" checked={perfil.pausado ?? false} onChange={set("pausado")} />
-          <Switch label="Activar recomendaciones" description="Permite sugerir tu perfil a organizadores y mostrarte proyectos." checked={perfil.consentimiento_recomendaciones ?? false} onChange={set("consentimiento_recomendaciones")} />
+          <Switch label="Activar recomendaciones" description="Permite aparecer en el directorio y las recomendaciones, y mostrarte proyectos." checked={perfil.consentimiento_recomendaciones ?? false} onChange={set("consentimiento_recomendaciones")} />
         </div>
       </Section>
 
@@ -214,7 +222,7 @@ function MyProfile() {
         const confirmado = await confirmarPerfil({
           nombre: perfil.nombre, carrera: perfil.carrera, fortalezas: perfil.fortalezas,
           reforzar: perfil.reforzar, intereses: perfil.intereses,
-          experiencia: perfil.experiencia ?? [], resumen_publico: aiDirty || perfil.perfil_estado_ia === "obsoleto" ? "" : perfil.resumen_publico ?? "",
+          experiencia: perfil.experiencia ?? [], resumen_publico: reviewedSummary(perfil, saved, aiDirty || perfil.perfil_estado_ia === "obsoleto"),
           disponibilidad: perfil.disponibilidad, visibilidad: perfil.visibilidad,
           pausado: perfil.pausado, consentimiento_recomendaciones: perfil.consentimiento_recomendaciones,
         })
@@ -267,7 +275,7 @@ function MyProfile() {
         <AIStatus state={aiDirty ? "obsoleto" : saved.perfil_estado_ia} busy={saving} disabled={dirty} onRetry={retry}
           onReview={() => { setMode("editar"); setReviewing(true); setReviewed(false) }} />
         {reviewing && <Card className="space-y-3 p-4">
-          <p className="text-sm">Revisa las fortalezas, intereses, disponibilidad y permisos del formulario antes de confirmar.</p>
+          <p className="text-sm">Revisa las fortalezas, intereses, biografía pública, disponibilidad y permisos del formulario antes de confirmar.</p>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={reviewed}
             onChange={(event) => setReviewed(event.target.checked)} />He revisado mis datos y quiero confirmar esta versión.</label>
           <Button disabled={!reviewed || saving} onClick={() => save(true)}>Confirmar y generar análisis</Button>
@@ -343,8 +351,7 @@ function OtherProfile({ id }) {
   }, [])
 
   const selectedProject = projects.find((project) => project.id === projectId)
-  const openRoles = selectedProject?.roles.filter((role) => !role.cubiertoPor) ?? []
-  const availableRoles = openRoles.length > 0 ? openRoles : selectedProject?.roles ?? []
+  const availableRoles = usableRoles(selectedProject)
   const selectedRole = availableRoles.find((role) => role.id === roleId) ?? availableRoles[0]
 
   if (loading) return <div className="p-8"><Skeleton className="h-64 w-full rounded-xl" /></div>
@@ -406,10 +413,11 @@ function OtherProfile({ id }) {
           </div>
           <Button
             onClick={() => setInviting(true)}
-            disabled={projectsLoading || projectsError || projects.length === 0}
+            disabled={projectsLoading || projectsError || !selectedRole}
           >
             <Send aria-hidden="true" className="size-4" /> Invitar
           </Button>
+          {selectedProject && !selectedRole && <p role="status" className="text-sm text-ink-2">{selectedProject.motivo_no_disponible || "No hay vacantes utilizables."}</p>}
         </section>
         <InviteModal
           open={inviting}

@@ -37,6 +37,8 @@ export default function RoleCoverage({ roles, invitedByRole = {}, highlightRolId
               )}
             </div>
 
+            <p className="text-xs text-ink-2">{r.ocupados ?? r.integrantesIds?.length ?? (r.cubiertoPor ? 1 : 0)} de {r.vacantes ?? 1} vacantes ocupadas</p>
+
             {member ? (
               <div className="flex items-center gap-2">
                 <Avatar name={member.nombre} size="sm" />

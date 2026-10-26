@@ -9,6 +9,7 @@ import InviteModal from "../components/invite/InviteModal"
 import { EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { SearchBar } from "../components/search/StudentSearch"
 import { obtenerEstudiantes, obtenerProyectos } from "../services/api"
+import { availableRoles as usableRoles } from "../lib/contracts"
 
 function getUsuarioActual() {
   try {
@@ -88,8 +89,7 @@ export default function StudentsPage() {
   const selectedProject = projects.find((project) => project.id === projectId)
   const availableRoles = useMemo(() => {
     if (!selectedProject) return []
-    const openRoles = selectedProject.roles.filter((role) => !role.cubiertoPor)
-    return openRoles.length > 0 ? openRoles : selectedProject.roles
+    return usableRoles(selectedProject)
   }, [selectedProject])
   const selectedRole = availableRoles.find((role) => role.id === roleId) ?? availableRoles[0]
 
@@ -110,7 +110,7 @@ export default function StudentsPage() {
             )}
           </div>
           <div className="mb-4">
-            <SearchBar value={query} onChange={setQuery} placeholder="Buscar por nombre o carrera" />
+            <SearchBar value={query} onChange={setQuery} placeholder="Nombre, carrera o habilidad confirmada visible" />
           </div>
 
           {loadingStudents ? (
@@ -124,7 +124,7 @@ export default function StudentsPage() {
             />
           ) : students.length === 0 ? (
             <EmptyState icon={SearchX} title="No encontramos estudiantes">
-              Prueba con otro nombre o carrera.
+              Prueba con otro nombre, carrera o habilidad confirmada visible.
             </EmptyState>
           ) : (
             <ul className="space-y-3">
@@ -222,10 +222,11 @@ export default function StudentsPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => setInviteOpen(true)}
-                    disabled={loadingProjects || projects.length === 0 || projectsError}
+                    disabled={loadingProjects || !selectedRole || projectsError}
                   >
                     <Send aria-hidden="true" className="size-4" /> Invitar
                   </Button>
+                  {selectedProject && !selectedRole && <p role="status" className="text-sm text-ink-2">{selectedProject.motivo_no_disponible || "No hay vacantes utilizables."}</p>}
                   <Button variant="secondary" as={Link} to={`/perfil/${selectedStudent.id}`}>
                     Ver perfil completo
                   </Button>

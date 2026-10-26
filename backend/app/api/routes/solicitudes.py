@@ -10,6 +10,9 @@ from app.core.security import get_current_user, require_self
 from app.services.team_rules import (team_transaction, lock_event, available_role, reject_pending_pair)
 from app.schemas.profile_data import safe_profile_data
 from app.schemas.event_details import safe_event_details, safe_event_requirements, safe_roles
+from app.services.team_rules import participation_availability
+from app.services.team_coverage import confirmed_team_coverage
+from app.services.ai.recommendations.orm_adapter import candidate_from_orm
 
 router = APIRouter()
 MARCADOR_SOLICITUD_UNIRSE = "[SOLICITUD_UNIRSE]"
@@ -205,9 +208,9 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
             visibilidad = datos.get("visibilidad") or {}
             if not isinstance(visibilidad, dict):
                 visibilidad = {}
-            fortalezas = datos.get("fortalezas", datos.get("habilidades", []))
-            if not visibilidad.get("fortalezas", True) or datos.get("pausado", False):
-                fortalezas = []
+            candidate = candidate_from_orm(usuario, perfil, self_access=usuario.id_usuario == actor.id_usuario)
+            fortalezas = [{"nombre": f.value} for f in candidate.declared_skills or []
+                          if f.confirmed and f.polarity == "affirms"]
             if not isinstance(fortalezas, list):
                 fortalezas = []
             fortalezas = [
@@ -251,6 +254,7 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
             })
 
         proyecto = {
+            **participation_availability(evento, participaciones),
             "id_evento": evento.id_evento,
             "creador_id": evento.creador_id,
             "categoria_principal": evento.categoria_principal,
@@ -259,11 +263,14 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
             "detalles_especificos": {**detalles, "roles": roles},
             "requisitos_ia": requisitos if evento.requisitos_confirmados_at else {},
             "requisitos_confirmados": bool(evento.requisitos_confirmados_at),
+            "soy_integrante": True,
+            "cupos_disponibles": max(0, detalles.get("integrantes", 8) - len(miembros_ids)),
             "estado_ia": evento.estado_ia if evento.creador_id == actor.id_usuario else None,
             "estado": evento.estado,
             "fecha_creacion": evento.fecha_creacion.isoformat() if evento.fecha_creacion else None,
         }
         resultado.append({
+            "cobertura_habilidades": confirmed_team_coverage(evento, usuarios, actor.id_usuario),
             "id": str(evento.id_evento),
             "projectId": str(evento.id_evento),
             "nombre": evento.titulo,

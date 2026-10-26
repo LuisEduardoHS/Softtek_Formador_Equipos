@@ -1,13 +1,13 @@
 import { Check, CircleDashed } from "lucide-react"
-import { skillCoverage } from "../../lib/projects"
 
 /**
  * Gráfico de cobertura de habilidades del equipo: anillo cubiertas vs.
  * faltantes y, al lado, el detalle de cada habilidad.
- * - roles: roles del proyecto ({ habilidades[], cubiertoPor })
+ * - coverage: requisitos y declaraciones confirmadas calculados por el backend.
  */
-export default function TeamCoverageChart({ roles }) {
-  const { cubiertas, faltantes, total } = skillCoverage(roles)
+export default function TeamCoverageChart({ coverage }) {
+  const { cubiertas = [], por_acreditar: faltantes = [], total = 0, estado = "desconocida" } = coverage ?? {}
+  const unknown = estado !== "conocida" || total === 0
   const r = 42
   const c = 2 * Math.PI * r
   const frac = total ? cubiertas.length / total : 0
@@ -30,12 +30,12 @@ export default function TeamCoverageChart({ roles }) {
         </svg>
         <figcaption className="absolute text-center">
           <span className="block text-h1 font-bold">
-            {cubiertas.length}/{total}
+            {total ? `${cubiertas.length}/${total}` : "—"}
           </span>
-          <span className="text-xs text-ink-2">habilidades</span>
+          <span className="text-xs text-ink-2">{unknown ? "Desconocida" : "habilidades"}</span>
         </figcaption>
         <span className="sr-only">
-          {cubiertas.length} de {total} habilidades cubiertas
+          {unknown ? "No se puede determinar la cobertura completa." : `${cubiertas.length} de ${total} habilidades cubiertas`}
         </span>
       </figure>
 
@@ -54,7 +54,7 @@ export default function TeamCoverageChart({ roles }) {
         </div>
         <div>
           <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-warn-ink">
-            <CircleDashed aria-hidden="true" className="size-4" strokeWidth={2.5} /> Faltan ({faltantes.length})
+            <CircleDashed aria-hidden="true" className="size-4" strokeWidth={2.5} /> Por acreditar ({faltantes.length})
           </p>
           {faltantes.length ? (
             <ul className="flex flex-wrap gap-1.5">
@@ -65,10 +65,11 @@ export default function TeamCoverageChart({ roles }) {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-ink-2">¡Ninguna! Tu equipo cubre todo lo necesario.</p>
+            <p className="text-sm text-ink-2">{unknown ? "Cobertura desconocida: faltan requisitos confirmados o perfiles con habilidades visibles y confirmadas." : "Las habilidades requeridas tienen evidencia confirmada en el equipo."}</p>
           )}
         </div>
       </div>
+      {unknown && total > 0 && <p className="text-xs text-ink-2">La información no visible o sin confirmar impide verificar toda la cobertura.</p>}
     </div>
   )
 }

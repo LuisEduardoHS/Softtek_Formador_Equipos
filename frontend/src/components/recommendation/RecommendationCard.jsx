@@ -2,7 +2,7 @@ import { useState } from "react"
 import { CalendarCheck, Check, Send, ThumbsDown, ThumbsUp, Undo2, UserRound, X } from "lucide-react"
 import Avatar from "../ui/Avatar"
 import AvailabilityGrid from "../ui/AvailabilityGrid"
-import { currentUser } from "../../data/mockData"
+import { confirmedComparison } from "../../lib/contracts"
 import Button from "../ui/Button"
 import SkillChip from "../ui/SkillChip"
 import { AIPanel } from "../ui/AIBadge"
@@ -42,6 +42,7 @@ export function ComplementLevel({ nivel }) {
  */
 export default function RecommendationCard({
   student,
+  viewer,
   rol,
   rec,
   project,
@@ -58,7 +59,10 @@ export default function RecommendationCard({
   const [feedback, setFeedback] = useState(null)
   const expanded = variant === "expanded"
   const necesarias = new Set(rol?.habilidades ?? [])
-  const interesesComunes = (student.intereses ?? []).filter((i) => currentUser.intereses.includes(i))
+  const currentUser = confirmedComparison(viewer)
+  const interesesComunes = (student.intereses ?? []).filter((i) => currentUser?.intereses?.includes(i))
+  const commonBlocks = currentUser && Array.isArray(student.disponibilidad)
+    ? student.disponibilidad.filter((block) => currentUser.disponibilidad?.includes(block)).length : null
 
   const sendFeedback = (value) => {
     const next = feedback === value ? null : value
@@ -128,10 +132,10 @@ export default function RecommendationCard({
         </ul>
       </div>
 
-      <p className="flex items-center gap-2 text-sm text-ink">
+      {commonBlocks !== null && <p className="flex items-center gap-2 text-sm text-ink">
         <CalendarCheck aria-hidden="true" className="size-4 text-success-ink" />
-        Coinciden {rec.bloquesComunes} {rec.bloquesComunes === 1 ? "bloque" : "bloques"} por semana
-      </p>
+        Coinciden {commonBlocks} {commonBlocks === 1 ? "bloque" : "bloques"} por semana
+      </p>}
 
       <AIPanel title="Por qué te lo recomendamos">
         <p className={expanded ? "" : "line-clamp-2"}>{rec.porQue}</p>
@@ -182,7 +186,7 @@ export default function RecommendationCard({
           {student.disponibilidad && (
             <div>
               <p className="mb-2 text-label font-semibold tracking-wide text-ink-2 uppercase">Horarios</p>
-              <AvailabilityGrid value={student.disponibilidad} compare={currentUser.disponibilidad} size="sm" />
+              <AvailabilityGrid value={student.disponibilidad} compare={currentUser?.disponibilidad} size="sm" />
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { responseMessage } from "../lib/contracts"
 import { Link } from "react-router-dom"
 import { ArrowRight, Compass, Inbox, Plus, UserPen, Users } from "lucide-react"
 import Button from "../components/ui/Button"
@@ -82,7 +83,7 @@ function ProfileProgress({ value, status }) {
         <p className="font-semibold text-ink">{message}</p>
         <p className="text-sm text-ink-2">
           {status === "success"
-            ? "Agrega tus habilidades y tecnologías para que la IA encuentre tu equipo ideal."
+            ? "Revisa los campos de tu perfil y confirma la información que quieras compartir."
             : status === "loading"
               ? "Estamos revisando los datos que has completado."
               : "Vuelve a cargar la página para intentarlo de nuevo."}
@@ -102,7 +103,7 @@ function ColdStart() {
   return (
     <EmptyState
       icon={Compass}
-      title="Aún no hay proyectos o recomendaciones"
+      title="Aún no hay recomendaciones para tu perfil"
       actions={
         <>
           <Button as={Link} to="/perfil">
@@ -114,7 +115,7 @@ function ColdStart() {
         </>
       }
     >
-      Actualmente no hay proyectos publicados en tu universidad. ¡Sé el primero en crear una convocatoria o completa tu perfil!
+      No encontramos proyectos recomendables para ti en este momento. Puedes explorar los proyectos existentes o revisar tu perfil.
     </EmptyState>
   )
 }
@@ -170,9 +171,10 @@ function Recommendations() {
                     <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary uppercase tracking-wider">
                       {proyecto?.tipo || "Proyecto"}
                     </span>
-                    <span className="text-xs text-ink-2">{rec.eligibility === "needs_review" ? "Requiere revisión" : "Disponible"}</span>
+                    <span className="text-xs text-ink-2">{rec.eligibility === "needs_review" ? "Requiere revisión" : "Elegible por evidencias"}</span>
                   </div>
                   <h3 className="mt-3 text-lg font-bold text-ink">{proyecto?.titulo || `Proyecto ${rec.event_id}`}</h3>
+                  <p className="mt-1 text-xs text-ink-2">{proyecto?.acepta_participacion ? "Con vacantes de rol" : proyecto?.motivo_no_disponible || "Disponibilidad por verificar"}</p>
                   <p className="mt-2 line-clamp-3 text-sm text-ink-2">{rec.explanation.strengths[0] || rec.explanation.unknowns[0] || "Revisa los requisitos del proyecto."}</p>
                 </div>
 
@@ -208,9 +210,9 @@ function PendingInvitations() {
     try {
       const result = await responderInvitacion(invitation.id, estado)
       inv.setData((list) => list.map((i) => (i.id === invitation.id ? { ...i, estado: result.estado } : i)))
-      toast(estado === "aceptada" ? `¡Te uniste al proyecto!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
-    } catch {
-      toast("No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
+      toast(responseMessage(invitation, estado), estado === "aceptada" ? "success" : "info")
+    } catch (error) {
+      toast(error.message || "No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
     } finally {
       setBusy(null)
     }

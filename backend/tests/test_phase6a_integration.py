@@ -263,9 +263,9 @@ def test_event_creator_spoof_review_and_private_draft(context, monkeypatch):
     event_id = draft.json()["id_evento"]
     assert draft.json()["estado"] == "Borrador"
     assert client.get(f"/eventos/{event_id}", headers=headers(2)).status_code == 404
-    assert client.post(f"/eventos/{event_id}/confirmar", json={"requirements": requirements(), "confirmado_por_creador": True},
+    assert client.post(f"/eventos/{event_id}/confirmar", json={"requirements": requirements(), "confirmado_por_creador": True, "fuente_revision": draft.json()["fuente_revision"]},
                        headers=headers(2)).status_code == 403
-    confirmed = client.post(f"/eventos/{event_id}/confirmar", json={"requirements": requirements(), "confirmado_por_creador": True},
+    confirmed = client.post(f"/eventos/{event_id}/confirmar", json={"requirements": requirements(), "confirmado_por_creador": True, "fuente_revision": draft.json()["fuente_revision"]},
                             headers=headers(1))
     assert confirmed.status_code == 200, confirmed.text
     assert confirmed.json()["estado_ia"] == "listo"

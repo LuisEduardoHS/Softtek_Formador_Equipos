@@ -18,6 +18,7 @@ import useAsync from "../hooks/useAsync"
 import { actualizarProyecto, obtenerCandidatos, obtenerInvitaciones, obtenerProyecto, solicitarUnirse } from "../services/api"
 import { coverage, formatDate } from "../lib/projects"
 import { getSessionUser } from "../lib/session"
+import { availableRoles } from "../lib/contracts"
 import { inputCls } from "../lib/ui"
 
 /* ------------------------------ Encabezado ------------------------------ */
@@ -49,8 +50,8 @@ function ProjectHeader({ project, action }) {
           <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
             <div className="flex items-center gap-1.5">
               <Users aria-hidden="true" className="size-4 text-ink-2" />
-              <dt className="sr-only">Integrantes</dt>
-              <dd>{project.integrantes} integrantes</dd>
+              <dt className="sr-only">Capacidad total</dt>
+              <dd>Capacidad: {project.integrantes} personas</dd>
             </div>
             {project.fechaLimite && (
               <div className="flex items-center gap-1.5">
@@ -76,7 +77,7 @@ function Candidates({ project }) {
   const [target, setTarget] = useState(null)
   const [invited, setInvited] = useState(new Set())
   const [selectedRoles, setSelectedRoles] = useState({})
-  const { pendientes } = coverage(project)
+  const pendientes = availableRoles(project)
 
   if (cands.loading) {
     return (
@@ -134,7 +135,7 @@ function Candidates({ project }) {
 function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
   const toast = useToast()
   const msgId = useId()
-  const pendientes = coverage(project).pendientes
+  const pendientes = availableRoles(project)
   const [rolId, setRolId] = useState(defaultRolId ?? pendientes[0]?.id)
   const [mensaje, setMensaje] = useState("")
   const [sending, setSending] = useState(false)
@@ -475,7 +476,7 @@ function ProjectDetailPage({ id }) {
   const usuarioId = usuarioLocal.id_usuario
   const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
   const esIntegrante = project.soy_integrante
-  const { cubiertos, total, pendientes } = coverage(project)
+  const { cubiertos, total } = coverage(project)
 
   const pendingApplication = (sentInvitations.data ?? []).find((item) =>
     String(item.projectId) === String(project.id) && item.estado === "pendiente" &&
@@ -493,7 +494,9 @@ function ProjectDetailPage({ id }) {
         <Users aria-hidden="true" className="size-4" /> Ver mi equipo
       </Button>
     )
-  } else if (pendientes.length > 0 && project.cupos_disponibles > 0 && project.estado === "Abierto") {
+  } else if (requestedRol || pendingApplication) {
+    action = <Button disabled>Solicitud enviada</Button>
+  } else if (project.puede_solicitar && availableRoles(project).length > 0) {
     action = requestedRol || pendingApplication ? (
       <Button disabled className="animate-scale-in">
         <CircleCheck aria-hidden="true" className="size-4" /> Solicitud enviada
@@ -503,6 +506,8 @@ function ProjectDetailPage({ id }) {
         <Hand aria-hidden="true" className="size-4" /> Solicitar unirme
       </Button>
     )
+  } else {
+    action = <p role="status" className="text-sm text-ink-2">{project.motivo_no_disponible || "No puedes solicitar participación: revisa tu perfil o tus invitaciones pendientes."}</p>
   }
 
   return (
@@ -519,7 +524,7 @@ function ProjectDetailPage({ id }) {
               <h2 id="cov-title" className="text-h2 font-semibold">
                 Mapa de cobertura de roles
               </h2>
-              <p className="text-sm text-ink-2">Qué aporta ya cada integrante y qué falta cubrir.</p>
+              <p className="text-sm text-ink-2">Roles asignados a participantes reales y vacantes pendientes. La asignación de rol no acredita habilidades.</p>
             </div>
             <div className="w-full sm:w-64">
               <CoverageBar cubiertos={cubiertos} total={total} />

@@ -31,7 +31,7 @@ export default function ProjectsPage() {
     (p) =>
       (!t || p.titulo.toLowerCase().includes(t) || p.roles.some((r) => r.nombre.toLowerCase().includes(t))) &&
       (tipo === "todos" || p.tipo === tipo) &&
-      (tab === "mios" || !soloAbiertos || (p.estado === "Abierto" && (p.roles.length === 0 || p.roles.some((r) => !r.cubiertoPor)))),
+      (tab === "mios" || !soloAbiertos || p.acepta_participacion),
   )
 
   return (

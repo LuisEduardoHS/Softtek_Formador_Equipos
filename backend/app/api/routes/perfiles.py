@@ -137,6 +137,7 @@ async def reintentar_embedding_perfil(db: Session = Depends(get_db),
 
 
 def crear_perfil_publico(usuario, perfil):
+    from app.services.ai.recommendations.orm_adapter import candidate_from_orm
     datos_crudos = safe_profile_data(perfil.datos_crudos if perfil else {})
     configuracion = datos_crudos.get("visibilidad", {})
     visibilidad = {
@@ -156,6 +157,17 @@ def crear_perfil_publico(usuario, perfil):
         if campo == "bio" or visibilidad.get(campo, False):
             if campo in datos_crudos:
                 datos_publicos[campo] = datos_crudos[campo]
+    candidate = candidate_from_orm(usuario, perfil)
+    # Draft/edited declarations must not masquerade as confirmed public skills.
+    if visibilidad["fortalezas"]:
+        levels = {s["nombre"].casefold(): s.get("nivel") for s in datos_crudos.get("fortalezas", [])
+                  if isinstance(s, dict) and isinstance(s.get("nombre"), str)}
+        datos_publicos["fortalezas"] = [{"nombre": f.value, "nivel": levels.get(f.value.casefold())}
+                                        for f in candidate.declared_skills or []]
+    if visibilidad["intereses"]:
+        datos_publicos["intereses"] = candidate.profile.intereses if candidate.profile else []
+    if visibilidad["disponibilidad"]:
+        datos_publicos["disponibilidad"] = [f.value for f in candidate.availability or []]
 
     return PerfilPublicoOut(
         usuario_id=usuario.id_usuario,
@@ -172,6 +184,10 @@ def crear_perfil_publico(usuario, perfil):
 @router.get("/estudiantes/", response_model=list[PerfilPublicoOut])
 def listar_estudiantes(
     q: str = Query("", max_length=100),
+    carrera: str = Query("", max_length=150),
+    habilidad: str = Query("", max_length=150),
+    disponibilidad: str = Query("", pattern=r"^(manana|tarde|noche)?$"),
+    semestre: Optional[int] = Query(None, ge=1, le=20),
     exclude_id: Optional[int] = Query(None, gt=0),
     limit: int = Query(100, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -183,18 +199,32 @@ def listar_estudiantes(
 
     if exclude_id:
         query = query.filter(Usuario.id_usuario != exclude_id)
-    if q.strip():
-        termino = f"%{q.strip()}%"
-        query = query.filter(
-            (Usuario.nombre.ilike(termino)) | (Usuario.carrera.ilike(termino))
-        )
-
+    from app.services.ai.recommendations.orm_adapter import candidate_from_orm
+    from app.services.ai.matching.normalization import apply_equivalence
+    term = apply_equivalence(q.strip()) if q.strip() else ""
     estudiantes = []
-    for usuario, perfil in query.order_by(Usuario.id_usuario.desc()).limit(limit).all():
+    for usuario, perfil in query.order_by(Usuario.id_usuario.desc()).all():
+        candidate = candidate_from_orm(usuario, perfil)
+        if candidate.visibility != "visible":
+            continue
         perfil_publico = crear_perfil_publico(usuario, perfil)
-        if perfil_publico.datos_crudos["pausado"]:
+        public_data = perfil_publico.datos_crudos
+        if carrera.strip() and apply_equivalence(carrera) != apply_equivalence(usuario.carrera or "sin carrera"):
+            continue
+        skills = [f.value for f in candidate.declared_skills or []]
+        if habilidad.strip() and apply_equivalence(habilidad) not in {apply_equivalence(s) for s in skills}:
+            continue
+        if disponibilidad and not any(f.value.endswith("-" + disponibilidad) for f in candidate.availability or []):
+            continue
+        if semestre is not None and public_data.get("semestre") != semestre:
+            continue
+        searchable = [usuario.nombre, usuario.carrera or ""] + [
+            f.value for f in candidate.declared_skills or []]
+        if term and not any(term in apply_equivalence(value) for value in searchable if value and value.strip()):
             continue
         estudiantes.append(perfil_publico)
+        if len(estudiantes) == limit:
+            break
     return estudiantes
 
 

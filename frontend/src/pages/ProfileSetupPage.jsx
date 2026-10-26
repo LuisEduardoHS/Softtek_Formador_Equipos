@@ -213,7 +213,8 @@ function ReviewStep({ textos, disponibilidad, perfil, setPerfil, onEditAvailabil
       </ReviewBlock>
 
       <ReviewBlock title="Recomendaciones" desc="Tú decides si tu perfil puede aparecer en sugerencias para organizadores y recibir proyectos sugeridos.">
-        <Switch label="Activar recomendaciones" checked={consent} onChange={setConsent} />
+        <p role="note" className="text-sm text-warn-ink">El resumen público puede revelar habilidades u otros datos aunque después ocultes campos individuales. Revisa el texto antes de confirmar.</p>
+        <Switch label="Activar recomendaciones y aparecer en el directorio" checked={consent} onChange={setConsent} />
       </ReviewBlock>
 
       <ReviewBlock

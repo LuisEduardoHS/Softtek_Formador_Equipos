@@ -6,6 +6,7 @@ import { useToast } from "../components/ui/Toast"
 import InvitationItem from "../components/invite/InvitationItem"
 import useAsync from "../hooks/useAsync"
 import { obtenerInvitaciones, responderInvitacion } from "../services/api"
+import { responseMessage } from "../lib/contracts"
 
 const FILTROS = [
   ["todas", "Todas"],
@@ -27,9 +28,9 @@ export default function InvitationsPage() {
     try {
       const result = await responderInvitacion(i.id, estado)
       inv.setData((list) => list.map((x) => (x.id === i.id ? { ...x, estado: result.estado } : x)))
-      toast(estado === "aceptada" ? `¡Te uniste a «${i.proyecto?.titulo || "tu equipo"}»!` : "Rechazaste la invitación.", estado === "aceptada" ? "success" : "info")
-    } catch {
-      toast("No pudimos registrar tu respuesta.", "error")
+      toast(responseMessage(i, estado), estado === "aceptada" ? "success" : "info")
+    } catch (error) {
+      toast(error.message || "No pudimos registrar tu respuesta.", "error")
     } finally {
       setBusy(null)
     }

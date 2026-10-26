@@ -5,10 +5,11 @@ import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
 import SkillChip from "../ui/SkillChip"
 import { EmptyState, ErrorState, Skeleton } from "../ui/Feedback"
-import { buscarEstudiantes } from "../../services/api"
-import { FRANJAS, FRANJAS_LABEL, filtros } from "../../data/mockData"
+import { buscarEstudiantes, obtenerEstudiantes } from "../../services/api"
+import useAsync from "../../hooks/useAsync"
+import { FRANJAS, FRANJAS_LABEL } from "../../data/mockData"
 
-export function SearchBar({ value, onChange, placeholder = "Buscar por nombre o habilidad", label = "Buscar estudiantes" }) {
+export function SearchBar({ value, onChange, placeholder = "Nombre, carrera o habilidad confirmada visible", label = "Buscar estudiantes" }) {
   const id = useId()
   return (
     <div className="relative flex-1">
@@ -54,25 +55,27 @@ function Select({ label, value, onChange, options }) {
 
 const EMPTY = { carrera: "", habilidad: "", disponibilidad: "", semestre: "" }
 
-export function FilterPanel({ value, onChange }) {
+export function FilterPanel({ value, onChange, students = [] }) {
   const set = (k) => (v) => onChange({ ...value, [k]: v })
+  const options = (values) => [...new Set(values.filter(Boolean))].sort().map((v) => [v, v])
   return (
     <div className="grid animate-fade-up gap-3 rounded-xl border border-line bg-surface-2/60 p-4 sm:grid-cols-2 lg:grid-cols-4">
-      <Select label="Carrera" value={value.carrera} onChange={set("carrera")} options={filtros.carreras.map((c) => [c, c])} />
-      <Select label="Habilidad" value={value.habilidad} onChange={set("habilidad")} options={filtros.habilidades.map((h) => [h, h])} />
+      <Select label="Carrera" value={value.carrera} onChange={set("carrera")} options={options(students.map((s) => s.carrera))} />
+      <Select label="Habilidad confirmada visible" value={value.habilidad} onChange={set("habilidad")} options={options(students.flatMap((s) => s.fortalezas.map((h) => h.nombre)))} />
       <Select
-        label="Disponibilidad"
+        label="Bloque declarado (sin hora exacta)"
         value={value.disponibilidad}
         onChange={set("disponibilidad")}
         options={FRANJAS.map((f) => [f, FRANJAS_LABEL[f]])}
       />
-      <Select label="Semestre" value={value.semestre} onChange={set("semestre")} options={filtros.semestres.map((s) => [s, `${s}.º`])} />
+      <Select label="Semestre" value={value.semestre} onChange={set("semestre")} options={options(students.map((s) => s.semestre)).map(([s]) => [s, `${s}.º`])} />
     </div>
   )
 }
 
 /** Búsqueda manual (secundaria) con filtros. */
 export default function StudentSearch() {
+  const directory = useAsync(obtenerEstudiantes)
   const [q, setQ] = useState("")
   const [f, setF] = useState(EMPTY)
   const [open, setOpen] = useState(false)
@@ -107,7 +110,8 @@ export default function StudentSearch() {
         </Button>
       </div>
 
-      {open && <FilterPanel value={f} onChange={setF} />}
+      {open && <FilterPanel value={f} onChange={setF} students={directory.data ?? []} />}
+      {open && <p className="text-xs text-ink-2">Filtros sobre perfiles visibles. Los bloques declarados no garantizan disponibilidad a una hora exacta.</p>}
 
       {activos > 0 && (
         <button

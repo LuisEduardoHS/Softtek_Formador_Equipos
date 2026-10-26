@@ -15,6 +15,7 @@ from app.services.ai.matching.normalization import apply_equivalence
 from app.services.ai.matching.schemas import CandidateInput, EventInput, Evidence, Location, Participant
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
 from app.services.ai.integration import PROFILE_CONFIRMED_STATES
+from app.services.team_rules import participation_availability
 
 from .candidates import recommend_candidates
 from .contracts import OrganizerRecommendationContext, UserRecommendationContext
@@ -205,6 +206,8 @@ def candidate_recommendations(db: Session, event: Evento, actor: Usuario,
         raise PermissionError("Solo el organizador puede consultar candidatos.")
     profiles = _all_profiles(db)
     members = _rosters(db, [event.id_evento])[event.id_evento]
+    if not participation_availability(event, members)["acepta_participacion"]:
+        return []
     member_ids = {row.id_usuario for row in members}
     pending_ids = {row.id_destinatario if row.id_remitente == actor.id_usuario
                    else row.id_remitente for row in _pending(db, [event.id_evento])}
@@ -232,6 +235,9 @@ def project_recommendations(db: Session, actor: Usuario, *, top_n: int = 10):
     records = db.query(Evento).filter(Evento.estado == "Abierto").all()
     ids = [row.id_evento for row in records]
     rosters = _rosters(db, ids)
+    records = [row for row in records if participation_availability(
+        row, rosters[row.id_evento])["acepta_participacion"]
+        and row.creador_id in profiles and profiles[row.creador_id][0].estado_cuenta == "Activa"]
     pending = _pending(db, ids)
     member_ids = frozenset(row.id_evento for row in records
                            if any(member.id_usuario == actor.id_usuario

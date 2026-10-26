@@ -159,10 +159,13 @@ export async function reintentarEmbeddingPerfil() {
   return mapPerfil(await request("/perfil/embedding/reintentar", { method: "POST" }))
 }
 
-export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
+export async function obtenerEstudiantes({ q = "", excludeId, limit = 100, carrera, habilidad, disponibilidad, semestre } = {}) {
   const params = new URLSearchParams({ limit: String(limit) })
   if (q.trim()) params.set("q", q.trim())
   if (excludeId) params.set("exclude_id", String(excludeId))
+  for (const [key, value] of Object.entries({ carrera, habilidad, disponibilidad, semestre })) {
+    if (value) params.set(key, String(value))
+  }
   const perfiles = await request(`/perfil/estudiantes/?${params.toString()}`)
   return perfiles.map(mapPerfil)
 }
@@ -198,6 +201,10 @@ function mapEventoAProyecto(evento) {
     fuente_revision: evento.fuente_revision,
     soy_integrante: evento.soy_integrante === true,
     cupos_disponibles: evento.cupos_disponibles ?? 0,
+    acepta_participacion: evento.acepta_participacion === true,
+    puede_solicitar: evento.puede_solicitar === true,
+    motivo_no_disponible: evento.motivo_no_disponible,
+    roles_disponibles: Array.isArray(evento.roles_disponibles) ? evento.roles_disponibles.map((role) => ({ ...role, id: String(role.id) })) : [],
     roles: rolesEvento.filter((rol) => rol && typeof rol === "object" && !Array.isArray(rol)).map((rol, index) => {
       const habilidades = Array.isArray(rol.habilidades)
         ? rol.habilidades.filter((skill) => typeof skill === "string" && skill.trim()) : []
@@ -289,6 +296,7 @@ export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes
 }
 
 export function confirmarProyecto(project, requirements) {
+  if (!project.fuente_revision) throw new Error("Recarga el proyecto y revisa su versión actual antes de confirmar.")
   return request(`/eventos/${encodeURIComponent(project.id)}/confirmar`, {
     method: "POST",
     body: { requirements: { ...requirements, categoria: toCategory(project.tipo) },
@@ -410,12 +418,5 @@ export async function obtenerEquipo(id) {
 }
 
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
-  return obtenerEstudiantes({ q }).then((estudiantes) =>
-    estudiantes.filter((estudiante) =>
-      (!carrera || estudiante.carrera === carrera) &&
-      (!habilidad || estudiante.fortalezas.some((fortaleza) => fortaleza.nombre === habilidad)) &&
-      (!disponibilidad || estudiante.disponibilidad.includes(disponibilidad)) &&
-      (!semestre || estudiante.semestre === Number(semestre)),
-    ),
-  )
+  return obtenerEstudiantes({ q, carrera, habilidad, disponibilidad, semestre })
 }

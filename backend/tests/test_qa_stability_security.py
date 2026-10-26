@@ -83,10 +83,13 @@ def event():
 ])
 def test_qa01_invalid_self_profile_rejected_and_other_user_directory_survives(qa, raw):
     client, engine = qa
+    with Session(engine) as db:
+        db.get(PerfilUsuario, 2).datos_crudos = {"pausado": False, "consentimiento_recomendaciones": True}
+        db.commit()
     assert client.put("/perfil/1", headers=auth(), json={"datos_crudos": raw}).status_code == 422
     directory = client.get("/perfil/estudiantes/", headers=auth(2))
     assert directory.status_code == 200
-    assert {p["usuario_id"] for p in directory.json()} == {1, 2}
+    assert {p["usuario_id"] for p in directory.json()} == {2}  # Only the opted-in healthy account is discoverable.
     with Session(engine) as db:
         assert db.get(PerfilUsuario, 1).datos_crudos == {}
 
@@ -202,7 +205,8 @@ def test_qa03_confirmations_and_idempotent_creation_survive_actual_sdk_error_typ
     assert client.post("/eventos/", headers=hdrs, json=changed).status_code == 409
     eid = created.json()["id_evento"]
     assert client.post(f"/eventos/{eid}/confirmar", headers=auth(), json={
-        "requirements": event()["requisitos_confirmados"], "confirmado_por_creador": True}).status_code == 200
+        "requirements": event()["requisitos_confirmados"], "confirmado_por_creador": True,
+        "fuente_revision": created.json()["fuente_revision"]}).status_code == 200
     with Session(engine) as db:
         assert db.query(Evento).count() == 1
         assert db.get(PerfilUsuario, 1).embedding_perfil is None

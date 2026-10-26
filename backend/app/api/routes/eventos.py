@@ -8,7 +8,10 @@ from app.core.security import get_current_user
 from app.db.database import get_db
 from app.models.participante import ParticipanteEvento
 from app.models.evento import Evento
-from app.models.usuario import Usuario
+from app.models.usuario import Usuario, PerfilUsuario
+from app.models.solicitud import SolicitudEquipo
+from app.services.team_rules import participation_availability
+from app.schemas.profile_data import safe_profile_data
 from app.schemas.ai_integration import EventInterpretRequest, EventReviewed
 from app.schemas.evento import EventoCreate, EventoOut, EventoUpdate
 from app.schemas.event_details import safe_event_details, safe_event_requirements
@@ -27,6 +30,20 @@ def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
     participants = db.query(ParticipanteEvento).filter(
         ParticipanteEvento.id_evento == evento.id_evento).all()
     member_ids = {p.id_usuario for p in participants} | {evento.creador_id}
+    availability = participation_availability(evento, participants)
+    if not creator or creator.estado_cuenta != "Activa":
+        availability.update(acepta_participacion=False, roles_disponibles=[],
+                            motivo_no_disponible="La cuenta creadora no está activa.")
+    can_apply = availability["acepta_participacion"] and actor.id_usuario not in member_ids
+    profile = db.query(PerfilUsuario).filter_by(usuario_id=actor.id_usuario).first()
+    if profile and safe_profile_data(profile.datos_crudos).get("pausado"):
+        can_apply = False
+    if can_apply:
+        # Read only: don't acquire enrollment locks for a page view.
+        pair = {actor.id_usuario, evento.creador_id}
+        can_apply = not any({s.id_remitente, s.id_destinatario} == pair for s in db.query(
+            SolicitudEquipo).filter(SolicitudEquipo.id_evento == evento.id_evento,
+                                    SolicitudEquipo.estado.ilike("pendiente")).all())
     roles = details.get("roles")
     if isinstance(roles, list):
         details["roles"] = []
@@ -50,6 +67,7 @@ def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
         fuente_revision=event_source_revision(evento) if evento.creador_id == actor.id_usuario else None,
         soy_integrante=actor.id_usuario in member_ids,
         cupos_disponibles=max(0, capacity(details) - len(member_ids)),
+        **availability, puede_solicitar=can_apply,
         estado=evento.estado, fecha_creacion=evento.fecha_creacion,
     )
 
