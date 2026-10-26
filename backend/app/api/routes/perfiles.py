@@ -4,6 +4,7 @@ from typing import Optional
 from app.db.database import get_db
 from app.models.usuario import Usuario, PerfilUsuario
 from app.schemas.perfil import PerfilPublicoOut, PerfilUpdate, PerfilOut
+from app.schemas.profile_data import safe_profile_data
 from app.core.security import get_current_user, require_self
 from fastapi.concurrency import run_in_threadpool
 from app.schemas.ai_integration import ProfileInterpretRequest, ProfileReviewed
@@ -25,13 +26,19 @@ def _own_profile(db: Session, actor: Usuario) -> PerfilUsuario:
 
 
 def _private_profile(usuario: Usuario, perfil: PerfilUsuario) -> PerfilOut:
+    structured = None
+    if perfil.perfil_estado_ia in {"listo", "pendiente_embedding"}:
+        try:
+            structured = StructuredProfile.model_validate(perfil.perfil_estructurado_ia).model_dump(mode="json")
+        except (ValueError, TypeError):
+            pass  # A damaged legacy structure is not usable confirmed evidence.
     return PerfilOut(
         usuario_id=usuario.id_usuario, nombre=usuario.nombre, correo=usuario.correo,
         carrera=usuario.carrera, estado_geografico=usuario.estado_geografico,
         municipio=usuario.municipio, rol_sistema=usuario.rol_sistema,
-        datos_crudos=perfil.datos_crudos or {},
-        atributos_dinamicos=perfil.atributos_dinamicos or {},
-        perfil_estructurado_ia=perfil.perfil_estructurado_ia if perfil.perfil_estado_ia in {"listo", "pendiente_embedding"} else None,
+        datos_crudos=safe_profile_data(perfil.datos_crudos),
+        atributos_dinamicos=perfil.atributos_dinamicos if isinstance(perfil.atributos_dinamicos, dict) else {},
+        perfil_estructurado_ia=structured,
         perfil_estado_ia=perfil.perfil_estado_ia,
     )
 
@@ -41,10 +48,12 @@ async def interpretar_perfil(payload: ProfileInterpretRequest,
                             db: Session = Depends(get_db),
                             actor: Usuario = Depends(get_current_user)):
     perfil = _own_profile(db, actor)
-    raw = dict(perfil.datos_crudos or {})
+    raw = safe_profile_data(perfil.datos_crudos)
     raw["borrador_texto_ia"] = payload.model_dump()
     perfil.datos_crudos = raw
     perfil.perfil_borrador_ia = None
+    previous_state = perfil.perfil_estado_ia
+    previous_revision = perfil.perfil_fuente_revision
     perfil.perfil_estado_ia = "interpretando"
     db.commit()
     description = (f"Habilidades declaradas: {payload.fortalezas}\n"
@@ -55,9 +64,16 @@ async def interpretar_perfil(payload: ProfileInterpretRequest,
             ProfileParser(ai=OllamaClient(timeout=60)).parse_profile, description
         )
     except OllamaServiceError as error:
-        perfil.perfil_estado_ia = "interpretacion_pendiente"
+        db.refresh(perfil, with_for_update=True)
+        # Do not overwrite a confirmation made while this request was running.
+        if perfil.perfil_estado_ia == "interpretando" and perfil.perfil_fuente_revision == previous_revision:
+            perfil.perfil_estado_ia = (previous_state if previous_state in {"listo", "pendiente_embedding"}
+                                      else "interpretacion_pendiente")
         db.commit()
         raise HTTPException(status_code=503, detail="La interpretación no está disponible. Conservamos el borrador; puedes revisar manualmente y reintentar.") from error
+    db.refresh(perfil, with_for_update=True)
+    if perfil.perfil_estado_ia != "interpretando" or perfil.perfil_fuente_revision != previous_revision:
+        raise HTTPException(409, "El perfil cambió durante el análisis. Conservamos los datos actuales; revisa o reintenta.")
     perfil.perfil_borrador_ia = parsed.model_dump(mode="json")
     perfil.perfil_estado_ia = "pendiente_revision"
     db.commit()
@@ -86,7 +102,7 @@ async def confirmar_perfil(payload: ProfileReviewed,
     perfil.perfil_estado_ia = "pendiente_embedding"
     perfil.embedding_perfil = None
     perfil.perfil_embedding_fuente_revision = None
-    raw = dict(perfil.datos_crudos or {})
+    raw = safe_profile_data(perfil.datos_crudos)
     raw.update({"fortalezas": [item.model_dump() for item in payload.fortalezas],
                 "reforzar": payload.reforzar, "intereses": payload.intereses,
                 "experiencia": payload.experiencia,
@@ -119,7 +135,7 @@ async def reintentar_embedding_perfil(db: Session = Depends(get_db),
 
 
 def crear_perfil_publico(usuario, perfil):
-    datos_crudos = perfil.datos_crudos or {} if perfil else {}
+    datos_crudos = safe_profile_data(perfil.datos_crudos if perfil else {})
     configuracion = datos_crudos.get("visibilidad", {})
     visibilidad = {
         "fortalezas": True,
@@ -256,14 +272,15 @@ def actualizar_perfil(usuario_id: int, datos: PerfilUpdate, db: Session = Depend
         usuario.carrera = carrera
 
     # Fusionar los datos actuales con los nuevos datos enviados
-    datos_actuales = dict(perfil.datos_crudos or {})
+    previous_raw = perfil.datos_crudos if isinstance(perfil.datos_crudos, dict) else {}
+    datos_actuales = dict(previous_raw)
     if datos_crudos is not None:
         datos_actuales.update(datos_crudos)
     datos_actuales.update(nuevos_datos)
     
     # Asignar de nuevo el diccionario para que SQLAlchemy detecte el cambio en el campo JSON
     semantic_keys = {"fortalezas", "habilidades", "intereses", "reforzar", "bio", "experiencia", "disponibilidad"}
-    semantic_changed = any(datos_actuales.get(key) != (perfil.datos_crudos or {}).get(key)
+    semantic_changed = any(datos_actuales.get(key) != previous_raw.get(key)
                            for key in semantic_keys)
     perfil.datos_crudos = datos_actuales
     if semantic_changed:

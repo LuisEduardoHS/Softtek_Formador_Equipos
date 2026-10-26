@@ -4,6 +4,9 @@ import httpx
 
 from ollama import Client, ResponseError, RequestError
 
+# ollama 0.6.x wraps httpx connection failures in Python's ConnectionError.
+TRANSPORT_ERRORS = (ResponseError, RequestError, httpx.HTTPError, ConnectionError, TimeoutError)
+
 from app.services.ai.config import (
     OLLAMA_HOST,
     LLM_MODEL,
@@ -53,9 +56,9 @@ class OllamaClient:
 
             return content
 
-        except (ResponseError, RequestError, httpx.HTTPError) as error:
+        except TRANSPORT_ERRORS as error:
             raise OllamaServiceError(
-                f"Error comunicarse con llama: {error}"
+                "Error comunicarse con llama. Servicio no disponible."
             ) from error
 
     def generate_structured(self, prompt: str, schema: dict) -> str:
@@ -78,8 +81,8 @@ class OllamaClient:
                 format=schema,
                 options={"temperature": 0},
             )
-        except (ResponseError, RequestError, httpx.HTTPError) as error:
-            raise OllamaServiceError(f"Error al consultar Ollama: {error}") from error
+        except TRANSPORT_ERRORS as error:
+            raise OllamaServiceError("Error al consultar Ollama. Servicio no disponible.") from error
         content = response.message.content
         if not isinstance(content, str) or not content.strip():
             raise OllamaServiceError("La respuesta estructurada del modelo está vacía.")
@@ -115,7 +118,7 @@ class OllamaClient:
                 raise OllamaServiceError("Nomic devolvió un embedding de dimensión incorrecta.")
             return [float(value) for value in vector]
 
-        except (ResponseError, RequestError, httpx.HTTPError) as error:
+        except TRANSPORT_ERRORS as error:
             raise OllamaServiceError(
-                f"Error al generar embedding: {error}"
+                "Error al generar embedding. Servicio no disponible."
             ) from error

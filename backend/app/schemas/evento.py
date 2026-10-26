@@ -1,7 +1,14 @@
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from typing import Optional, Dict, Any
 from datetime import datetime
 from app.services.ai.schemas import StructuredEventRequirements
+from app.schemas.event_details import EventDetails
+
+
+def valid_details(value):
+    if any(k.startswith("_creation_") for k in value):
+        raise ValueError("Metadatos de creación reservados.")
+    return EventDetails.model_validate(value).model_dump(exclude_unset=True)
 
 class EventoCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -12,6 +19,8 @@ class EventoCreate(BaseModel):
     detalles_especificos: Dict[str, Any] = Field(default_factory=dict)
     requisitos_confirmados: StructuredEventRequirements | None = None
     confirmado_por_creador: bool = False
+
+    _details = field_validator("detalles_especificos")(valid_details)
 
     @model_validator(mode="after")
     def explicit_review(self):
@@ -26,6 +35,8 @@ class EventoUpdate(BaseModel):
     requisitos_ia: Dict[str, Any]
     integrantes: int = Field(ge=2, le=8)
     fuente_revision: str | None = Field(default=None, min_length=64, max_length=64)
+
+    _details = field_validator("detalles_especificos")(valid_details)
 
 class EventoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)

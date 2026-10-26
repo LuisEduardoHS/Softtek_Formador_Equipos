@@ -9,7 +9,7 @@ from app.core.security import create_access_token, get_current_user
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
 
 # Configuración del contexto para encriptar contraseñas con bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt_sha256", "bcrypt"], deprecated="auto")
 
 
 @router.post("/registro")
@@ -62,7 +62,18 @@ def login_usuario(user: UsuarioLogin, db: Session = Depends(get_db)):
     db_user = db.query(Usuario).filter(Usuario.correo == user.correo).first()
     
     # 2. Comprobar que el usuario exista y que la contraseña coincida con el hash
-    if not db_user or not pwd_context.verify(user.password, db_user.password_hash):
+    replacement = None
+    verified = False
+    if db_user:
+        scheme = pwd_context.identify(db_user.password_hash)
+        if scheme == "bcrypt" and len(user.password.encode("utf-8")) > 72:
+            raise HTTPException(422, "La cuenta usa bcrypt heredado: más de 72 bytes no pueden verificarse sin truncamiento. Requiere restablecimiento seguro de contraseña.")
+        if scheme:
+            try:
+                verified, replacement = pwd_context.verify_and_update(user.password, db_user.password_hash)
+            except (ValueError, TypeError):
+                verified = False
+    if not verified:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Correo o contraseña incorrectos."
@@ -70,6 +81,9 @@ def login_usuario(user: UsuarioLogin, db: Session = Depends(get_db)):
     
     if db_user.estado_cuenta != "Activa":
         raise HTTPException(status_code=403, detail="Cuenta inactiva.")
+    if replacement:
+        db_user.password_hash = replacement
+        db.commit()
     return {
         "mensaje": "Inicio de sesión exitoso",
         "access_token": create_access_token(db_user.id_usuario),

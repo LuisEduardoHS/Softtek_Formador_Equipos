@@ -25,9 +25,12 @@ def utc_now() -> datetime:
 
 
 def event_source_revision(evento) -> str:
+    details = evento.detalles_especificos or {}
+    if isinstance(details, dict):
+        details = {k: v for k, v in details.items() if not k.startswith("_creation_")}
     return content_revision({"titulo": evento.titulo, "categoria": evento.categoria_principal,
                              "descripcion": evento.descripcion_libre,
-                             "detalles": evento.detalles_especificos or {}})
+                             "detalles": details})
 
 
 def generate_reviewed_profile_vector(profile: StructuredProfile) -> list[float]:
@@ -46,7 +49,7 @@ def store_profile_embedding(perfil, structured: StructuredProfile,
     perfil.perfil_embedding_fuente_revision = None
     try:
         vector = (generator or generate_reviewed_profile_vector)(structured)
-    except (OllamaServiceError, ValueError):
+    except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
         return
     perfil.embedding_perfil = vector
     perfil.perfil_embedding_model = EMBEDDING_MODEL
@@ -63,7 +66,7 @@ def store_event_embedding(evento, requirements: StructuredEventRequirements,
     evento.embedding_fuente_revision = None
     try:
         vector = (generator or generate_reviewed_event_vector)(requirements)
-    except (OllamaServiceError, ValueError):
+    except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
         return
     evento.embedding_requisitos = vector
     evento.embedding_model = EMBEDDING_MODEL
@@ -78,7 +81,7 @@ async def process_profile_embedding(db, perfil, structured: StructuredProfile, *
     revision = expected_revision if expected_revision is not None else perfil.perfil_fuente_revision
     try:
         vector = await run_in_threadpool(generate_reviewed_profile_vector, structured)
-    except (OllamaServiceError, ValueError):
+    except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
         vector = None
     from app.models.usuario import PerfilUsuario
     values = dict(embedding_perfil=vector, perfil_embedding_fuente_revision=revision if vector else None,
@@ -99,7 +102,7 @@ async def process_event_embedding(db, evento, requirements: StructuredEventRequi
     revision = expected_revision if expected_revision is not None else evento.requisitos_fuente_revision
     try:
         vector = await run_in_threadpool(generate_reviewed_event_vector, requirements)
-    except (OllamaServiceError, ValueError):
+    except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
         vector = None
     from app.models.evento import Evento
     db.execute(update(Evento).where(

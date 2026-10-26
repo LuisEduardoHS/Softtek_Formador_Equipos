@@ -1,6 +1,7 @@
 """Reviewed 6A input; parser suggestions and confirmed facts are separate."""
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator, field_validator
+from app.schemas.profile_data import visibility_fields, Text50, TextList
 
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
 from app.services.ai.skill_terms import canonical_skill, folded
@@ -19,7 +20,7 @@ class ProfileInterpretRequest(_Strict):
 
 class ReviewedSkill(_Strict):
     nombre: str = Field(min_length=1, max_length=150)
-    nivel: str | None = Field(default=None, max_length=50)
+    nivel: Text50 | None = None
 
     @field_validator("nombre")
     @classmethod
@@ -33,14 +34,16 @@ class ProfileReviewed(_Strict):
     nombre: str = Field(min_length=1, max_length=150)
     carrera: str | None = Field(default=None, max_length=100)
     fortalezas: list[ReviewedSkill]
-    reforzar: list[str] = Field(default_factory=list)
-    intereses: list[str] = Field(default_factory=list)
-    experiencia: list[str] = Field(default_factory=list)
+    reforzar: TextList = Field(default_factory=list)
+    intereses: TextList = Field(default_factory=list)
+    experiencia: TextList = Field(default_factory=list)
     resumen_publico: str = Field(default="", max_length=1000)
-    disponibilidad: list[str] = Field(default_factory=list)
-    visibilidad: dict[str, bool]
-    pausado: bool = False
-    consentimiento_recomendaciones: bool = False
+    disponibilidad: TextList = Field(default_factory=list)
+    visibilidad: dict[str, StrictBool]
+    pausado: StrictBool = False
+    consentimiento_recomendaciones: StrictBool = False
+
+    _visibility = field_validator("visibilidad")(visibility_fields)
 
     @model_validator(mode="after")
     def bounded_lists(self):

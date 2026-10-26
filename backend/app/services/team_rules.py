@@ -4,6 +4,9 @@ from contextlib import contextmanager
 from fastapi import HTTPException
 from sqlalchemy import or_, and_, update
 from sqlalchemy.exc import IntegrityError, OperationalError
+from pydantic import ValidationError
+from app.schemas.event_details import EventRole
+from app.schemas.profile_data import safe_profile_data
 
 from app.models.evento import Evento
 from app.models.participante import ParticipanteEvento
@@ -60,23 +63,26 @@ def capacity(details):
 
 def validated_roles(details, members=()):
     roles = details.get("roles", [])
-    if not isinstance(roles, list):
+    if not isinstance(roles, list) or len(roles) > 100:
         raise HTTPException(422, "La lista de roles no es válida.")
     cleaned, names, ids = [], set(), set()
     for index, role in enumerate(roles):
-        if not isinstance(role, dict) or not isinstance(role.get("nombre"), str):
-            raise HTTPException(422, "Cada rol debe tener un nombre válido.")
-        name = " ".join(role["nombre"].split())
-        key, identifier = role_key(name), str(role.get("id", index))
-        slots = role.get("vacantes", 1)
-        if not name or len(name) > 50 or key in names or identifier in ids:
+        try:
+            if not isinstance(role, dict):
+                raise ValueError("Rol no válido")
+            parsed = EventRole.model_validate({"id": str(index), **role})
+        except (ValidationError, ValueError) as error:
+            raise HTTPException(422, "Cada rol requiere nombre (1–50), id (1–100), habilidades textuales (1–150), vacantes enteras (1–8) e indispensable booleano.") from error
+        name = " ".join(parsed.nombre.split())
+        key, identifier = role_key(name), parsed.id
+        slots = parsed.vacantes
+        if key in names or identifier in ids:
             raise HTTPException(422, "Usa nombres e identificadores de rol únicos; el nombre admite hasta 50 caracteres.")
         if type(slots) is not int or not 1 <= slots <= 8:
             raise HTTPException(422, "Las vacantes de cada rol deben estar entre 1 y 8.")
         names.add(key)
         ids.add(identifier)
-        cleaned.append({k: v for k, v in {**role, "nombre": name, "id": identifier, "vacantes": slots}.items()
-                        if k not in {"cubiertoPor", "ocupados", "integrantesIds"}})
+        cleaned.append({**parsed.model_dump(), "nombre": name})
     for member in members:
         matching = next((r for r in cleaned if role_key(r["nombre"]) == role_key(member.rol)), None)
         if not matching:
@@ -114,7 +120,7 @@ def available_role(db, event, user_id, requested):
         raise HTTPException(409, "La cuenta del integrante ya no está activa.")
     if not creator or creator.estado_cuenta != "Activa":
         raise HTTPException(409, "La cuenta creadora ya no está activa.")
-    if profile and (profile.datos_crudos or {}).get("pausado"):
+    if profile and safe_profile_data(profile.datos_crudos).get("pausado"):
         raise HTTPException(409, "El perfil del integrante está pausado.")
     roles = event_roles(event)
     if not roles and role_key(requested) in {"", "participante"}:

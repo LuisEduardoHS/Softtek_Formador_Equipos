@@ -1,0 +1,6147 @@
+{
+  "initial_inspection": {
+    "git_head": "568026a",
+    "git_initial_clean": true,
+    "python": "3.13.15",
+    "dependencies": {
+      "fastapi": "0.143.0",
+      "starlette": "1.8.0",
+      "SQLAlchemy": "2.1.4",
+      "PyMySQL": "1.2.3",
+      "ollama": "0.6.3",
+      "pydantic": "2.14.1",
+      "alembic": "1.20.0",
+      "httpx": "0.28.1",
+      "PyJWT": "2.15.1",
+      "passlib": "1.7.4",
+      "bcrypt": "4.0.1",
+      "pytest": "9.1.1"
+    },
+    "mysql": {
+      "version": "8.0.46",
+      "isolation_level": "REPEATABLE-READ",
+      "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+    },
+    "source_database": "softtek_formador_equipos",
+    "source_counts": {
+      "usuarios": 1,
+      "perfiles_usuarios": 1,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "alembic_revision": [
+      "20261022_6a"
+    ],
+    "source_ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+    "table_engines": [
+      {
+        "TABLE_NAME": "alembic_version",
+        "ENGINE": "InnoDB"
+      },
+      {
+        "TABLE_NAME": "eventos",
+        "ENGINE": "InnoDB"
+      },
+      {
+        "TABLE_NAME": "participantes_evento",
+        "ENGINE": "InnoDB"
+      },
+      {
+        "TABLE_NAME": "perfiles_usuarios",
+        "ENGINE": "InnoDB"
+      },
+      {
+        "TABLE_NAME": "solicitudes_equipo",
+        "ENGINE": "InnoDB"
+      },
+      {
+        "TABLE_NAME": "usuarios",
+        "ENGINE": "InnoDB"
+      }
+    ],
+    "source_checksums": {
+      "usuarios": 101962764,
+      "perfiles_usuarios": 2746401420,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "schema": {
+      "usuarios": {
+        "columns": [
+          {
+            "name": "id_usuario",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "nombre",
+            "type": "VARCHAR(150) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "correo",
+            "type": "VARCHAR(100) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "carrera",
+            "type": "VARCHAR(100) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "estado_geografico",
+            "type": "VARCHAR(50) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "municipio",
+            "type": "VARCHAR(50) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "estado_cuenta",
+            "type": "VARCHAR(20) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": "'Activa'"
+          },
+          {
+            "name": "rol_sistema",
+            "type": "VARCHAR(30) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": "'Estudiante'"
+          },
+          {
+            "name": "password_hash",
+            "type": "VARCHAR(255) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "fecha_registro",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": "CURRENT_TIMESTAMP"
+          }
+        ],
+        "foreign_keys": [],
+        "indexes": [
+          {
+            "name": "correo",
+            "column_names": [
+              "correo"
+            ],
+            "unique": true
+          }
+        ],
+        "unique": [
+          {
+            "name": "correo",
+            "column_names": [
+              "correo"
+            ],
+            "duplicates_index": "correo"
+          }
+        ]
+      },
+      "perfiles_usuarios": {
+        "columns": [
+          {
+            "name": "usuario_id",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "nombre_mostrar",
+            "type": "VARCHAR(100) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "datos_crudos",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "atributos_dinamicos",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "resumen_publico_ia",
+            "type": "TEXT COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_estructurado_ia",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "embedding_perfil",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_borrador_ia",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_estado_ia",
+            "type": "VARCHAR(32) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_fuente_revision",
+            "type": "VARCHAR(64) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_embedding_model",
+            "type": "VARCHAR(100) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_embedding_pipeline",
+            "type": "VARCHAR(60) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_embedding_fuente_revision",
+            "type": "VARCHAR(64) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_confirmado_at",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "perfil_procesado_at",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+          }
+        ],
+        "foreign_keys": [
+          {
+            "name": "perfiles_usuarios_ibfk_1",
+            "constrained_columns": [
+              "usuario_id"
+            ],
+            "referred_schema": null,
+            "referred_table": "usuarios",
+            "referred_columns": [
+              "id_usuario"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          }
+        ],
+        "indexes": [],
+        "unique": []
+      },
+      "eventos": {
+        "columns": [
+          {
+            "name": "id_evento",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "creador_id",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "categoria_principal",
+            "type": "VARCHAR(50) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": "'Academico'"
+          },
+          {
+            "name": "titulo",
+            "type": "VARCHAR(150) COLLATE utf8mb4_unicode_ci",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "descripcion_libre",
+            "type": "TEXT COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "detalles_especificos",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "requisitos_ia",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "embedding_requisitos",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "requisitos_borrador_ia",
+            "type": "JSON",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "estado_ia",
+            "type": "VARCHAR(32) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "requisitos_fuente_revision",
+            "type": "VARCHAR(64) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "embedding_model",
+            "type": "VARCHAR(100) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "embedding_pipeline",
+            "type": "VARCHAR(60) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "embedding_fuente_revision",
+            "type": "VARCHAR(64) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "requisitos_confirmados_at",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "procesado_at",
+            "type": "DATETIME",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "estado",
+            "type": "VARCHAR(30) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": "'Abierto'"
+          },
+          {
+            "name": "fecha_creacion",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": "CURRENT_TIMESTAMP"
+          }
+        ],
+        "foreign_keys": [
+          {
+            "name": "eventos_ibfk_1",
+            "constrained_columns": [
+              "creador_id"
+            ],
+            "referred_schema": null,
+            "referred_table": "usuarios",
+            "referred_columns": [
+              "id_usuario"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "name": "creador_id",
+            "column_names": [
+              "creador_id"
+            ],
+            "unique": false
+          }
+        ],
+        "unique": []
+      },
+      "solicitudes_equipo": {
+        "columns": [
+          {
+            "name": "id_solicitud",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "id_evento",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "id_remitente",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "id_destinatario",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "estado",
+            "type": "VARCHAR(50) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": "'Pendiente'"
+          },
+          {
+            "name": "mensaje_explicacion",
+            "type": "TEXT COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "fecha_envio",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": "CURRENT_TIMESTAMP"
+          }
+        ],
+        "foreign_keys": [
+          {
+            "name": "solicitudes_equipo_ibfk_1",
+            "constrained_columns": [
+              "id_evento"
+            ],
+            "referred_schema": null,
+            "referred_table": "eventos",
+            "referred_columns": [
+              "id_evento"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          },
+          {
+            "name": "solicitudes_equipo_ibfk_2",
+            "constrained_columns": [
+              "id_remitente"
+            ],
+            "referred_schema": null,
+            "referred_table": "usuarios",
+            "referred_columns": [
+              "id_usuario"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          },
+          {
+            "name": "solicitudes_equipo_ibfk_3",
+            "constrained_columns": [
+              "id_destinatario"
+            ],
+            "referred_schema": null,
+            "referred_table": "usuarios",
+            "referred_columns": [
+              "id_usuario"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "name": "id_destinatario",
+            "column_names": [
+              "id_destinatario"
+            ],
+            "unique": false
+          },
+          {
+            "name": "id_evento",
+            "column_names": [
+              "id_evento"
+            ],
+            "unique": false
+          },
+          {
+            "name": "id_remitente",
+            "column_names": [
+              "id_remitente"
+            ],
+            "unique": false
+          }
+        ],
+        "unique": []
+      },
+      "participantes_evento": {
+        "columns": [
+          {
+            "name": "id_participacion",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "id_evento",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "id_usuario",
+            "type": "INTEGER",
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "rol",
+            "type": "VARCHAR(50) COLLATE utf8mb4_unicode_ci",
+            "nullable": true,
+            "default": "'Participante'"
+          },
+          {
+            "name": "fecha_ingreso",
+            "type": "TIMESTAMP",
+            "nullable": true,
+            "default": "CURRENT_TIMESTAMP"
+          }
+        ],
+        "foreign_keys": [
+          {
+            "name": "participantes_evento_ibfk_1",
+            "constrained_columns": [
+              "id_evento"
+            ],
+            "referred_schema": null,
+            "referred_table": "eventos",
+            "referred_columns": [
+              "id_evento"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          },
+          {
+            "name": "participantes_evento_ibfk_2",
+            "constrained_columns": [
+              "id_usuario"
+            ],
+            "referred_schema": null,
+            "referred_table": "usuarios",
+            "referred_columns": [
+              "id_usuario"
+            ],
+            "options": {
+              "ondelete": "CASCADE"
+            }
+          }
+        ],
+        "indexes": [
+          {
+            "name": "id_evento",
+            "column_names": [
+              "id_evento",
+              "id_usuario"
+            ],
+            "unique": true
+          },
+          {
+            "name": "id_usuario",
+            "column_names": [
+              "id_usuario"
+            ],
+            "unique": false
+          }
+        ],
+        "unique": [
+          {
+            "name": "id_evento",
+            "column_names": [
+              "id_evento",
+              "id_usuario"
+            ],
+            "duplicates_index": "id_evento"
+          }
+        ]
+      }
+    },
+    "orm_comparison": {
+      "usuarios": {
+        "missing": [],
+        "extra": [],
+        "json_match": true
+      },
+      "perfiles_usuarios": {
+        "missing": [],
+        "extra": [],
+        "json_match": true
+      },
+      "eventos": {
+        "missing": [],
+        "extra": [],
+        "json_match": true
+      },
+      "solicitudes_equipo": {
+        "missing": [],
+        "extra": [],
+        "json_match": true
+      },
+      "participantes_evento": {
+        "missing": [],
+        "extra": [],
+        "json_match": true
+      }
+    },
+    "qa_database": "softtek_formador_equipos_qa_20261025_2120dd",
+    "qa_created_empty": true,
+    "ollama_version": {
+      "version": "0.40.5"
+    },
+    "ollama_models": [
+      {
+        "name": "nomic-embed-text:latest",
+        "size": 274302450,
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f"
+      },
+      {
+        "name": "llama3.1:8b",
+        "size": 4920753328,
+        "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e"
+      },
+      {
+        "name": "llama3.2:3b",
+        "size": 2019393189,
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+      }
+    ],
+    "ports_initial": {
+      "8000": "existing backend, untouched",
+      "5173": "existing frontend, untouched",
+      "3306": "existing MySQL",
+      "11434": "existing Ollama"
+    }
+  },
+  "final_inspection": {
+    "source_counts": {
+      "usuarios": 1,
+      "perfiles_usuarios": 1,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "source_checksums": {
+      "usuarios": 101962764,
+      "perfiles_usuarios": 2746401420,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "source_ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+    "alembic_revision": [
+      "20261022_6a"
+    ],
+    "principal_unchanged": true,
+    "qa_counts": {
+      "usuarios": 23,
+      "perfiles_usuarios": 23,
+      "eventos": 33,
+      "solicitudes_equipo": 18,
+      "participantes_evento": 12
+    },
+    "browser_profile": {
+      "usuario_id": 24,
+      "perfil_estado_ia": "listo",
+      "dimensions": 768,
+      "source_matches": 1,
+      "model": "nomic-embed-text"
+    },
+    "browser_event": {
+      "id_evento": 28,
+      "estado_ia": "listo",
+      "dimensions": 768,
+      "source_matches": 1,
+      "model": "nomic-embed-text"
+    },
+    "browser_adhesion": [
+      {
+        "id_evento": 3,
+        "id_usuario": 24,
+        "rol": "artista"
+      }
+    ],
+    "duplicate_memberships": 0,
+    "qa_json_vector_summary": {
+      "perfiles_usuarios": {
+        "count": 17,
+        "dimensions": [
+          3,
+          768
+        ],
+        "all_finite": true
+      },
+      "eventos": {
+        "count": 14,
+        "dimensions": [
+          768
+        ],
+        "all_finite": true
+      }
+    }
+  },
+  "baseline": [
+    {
+      "name": "pytest",
+      "seconds": 15.54,
+      "exit_code": 0,
+      "output": "........................................................................ [ 30%]\n........................................................................ [ 61%]\n........................................................................ [ 92%]\n..................                                                       [100%]\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  D:\\projects\\Softtek_Formador_Equipos\\backend\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n234 passed, 1 warning in 14.26s\n"
+    },
+    {
+      "name": "pip_check",
+      "seconds": 0.63,
+      "exit_code": 0,
+      "output": "No broken requirements found.\n"
+    },
+    {
+      "name": "build",
+      "seconds": 1.15,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 build\n> vite build\n\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 1989 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.80 kB │ gzip:   0.44 kB\ndist/assets/index-BThd0Ll0.css   54.47 kB │ gzip:  10.14 kB\ndist/assets/index-Cx4syKXu.js   483.37 kB │ gzip: 139.55 kB\n\n✓ built in 335ms\n"
+    },
+    {
+      "name": "lint",
+      "seconds": 3.99,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 lint\n> eslint .\n\n\nD:\\projects\\Softtek_Formador_Equipos\\frontend\\src\\components\\auth\\RequireSession.jsx\n  29:6  warning  React Hook useEffect has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps\n\n✖ 1 problem (0 errors, 1 warning)\n\n"
+    }
+  ],
+  "cases": [
+    {
+      "id": "C01",
+      "area": "C",
+      "title": "Registro válido con MySQL real",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "mensaje": "Usuario registrado exitosamente",
+          "access_token": "[REDACTED]",
+          "token_type": "bearer",
+          "usuario": {
+            "id_usuario": 2,
+            "nombre": "QA owner",
+            "correo": "owner@example.com",
+            "carrera": "Ingeniería QA"
+          }
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C02",
+      "area": "C",
+      "title": "Correo duplicado",
+      "status": "PASS",
+      "evidence": {
+        "status": 400,
+        "body": {
+          "detail": "El correo ya se encuentra registrado."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C03",
+      "area": "C",
+      "title": "Registro sin campos obligatorios",
+      "status": "PASS",
+      "evidence": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "nombre"
+              ],
+              "msg": "Field required",
+              "input": {
+                "correo": "missing@example.com"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "carrera"
+              ],
+              "msg": "Field required",
+              "input": {
+                "correo": "missing@example.com"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "password"
+              ],
+              "msg": "Field required",
+              "input": {
+                "correo": "missing@example.com"
+              }
+            }
+          ]
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C04",
+      "area": "C",
+      "title": "Login con contraseña incorrecta",
+      "status": "PASS",
+      "evidence": {
+        "status": 401,
+        "body": {
+          "detail": "Correo o contraseña incorrectos."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C05",
+      "area": "C",
+      "title": "Login correcto",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "mensaje": "Inicio de sesión exitoso",
+          "access_token": "[REDACTED]",
+          "token_type": "bearer",
+          "usuario": {
+            "id_usuario": 2,
+            "nombre": "QA owner",
+            "correo": "owner@example.com",
+            "carrera": "Ingeniería QA"
+          }
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C06",
+      "area": "C",
+      "title": "Token válido",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id_usuario": 2,
+          "nombre": "QA owner",
+          "correo": "owner@example.com",
+          "carrera": "Ingeniería QA"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C07",
+      "area": "C",
+      "title": "Token ausente",
+      "status": "PASS",
+      "evidence": {
+        "status": 401,
+        "body": {
+          "detail": "Credencial inválida o ausente."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C08",
+      "area": "C",
+      "title": "Token inválido",
+      "status": "PASS",
+      "evidence": {
+        "status": 401,
+        "body": {
+          "detail": "Credencial inválida o ausente."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C09",
+      "area": "C",
+      "title": "Token caducado firmado por QA",
+      "status": "PASS",
+      "evidence": {
+        "status": 401,
+        "body": {
+          "detail": "Credencial inválida o ausente."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C10",
+      "area": "C",
+      "title": "Lectura de perfil ajeno privado",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C11",
+      "area": "C",
+      "title": "Modificación de perfil ajeno",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C12",
+      "area": "C",
+      "title": "Creador falsificado",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "El creador debe ser el usuario autenticado."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C13",
+      "area": "C",
+      "title": "Cuenta inactiva: token previamente emitido",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "Cuenta inactiva."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C14",
+      "area": "C",
+      "title": "Cuenta inactiva: login",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "Cuenta inactiva."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C15",
+      "area": "C",
+      "title": "Registro rechaza contraseña vacía",
+      "status": "FAIL",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "mensaje": "Usuario registrado exitosamente",
+          "access_token": "[REDACTED]",
+          "token_type": "bearer",
+          "usuario": {
+            "id_usuario": 22,
+            "nombre": "QA empty_password",
+            "correo": "empty_password@example.com",
+            "carrera": "Ingeniería QA"
+          }
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C16",
+      "area": "C",
+      "title": "Registro limita longitud a lo admitido por MySQL",
+      "status": "FAIL",
+      "evidence": {
+        "status": 500,
+        "body": "Internal Server Error"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C17",
+      "area": "C",
+      "title": "Contraseñas diferentes después del byte 72 no autentican",
+      "status": "FAIL",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "mensaje": "Inicio de sesión exitoso",
+          "access_token": "[REDACTED]",
+          "token_type": "bearer",
+          "usuario": {
+            "id_usuario": 23,
+            "nombre": "QA long_password",
+            "correo": "long_password@example.com",
+            "carrera": "Ingeniería QA"
+          }
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-01",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D01",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "Python",
+          "SQL"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-02",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D02",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "Python"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-03",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D03",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "SQL"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-04",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D04",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "SQL"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-05",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D05",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "SQL"
+        ],
+        "learning_goals": [
+          "Docker"
+        ],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-06",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D06",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-07",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D07",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-08",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D08",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "portero",
+          "defensa"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-09",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D09",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "Figma",
+          "UX/UI"
+        ],
+        "learning_goals": [],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-10",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D10",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "pendiente_embedding",
+        "skills": [],
+        "learning_goals": [
+          "diseño"
+        ],
+        "dimensions": null,
+        "finite": false,
+        "source_revision_matches": true,
+        "embedding_revision_matches": false,
+        "model": null,
+        "no_semantic_information": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-11",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D11",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "pendiente_embedding",
+        "skills": [],
+        "learning_goals": [],
+        "dimensions": null,
+        "finite": false,
+        "source_revision_matches": true,
+        "embedding_revision_matches": false,
+        "model": null,
+        "no_semantic_information": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "D-PERSIST-12",
+      "area": "D/F",
+      "title": "Corrección humana y persistencia D12",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "skills": [
+          "Python",
+          "SQL"
+        ],
+        "learning_goals": [
+          "Docker",
+          "estadística"
+        ],
+        "dimensions": 768,
+        "finite": true,
+        "source_revision_matches": true,
+        "embedding_revision_matches": true,
+        "model": "nomic-embed-text",
+        "no_semantic_information": false
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C18",
+      "area": "C",
+      "title": "Perfil público omite contraseñas, tokens, vectores y áreas privadas",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "usuario_id": 3,
+          "nombre": "QA D01",
+          "carrera": "Ingeniería QA",
+          "estado_geografico": null,
+          "municipio": null,
+          "correo": null,
+          "datos_crudos": {
+            "visibilidad": {
+              "fortalezas": true,
+              "intereses": true,
+              "disponibilidad": true,
+              "reforzar": false,
+              "correo": false
+            },
+            "semestre": 1,
+            "pausado": false,
+            "fortalezas": [
+              {
+                "nivel": null,
+                "nombre": "Python"
+              },
+              {
+                "nivel": null,
+                "nombre": "SQL"
+              }
+            ],
+            "intereses": [
+              "web"
+            ],
+            "disponibilidad": [
+              "lun-tarde",
+              "sab-manana"
+            ],
+            "bio": ""
+          },
+          "atributos_dinamicos": {}
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C19",
+      "area": "C",
+      "title": "Perfil pausado no se descubre públicamente",
+      "status": "PASS",
+      "evidence": {
+        "status": 404,
+        "body": {
+          "detail": "Este perfil no está disponible."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C20",
+      "area": "C",
+      "title": "Ocultar fortalezas también evita publicarlas en la biografía",
+      "status": "FAIL",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "usuario_id": 15,
+          "nombre": "QA hidden",
+          "carrera": "Ingeniería QA",
+          "estado_geografico": null,
+          "municipio": null,
+          "correo": null,
+          "datos_crudos": {
+            "visibilidad": {
+              "fortalezas": false,
+              "intereses": false,
+              "disponibilidad": true,
+              "reforzar": false,
+              "correo": false
+            },
+            "semestre": 1,
+            "pausado": false,
+            "disponibilidad": [
+              "lun-tarde",
+              "sab-manana"
+            ],
+            "bio": "Domino Python y SQL."
+          },
+          "atributos_dinamicos": {}
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C21",
+      "area": "C",
+      "title": "Sin consentimiento no consulta recomendaciones propias",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "Activa el consentimiento de recomendaciones en tu perfil."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-01",
+      "area": "E/F",
+      "title": "Publicación humana E01",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 1,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Academico",
+          "roles_buscados": [
+            "backend"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [
+            "SQL"
+          ],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "Python"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-02",
+      "area": "E/F",
+      "title": "Publicación humana E02",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 2,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Videojuegos",
+          "roles_buscados": [
+            "programador"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [
+            "Git"
+          ],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "Unreal Engine 5"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-03",
+      "area": "E/F",
+      "title": "Publicación humana E03",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 3,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Personal",
+          "roles_buscados": [
+            "artista"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "Blender"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-04",
+      "area": "E/F",
+      "title": "Publicación humana E04",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 4,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Deportivo",
+          "roles_buscados": [
+            "portero"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [],
+          "restricciones_explicitas": [
+            "sábados",
+            "Monterrey"
+          ]
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-05",
+      "area": "E/F",
+      "title": "Publicación humana E05",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 5,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Academico",
+          "roles_buscados": [
+            "diseñador"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "Figma"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-06",
+      "area": "E/F",
+      "title": "Publicación humana E06",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 6,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Academico",
+          "roles_buscados": [
+            "analista"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [
+            "Python"
+          ],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "SQL"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-07",
+      "area": "E/F",
+      "title": "Publicación humana E07",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 7,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Personal",
+          "roles_buscados": [
+            "desarrollador"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [
+            "Python",
+            "SQL"
+          ],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-08",
+      "area": "E/F",
+      "title": "Publicación humana E08",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 8,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "General",
+          "roles_buscados": [
+            "Colaborador"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-09",
+      "area": "E/F",
+      "title": "Publicación humana E09",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 9,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Academico",
+          "roles_buscados": [
+            "tutor"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "Python"
+          ],
+          "restricciones_explicitas": [
+            "lunes",
+            "16:00",
+            "18:00"
+          ]
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E-PERSIST-10",
+      "area": "E/F",
+      "title": "Publicación humana E10",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "event_id": 10,
+        "state": "listo",
+        "dimensions": 768,
+        "finite": true,
+        "requirements": {
+          "resumen": "Requisitos revisados por QA",
+          "categoria": "Academico",
+          "roles_buscados": [
+            "analista"
+          ],
+          "titulo_normalizado": "QA proyecto",
+          "habilidades_deseables": [],
+          "intereses_relacionados": [
+            "web"
+          ],
+          "habilidades_obligatorias": [
+            "SQL"
+          ],
+          "restricciones_explicitas": []
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C22",
+      "area": "C",
+      "title": "Edición de proyecto ajeno",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "Solo quien creó el evento puede editarlo."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C23",
+      "area": "C",
+      "title": "Candidatos solo para organizador",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "Solo el organizador puede consultar candidatos."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C24",
+      "area": "C",
+      "title": "Invitaciones ajenas no se leen",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C25",
+      "area": "C",
+      "title": "Equipos ajenos no se leen",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "C26",
+      "area": "C",
+      "title": "Notificaciones ajenas no se leen",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E11",
+      "area": "E",
+      "title": "Editar proyecto propio",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id_evento": 1,
+          "creador_id": 2,
+          "creador_nombre": "QA owner",
+          "categoria_principal": "Academico",
+          "titulo": "QA E01",
+          "descripcion_libre": "SQL obligatorio actualizado",
+          "detalles_especificos": {
+            "tipo": "academico",
+            "roles": [
+              {
+                "id": "backend",
+                "nombre": "Backend",
+                "vacantes": 1,
+                "habilidades": [
+                  "SQL"
+                ],
+                "ocupados": 0,
+                "integrantesIds": [],
+                "cubiertoPor": null
+              }
+            ],
+            "fechaLimite": null,
+            "integrantes": 4
+          },
+          "requisitos_ia": {},
+          "estado_ia": "pendiente_revision",
+          "requisitos_confirmados": false,
+          "fuente_revision": "80552083156c3fd8aeb50525feae004fc8f994aa75043dbcce5cf4c4b528f1e9",
+          "soy_integrante": true,
+          "cupos_disponibles": 3,
+          "estado": "Abierto",
+          "fecha_creacion": "2026-10-25T16:42:09"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E12",
+      "area": "E",
+      "title": "Edición invalida IA sin publicar requisitos anteriores",
+      "status": "PASS",
+      "evidence": {
+        "public": {
+          "id_evento": 1,
+          "creador_id": 2,
+          "creador_nombre": "QA owner",
+          "categoria_principal": "Academico",
+          "titulo": "QA E01",
+          "descripcion_libre": "SQL obligatorio actualizado",
+          "detalles_especificos": {
+            "tipo": "academico",
+            "roles": [
+              {
+                "id": "backend",
+                "nombre": "Backend",
+                "vacantes": 1,
+                "habilidades": [
+                  "SQL"
+                ],
+                "ocupados": 0,
+                "integrantesIds": [],
+                "cubiertoPor": null
+              }
+            ],
+            "fechaLimite": null,
+            "integrantes": 4
+          },
+          "requisitos_ia": {},
+          "estado_ia": null,
+          "requisitos_confirmados": false,
+          "fuente_revision": null,
+          "soy_integrante": false,
+          "cupos_disponibles": 3,
+          "estado": "Abierto",
+          "fecha_creacion": "2026-10-25T16:42:09"
+        },
+        "vector_is_null": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E13",
+      "area": "E",
+      "title": "Reintento antes de reconfirmar",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Primero confirma los requisitos."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "E14",
+      "area": "E",
+      "title": "Rechazo de revisión obsoleta",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "El proyecto cambió mientras lo revisabas. Recarga los requisitos."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F01",
+      "area": "F",
+      "title": "Fallo controlado de Ollama conserva confirmación",
+      "status": "FAIL",
+      "evidence": {
+        "status": 500,
+        "body": "Internal Server Error"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F02",
+      "area": "F",
+      "title": "Reintento real recupera Nomic",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id_evento": 1,
+          "creador_id": 2,
+          "creador_nombre": "QA owner",
+          "categoria_principal": "Academico",
+          "titulo": "QA E01",
+          "descripcion_libre": "SQL obligatorio actualizado",
+          "detalles_especificos": {
+            "tipo": "academico",
+            "roles": [
+              {
+                "id": "backend",
+                "nombre": "Backend",
+                "vacantes": 1,
+                "habilidades": [
+                  "SQL"
+                ],
+                "ocupados": 0,
+                "integrantesIds": [],
+                "cubiertoPor": null
+              }
+            ],
+            "fechaLimite": null,
+            "integrantes": 4
+          },
+          "requisitos_ia": {
+            "resumen": "Requisitos revisados por QA",
+            "categoria": "Academico",
+            "roles_buscados": [
+              "Backend"
+            ],
+            "titulo_normalizado": "QA proyecto",
+            "habilidades_deseables": [],
+            "intereses_relacionados": [
+              "web"
+            ],
+            "habilidades_obligatorias": [
+              "SQL"
+            ],
+            "restricciones_explicitas": []
+          },
+          "estado_ia": "listo",
+          "requisitos_confirmados": true,
+          "fuente_revision": "80552083156c3fd8aeb50525feae004fc8f994aa75043dbcce5cf4c4b528f1e9",
+          "soy_integrante": true,
+          "cupos_disponibles": 3,
+          "estado": "Abierto",
+          "fecha_creacion": "2026-10-25T16:42:09"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F03",
+      "area": "F",
+      "title": "Perfil conserva datos si Nomic no responde",
+      "status": "FAIL",
+      "evidence": {
+        "status": 500,
+        "body": "Internal Server Error"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F04",
+      "area": "F",
+      "title": "Perfil reintenta Nomic real",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F05",
+      "area": "F",
+      "title": "Fallo controlado del parser guarda borrador",
+      "status": "FAIL",
+      "evidence": {
+        "status": 500,
+        "body": "Internal Server Error"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G01",
+      "area": "G",
+      "title": "Matching real: permiso y proyección pública",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": [
+          {
+            "event_id": 11,
+            "candidate_id": 3,
+            "eligibility": "needs_review",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 2,
+              "unknown": 1,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad obligatoria: Python.",
+                "Evidencia confirmada para habilidad deseable: SQL.",
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 19,
+            "eligibility": "needs_review",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 2,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad obligatoria: Python.",
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 14,
+            "eligibility": "needs_review",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 2,
+              "unknown": 1,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad obligatoria: Python.",
+                "Evidencia confirmada para habilidad deseable: SQL."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 5,
+            "eligibility": "needs_review",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 2,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad deseable: SQL."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 6,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 2,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad deseable: SQL."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 7,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 2,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad deseable: SQL."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 20,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 21,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 8,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 9,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 10,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 11,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 4,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente.",
+                "No hay señales puntuables disponibles."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 12,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente.",
+                "No hay señales puntuables disponibles."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 13,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente.",
+                "No hay señales puntuables disponibles."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 11,
+            "candidate_id": 15,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 3,
+              "not_applicable": 0
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "Por verificar habilidad deseable: SQL.",
+                "Por verificar rol solicitado: Backend.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente.",
+                "No hay señales puntuables disponibles."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          }
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G02",
+      "area": "G",
+      "title": "Excluye perfil pausado y sin consentimiento",
+      "status": "PASS",
+      "evidence": {
+        "candidate_ids": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          19,
+          20,
+          21
+        ],
+        "paused_id": 16,
+        "no_consent_id": 17
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G03",
+      "area": "G",
+      "title": "Habilidad confirmada respalda explicación",
+      "status": "PASS",
+      "evidence": {
+        "apt": {
+          "event_id": 11,
+          "candidate_id": 3,
+          "eligibility": "needs_review",
+          "evidence_group": "sufficient_evidence",
+          "evidence_coverage": {
+            "known": 2,
+            "unknown": 1,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: Python.",
+              "Evidencia confirmada para habilidad deseable: SQL.",
+              "Hay coincidencia textual de intereses o preferencias con el evento."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G04",
+      "area": "G",
+      "title": "Interés sin habilidad no acredita Python",
+      "status": "PASS",
+      "evidence": {
+        "interested_only": {
+          "event_id": 11,
+          "candidate_id": 9,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 0,
+            "unknown": 3,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad obligatoria: Python.",
+              "Por verificar habilidad deseable: SQL.",
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "No hay requisitos con evidencia confirmada para este candidato.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G05",
+      "area": "G",
+      "title": "top_n fuera de rango",
+      "status": "PASS",
+      "evidence": {
+        "status": 422,
+        "body": {
+          "detail": [
+            {
+              "type": "less_than_equal",
+              "loc": [
+                "query",
+                "top_n"
+              ],
+              "msg": "Input should be less than or equal to 20",
+              "input": "21",
+              "ctx": {
+                "le": 20
+              }
+            }
+          ]
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G06",
+      "area": "G",
+      "title": "top_n limita resultados",
+      "status": "PASS",
+      "evidence": {
+        "candidate_ids": [
+          3,
+          19
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G07",
+      "area": "G",
+      "title": "Ranking determinista con la misma instantánea",
+      "status": "PASS",
+      "evidence": {
+        "same": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G08",
+      "area": "G",
+      "title": "Campos ocultos no se exponen como habilidades explícitas",
+      "status": "PASS",
+      "evidence": {
+        "hidden_candidate": {
+          "event_id": 11,
+          "candidate_id": 15,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 0,
+            "unknown": 3,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad obligatoria: Python.",
+              "Por verificar habilidad deseable: SQL.",
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "No hay requisitos con evidencia confirmada para este candidato.",
+              "Hay requisitos sin evidencia suficiente.",
+              "No hay señales puntuables disponibles."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G09",
+      "area": "G",
+      "title": "Vector obsoleto descartado en adaptación ORM real",
+      "status": "PASS",
+      "evidence": {
+        "discarded": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G10",
+      "area": "G",
+      "title": "Vector Nomic de dimensión incompatible descartado",
+      "status": "PASS",
+      "evidence": {
+        "discarded": true
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G11",
+      "area": "G",
+      "title": "Matching opera sin embedding",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "count": 10
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G12",
+      "area": "G",
+      "title": "Equivalencia Python/programar en Python en evidencia real",
+      "status": "PASS",
+      "evidence": {
+        "equivalent_candidate": {
+          "event_id": 11,
+          "candidate_id": 19,
+          "eligibility": "needs_review",
+          "evidence_group": "sufficient_evidence",
+          "evidence_coverage": {
+            "known": 1,
+            "unknown": 2,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: Python.",
+              "Hay coincidencia textual de intereses o preferencias con el evento."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad deseable: SQL.",
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G13",
+      "area": "G",
+      "title": "UE5 acredita Unreal Engine 5",
+      "status": "PASS",
+      "evidence": {
+        "ue5_candidate": {
+          "event_id": 12,
+          "candidate_id": 20,
+          "eligibility": "needs_review",
+          "evidence_group": "sufficient_evidence",
+          "evidence_coverage": {
+            "known": 1,
+            "unknown": 1,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: Unreal Engine 5.",
+              "Hay coincidencia textual de intereses o preferencias con el evento."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar rol solicitado: Programador.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G14",
+      "area": "G",
+      "title": "Negación confirmada conserva polaridad (motor puro)",
+      "status": "PASS",
+      "evidence": {
+        "status": "unmet_confirmed",
+        "execution": "pure engine, not HTTP persistence"
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H01",
+      "area": "H",
+      "title": "Invitación válida",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id": 1,
+          "estado": "pendiente"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H02",
+      "area": "H",
+      "title": "Invitación duplicada",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Ya existe una invitación o solicitud pendiente entre esta persona y el evento."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H03",
+      "area": "H",
+      "title": "Adhesión inversa duplicada",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Ya existe una invitación o solicitud pendiente entre esta persona y el evento."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H04",
+      "area": "H",
+      "title": "Responder como otra persona",
+      "status": "PASS",
+      "evidence": {
+        "status": 403,
+        "body": {
+          "detail": "No tienes acceso a este recurso."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H05",
+      "area": "H",
+      "title": "Aceptación válida",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id": 1,
+          "estado": "aceptada"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H06",
+      "area": "H",
+      "title": "Doble aceptación",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Esta solicitud ya fue respondida."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H07",
+      "area": "H",
+      "title": "Invitar integrante existente",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Esta persona ya forma parte del equipo."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H08",
+      "area": "H",
+      "title": "Rol ocupado",
+      "status": "PASS",
+      "evidence": {
+        "status": 409,
+        "body": {
+          "detail": "Ese rol ya está cubierto."
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H09",
+      "area": "H",
+      "title": "Fila de integrante y solicitud aceptada reales",
+      "status": "PASS",
+      "evidence": {
+        "members": [
+          {
+            "user": 3,
+            "role": "Backend"
+          }
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H10",
+      "area": "H",
+      "title": "Solicitud válida",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id": 2,
+          "estado": "pendiente"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H11",
+      "area": "H",
+      "title": "Creador acepta adhesión",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id": 2,
+          "estado": "aceptada"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H12",
+      "area": "H",
+      "title": "Se incorpora al solicitante y no al creador",
+      "status": "PASS",
+      "evidence": {
+        "members": [
+          {
+            "user": 5,
+            "role": "Backend"
+          }
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H13",
+      "area": "H",
+      "title": "Rechazo válido",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": {
+          "id": 3,
+          "estado": "rechazada"
+        }
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H14",
+      "area": "H",
+      "title": "Rechazo no crea miembro",
+      "status": "PASS",
+      "evidence": {
+        "members": []
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H_edited",
+      "area": "H",
+      "title": "Revalidación al aceptar: role",
+      "status": "PASS",
+      "evidence": {
+        "http": 409,
+        "members": [],
+        "detail": "El rol seleccionado ya no existe. Revisa el proyecto."
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H_paused",
+      "area": "H",
+      "title": "Revalidación al aceptar: paused",
+      "status": "PASS",
+      "evidence": {
+        "http": 409,
+        "members": [],
+        "detail": "El perfil del integrante está pausado."
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H_inactive",
+      "area": "H",
+      "title": "Revalidación al aceptar: inactive",
+      "status": "PASS",
+      "evidence": {
+        "http": 403,
+        "members": [],
+        "detail": "Cuenta inactiva."
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H-RACE-last_slot",
+      "area": "H",
+      "title": "Concurrencia InnoDB last_slot",
+      "status": "PASS",
+      "evidence": {
+        "http_statuses": [
+          200,
+          409
+        ],
+        "members": [
+          {
+            "user": 3,
+            "role": "Backend"
+          }
+        ],
+        "pending": 1
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H-RACE-same_role",
+      "area": "H",
+      "title": "Concurrencia InnoDB same_role",
+      "status": "PASS",
+      "evidence": {
+        "http_statuses": [
+          409,
+          200
+        ],
+        "members": [
+          {
+            "user": 5,
+            "role": "Backend"
+          }
+        ],
+        "pending": 1
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H-RACE-inverse_pair",
+      "area": "H",
+      "title": "Concurrencia InnoDB inverse_pair",
+      "status": "PASS",
+      "evidence": {
+        "http_statuses": [
+          409,
+          200
+        ],
+        "members": [],
+        "pending": 1
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H15",
+      "area": "H",
+      "title": "Dos vacantes permiten dos miembros y rechazan un tercero",
+      "status": "PASS",
+      "evidence": {
+        "statuses": [
+          200,
+          200,
+          200,
+          200,
+          409
+        ],
+        "members": [
+          {
+            "user": 3,
+            "role": "Backend"
+          },
+          {
+            "user": 5,
+            "role": "Backend"
+          }
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "H16",
+      "area": "H",
+      "title": "Equipo persiste al iniciar nueva sesión",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "team_ids": [
+          "22",
+          "19",
+          "13"
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G15",
+      "area": "G",
+      "title": "Excluye integrante, invitación y adhesión pendientes",
+      "status": "PASS",
+      "evidence": {
+        "candidate_ids": [
+          4,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          19,
+          20,
+          21
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G_closed",
+      "area": "G",
+      "title": "Sin candidatos para proyecto cerrado",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": []
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G_full",
+      "area": "G",
+      "title": "Sin candidatos para proyecto lleno",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "body": []
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "G16",
+      "area": "G",
+      "title": "Proyecto con único rol ocupado no propone otra persona para esa vacante",
+      "status": "FAIL",
+      "evidence": {
+        "status": 200,
+        "body": [
+          {
+            "event_id": 26,
+            "candidate_id": 19,
+            "eligibility": "eligible",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 0,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad obligatoria: Python.",
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 14,
+            "eligibility": "eligible",
+            "evidence_group": "sufficient_evidence",
+            "evidence_coverage": {
+              "known": 1,
+              "unknown": 0,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [
+                "Evidencia confirmada para habilidad obligatoria: Python."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 20,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 21,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [
+                "Hay coincidencia textual de intereses o preferencias con el evento."
+              ],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 5,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 8,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 9,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 10,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 11,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          },
+          {
+            "event_id": 26,
+            "candidate_id": 4,
+            "eligibility": "needs_review",
+            "evidence_group": "insufficient_evidence",
+            "evidence_coverage": {
+              "known": 0,
+              "unknown": 1,
+              "not_applicable": 1
+            },
+            "explanation": {
+              "strengths": [],
+              "gaps": [],
+              "unknowns": [
+                "Por verificar habilidad obligatoria: Python.",
+                "No hay datos suficientes para evaluar la complementariedad del equipo.",
+                "No hay embeddings comparables para la señal semántica.",
+                "No hay requisitos con evidencia confirmada para este candidato.",
+                "Hay requisitos sin evidencia suficiente.",
+                "No hay señales puntuables disponibles."
+              ]
+            },
+            "policy_version": "2026-10-21.v1"
+          }
+        ]
+      },
+      "source": "api_results.json"
+    },
+    {
+      "id": "F06",
+      "area": "F",
+      "title": "Estado persistido después de fallos de conexión",
+      "status": "FAIL",
+      "evidence": {
+        "profile_state": "interpretando",
+        "draft_present": true,
+        "event_state_after_successful_retry": "listo"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "F07",
+      "area": "F",
+      "title": "Error real de conexión debe traducirse a OllamaServiceError",
+      "status": "PASS",
+      "evidence": {
+        "kind": "direct SDK",
+        "error": "OllamaServiceError",
+        "cause": "ConnectTimeout",
+        "translated": true
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "C27",
+      "area": "C",
+      "title": "JSON de perfil inválido no inutiliza el directorio global",
+      "status": "FAIL",
+      "evidence": {
+        "self_edit_status": 200,
+        "directory_status": 500,
+        "public_status": 500
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "C28",
+      "area": "C",
+      "title": "Restauración del único perfil QA malformado recupera directorio",
+      "status": "PASS",
+      "evidence": {
+        "directory_status": 200
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G-RAW-D03",
+      "area": "G",
+      "title": "Etiquetas reales D03 acreditan SQL",
+      "status": "PASS",
+      "evidence": {
+        "raw_skills": [
+          "programar con SQL",
+          "crear consultas",
+          "SQL"
+        ],
+        "confirmed_skills": [
+          "programar con SQL",
+          "crear consultas",
+          "SQL"
+        ],
+        "requirement": "SQL",
+        "assessment": "met"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G-RAW-D06",
+      "area": "G",
+      "title": "Etiquetas reales D06 acreditan Blender",
+      "status": "FAIL",
+      "evidence": {
+        "raw_skills": [
+          "Experiencia en Blender",
+          "Experiencia en Unreal Engine 5",
+          "Modelado de escenarios 3D"
+        ],
+        "confirmed_skills": [
+          "Experiencia en Blender",
+          "Experiencia en Unreal Engine 5",
+          "Modelado de escenarios 3D"
+        ],
+        "requirement": "Blender",
+        "assessment": "unknown"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G-RAW-D09",
+      "area": "G",
+      "title": "Etiquetas reales D09 acreditan Figma",
+      "status": "FAIL",
+      "evidence": {
+        "raw_skills": [
+          "Diseño interfaces UX/UI en Figma",
+          "Realizar prototipos para una app"
+        ],
+        "confirmed_skills": [
+          "Diseño interfaces UX/UI en Figma",
+          "Realizar prototipos para una app"
+        ],
+        "requirement": "Figma",
+        "assessment": "unknown"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G-SQL-CON",
+      "area": "G",
+      "title": "programar con SQL y SQL tienen equivalencia explícita",
+      "status": "FAIL",
+      "evidence": {
+        "canonical_phrase": "programar con sql",
+        "canonical_skill": "sql"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G-INTERPRET-STATE",
+      "area": "G",
+      "title": "Un fallo de interpretación no pierde toda la evidencia confirmada previa",
+      "status": "FAIL",
+      "evidence": {
+        "persisted_state": "interpretando",
+        "confirmed_structure_exists": true,
+        "adapter_skills": null
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "E15",
+      "area": "E",
+      "title": "Revisión obsoleta sin huella no se confirma silenciosamente",
+      "status": "FAIL",
+      "evidence": {
+        "edit_status": 200,
+        "legacy_confirmation_status": 200,
+        "returned_required": [
+          "SQL"
+        ],
+        "note": "Known legacy-compatibility contract; not an authorization bypass"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G17",
+      "area": "G",
+      "title": "Proyectos propios y con membresía/acción pendiente quedan fuera",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "project_ids": [
+          14,
+          6,
+          11,
+          1,
+          9,
+          10,
+          15,
+          17,
+          18,
+          7
+        ]
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G18",
+      "area": "G",
+      "title": "Horario declarado se interpreta como evidencia conocida compatible",
+      "status": "FAIL",
+      "evidence": {
+        "candidate_availability": [
+          "lun-tarde",
+          "sab-manana"
+        ],
+        "assessments": [
+          {
+            "condition": "lunes",
+            "status": "unknown"
+          },
+          {
+            "condition": "16:00",
+            "status": "unknown"
+          },
+          {
+            "condition": "18:00",
+            "status": "unknown"
+          }
+        ],
+        "note": "Coarse lun-tarde cannot certify exact 16:00-18:00; unknown is safer than false positive, needs UX/data contract"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "E16",
+      "area": "E",
+      "title": "Habilidades por rol rechazan objetos no textuales",
+      "status": "FAIL",
+      "evidence": {
+        "http": 201,
+        "event_id": 27,
+        "role_shape": [
+          {
+            "id": "b",
+            "nombre": "Backend",
+            "vacantes": 1,
+            "habilidades": [
+              {
+                "unexpected": "object"
+              }
+            ],
+            "ocupados": 0,
+            "integrantesIds": [],
+            "cubiertoPor": null
+          }
+        ]
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "C29",
+      "area": "C",
+      "title": "HTML se conserva como texto a verificar visualmente",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "note": "Storage acceptance alone does not prove XSS; browser rendering checked separately"
+      },
+      "source": "probe_results.json"
+    },
+    {
+      "id": "G19",
+      "area": "G",
+      "title": "Equipo con creador sin confirmar conserva complementariedad desconocida",
+      "status": "PASS",
+      "evidence": {
+        "candidate": {
+          "event_id": 29,
+          "candidate_id": 5,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 2,
+            "unknown": 1,
+            "not_applicable": 1
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: SQL.",
+              "Evidencia confirmada para rol solicitado: SQL."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad obligatoria: Python.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        },
+        "setup_note": "El creador todavía no tenía perfil confirmado en esta primera instantánea; la segunda fase G23 sí lo confirma."
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "G20",
+      "area": "G",
+      "title": "Querer aprender Docker no acredita Docker",
+      "status": "PASS",
+      "evidence": {
+        "candidate": {
+          "event_id": 30,
+          "candidate_id": 7,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 0,
+            "unknown": 2,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad obligatoria: Docker.",
+              "Por verificar rol solicitado: Docker.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay requisitos con evidencia confirmada para este candidato.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "G21",
+      "area": "G",
+      "title": "Modelos distintos no producen semejanza semántica comparable",
+      "status": "PASS",
+      "evidence": {
+        "candidate": {
+          "event_id": 31,
+          "candidate_id": 14,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 1,
+            "unknown": 1,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: Python."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "G22",
+      "area": "G",
+      "title": "Pipelines distintos no comparan vectores",
+      "status": "PASS",
+      "evidence": {
+        "candidate": {
+          "event_id": 31,
+          "candidate_id": 14,
+          "eligibility": "needs_review",
+          "evidence_group": "insufficient_evidence",
+          "evidence_coverage": {
+            "known": 1,
+            "unknown": 1,
+            "not_applicable": 0
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: Python."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar rol solicitado: Backend.",
+              "No hay datos suficientes para evaluar la complementariedad del equipo.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "C30",
+      "area": "C",
+      "title": "Áreas privadas no se publican en proyección real",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "raw_public_keys": [
+          "visibilidad",
+          "semestre",
+          "pausado",
+          "fortalezas",
+          "intereses",
+          "disponibilidad",
+          "bio"
+        ]
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "I-SEARCH-API",
+      "area": "I-HTTP",
+      "title": "Búsqueda prometida por habilidad encuentra Python",
+      "status": "FAIL",
+      "evidence": {
+        "http": 200,
+        "results": 0,
+        "qa_profiles_with_python": 8
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "G23",
+      "area": "G",
+      "title": "Complementariedad con todos los integrantes y creador confirmados",
+      "status": "PASS",
+      "evidence": {
+        "owner_confirmation_status": 200,
+        "candidate": {
+          "event_id": 29,
+          "candidate_id": 5,
+          "eligibility": "needs_review",
+          "evidence_group": "sufficient_evidence",
+          "evidence_coverage": {
+            "known": 2,
+            "unknown": 1,
+            "not_applicable": 1
+          },
+          "explanation": {
+            "strengths": [
+              "Evidencia confirmada para habilidad obligatoria: SQL.",
+              "Evidencia confirmada para rol solicitado: SQL.",
+              "Aporta una capacidad que cubre un requisito o rol aún vacante."
+            ],
+            "gaps": [],
+            "unknowns": [
+              "Por verificar habilidad obligatoria: Python.",
+              "No hay embeddings comparables para la señal semántica.",
+              "Hay requisitos sin evidencia suficiente."
+            ]
+          },
+          "policy_version": "2026-10-21.v1"
+        }
+      },
+      "source": "matching_extra_results.json"
+    },
+    {
+      "id": "I01",
+      "status": "PASS",
+      "title": "Registro visual redirige al alta de perfil en MySQL QA",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I02",
+      "status": "PASS",
+      "title": "Perfil: análisis Llama, revisión y confirmación con Nomic/MySQL reales",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I03",
+      "status": "FAIL",
+      "title": "Inicio marca Disponible un proyecto cuyo único rol ya está ocupado",
+      "evidence": "Tarjeta QA G_occupied con Disponible, aunque el backend rechaza nuevas adhesiones por rol cubierto",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I04",
+      "status": "PASS",
+      "title": "Crear proyecto, interpretar con Llama, revisar y publicar con MySQL/Nomic",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I05",
+      "status": "PASS",
+      "title": "Organizador consulta candidatos y explicaciones reales",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I06",
+      "status": "PASS",
+      "title": "Invitación enviada desde React y candidato pendiente excluido",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I07",
+      "status": "PASS",
+      "title": "Aceptar invitación, ver equipo y recargar conserva dos integrantes",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I08",
+      "status": "FAIL",
+      "title": "Cobertura muestra 0/0 y ninguna habilidad faltante pese a requisitos Python/SQL",
+      "evidence": "La creación guarda habilidades globales pero los roles generados quedan sin habilidades",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I09",
+      "status": "PASS",
+      "title": "Acceso privado sin token redirige a login",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I10",
+      "status": "PASS",
+      "title": "Editar proyecto, ocultar IA anterior, corregir requisitos y reconfirmar con Nomic real",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I11",
+      "status": "PASS",
+      "title": "Reintento visual recupera embedding real tras precondición de conexión fallida",
+      "evidence": "El fallo previo HTTP 500 se registra por separado; aquí se verificó recuperación desde React",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I12",
+      "status": "PASS",
+      "title": "Solicitar adhesión y recargar mantiene estado pendiente",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I13",
+      "status": "PASS",
+      "title": "El creador acepta una adhesión desde React; se incorpora al solicitante",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I14",
+      "status": "FAIL",
+      "title": "Mensaje de aceptación de adhesión dice al creador que él se unió",
+      "evidence": "Toast ¡Te uniste a QA E03! al aceptar al solicitante",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I15",
+      "status": "FAIL",
+      "title": "Un proyecto con habilidades de rol como objetos provoca error de renderizado",
+      "evidence": "La API aceptó HTTP 201; React muestra ErrorBoundary",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I16",
+      "status": "PASS",
+      "title": "HTML almacenado en nombre y biografía se muestra escapado, sin diálogo de JavaScript",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I17",
+      "status": "FAIL",
+      "title": "Comparación de horarios usa usuario de demostración",
+      "evidence": "QA owner confirmó disponibilidad vacía, pero el perfil ajeno marca Lun tarde y Sáb mañana en común",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "I18",
+      "status": "FAIL",
+      "title": "Reuniones anuncia Propuesta enviada sin persistencia y navega a equipo ficticio t1",
+      "evidence": "MeetingPage no realiza petición de escritura; no existe endpoint/modelo de reuniones",
+      "area": "I",
+      "source": "ui_results.json"
+    },
+    {
+      "id": "F08",
+      "area": "F",
+      "title": "Creación con Ollama inaccesible no devuelve 500 después de persistir",
+      "status": "FAIL",
+      "evidence": {
+        "http_statuses": [
+          500,
+          500
+        ],
+        "persisted_events": 2,
+        "states": [
+          "pendiente_embedding",
+          "pendiente_embedding"
+        ],
+        "note": "Second request repeats the body after the first response; no production rows involved"
+      },
+      "source": "offline_creation_results.json"
+    }
+  ],
+  "llama_raw": [
+    {
+      "id": "D01",
+      "kind": "profile",
+      "input": "Sé Python y SQL. Tengo experiencia creando consultas y APIs.",
+      "repeat": false,
+      "expected_skills": [
+        "Python",
+        "SQL"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Crear consultas",
+          "Crear APIs"
+        ],
+        "resumen_publico": "Habilidades declaradas: Python, SQL. Experiencia: Crear consultas, Crear APIs"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 4.3
+    },
+    {
+      "id": "D02",
+      "kind": "profile",
+      "input": "Sé programar en Python.",
+      "repeat": false,
+      "expected_skills": [
+        "Python"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Python"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: Python"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 0.97
+    },
+    {
+      "id": "D03",
+      "kind": "profile",
+      "input": "Sé programar con SQL y crear consultas.",
+      "repeat": false,
+      "expected_skills": [
+        "SQL"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "programar con SQL",
+          "crear consultas",
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: programar con SQL, crear consultas, SQL"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.16
+    },
+    {
+      "id": "D04",
+      "kind": "profile",
+      "input": "No sé Python. Domino SQL.",
+      "repeat": false,
+      "expected_skills": [
+        "SQL"
+      ],
+      "forbidden_skills": [
+        "Python"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.03
+    },
+    {
+      "id": "D05",
+      "kind": "profile",
+      "input": "Quiero aprender Docker. Mi habilidad actual es SQL.",
+      "repeat": false,
+      "expected_skills": [
+        "SQL"
+      ],
+      "forbidden_skills": [
+        "Docker"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 0.93
+    },
+    {
+      "id": "D06",
+      "kind": "profile",
+      "input": "Tengo experiencia en Blender y Unreal Engine 5. He modelado escenarios 3D.",
+      "repeat": false,
+      "expected_skills": [
+        "Blender",
+        "Unreal Engine 5"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Experiencia en Blender",
+          "Experiencia en Unreal Engine 5",
+          "Modelado de escenarios 3D"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Experiencia en Blender",
+          "Experiencia en Unreal Engine 5",
+          "Modelado de escenarios 3D"
+        ],
+        "resumen_publico": "Habilidades declaradas: Experiencia en Blender, Experiencia en Unreal Engine 5, Modelado de escenarios 3D. Experiencia: Experiencia en Blender, Experiencia en Unreal Engine 5, Modelado de escenarios 3D"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.86
+    },
+    {
+      "id": "D07",
+      "kind": "profile",
+      "input": "Me gustan los videojuegos y los juegos de estrategia; no afirmo tener habilidades de programación.",
+      "repeat": false,
+      "expected_skills": [],
+      "forbidden_skills": [
+        "Python",
+        "SQL",
+        "Unreal Engine 5"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [],
+        "intereses": [
+          "videojuegos",
+          "juegos de estrategia"
+        ],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Intereses: videojuegos, juegos de estrategia"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.02
+    },
+    {
+      "id": "D08",
+      "kind": "profile",
+      "input": "Juego fútbol como portero y defensa en torneos amateurs. No tengo experiencia profesional.",
+      "repeat": false,
+      "expected_skills": [
+        "portero",
+        "defensa"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Juego fútbol como portero y defensa"
+        ],
+        "intereses": [
+          "Jugar fútbol"
+        ],
+        "areas_mejora": [],
+        "experiencia": [
+          "No tengo experiencia profesional"
+        ],
+        "resumen_publico": "Habilidades declaradas: Juego fútbol como portero y defensa. Intereses: Jugar fútbol. Experiencia: No tengo experiencia profesional"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.45
+    },
+    {
+      "id": "D09",
+      "kind": "profile",
+      "input": "Diseño interfaces UX/UI en Figma y he realizado prototipos para una app.",
+      "repeat": false,
+      "expected_skills": [
+        "Figma"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Diseño interfaces UX/UI en Figma",
+          "Realizar prototipos para una app"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Diseño interfaces UX/UI en Figma",
+          "Realizar prototipos para una app"
+        ],
+        "resumen_publico": "Habilidades declaradas: Diseño interfaces UX/UI en Figma, Realizar prototipos para una app. Experiencia: Diseño interfaces UX/UI en Figma, Realizar prototipos para una app"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.72
+    },
+    {
+      "id": "D10",
+      "kind": "profile",
+      "input": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+      "repeat": false,
+      "expected_skills": [],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [
+        "diseño"
+      ],
+      "data": {
+        "habilidades": [],
+        "intereses": [
+          "diseño"
+        ],
+        "areas_mejora": [
+          "experiencia laboral",
+          "experiencia profesional"
+        ],
+        "experiencia": [
+          "No tiene experiencia laboral ni profesional"
+        ],
+        "resumen_publico": "Intereses: diseño. Experiencia: No tiene experiencia laboral ni profesional"
+      },
+      "schema_valid": true,
+      "status": "FAIL",
+      "seconds": 1.49
+    },
+    {
+      "id": "D11",
+      "kind": "profile",
+      "input": "Me gustaría hacer algo interesante con otras personas, todavía no sé qué aportar.",
+      "repeat": false,
+      "expected_skills": [],
+      "forbidden_skills": [
+        "Python",
+        "SQL"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [],
+        "intereses": [
+          "hacer algo interesante con otras personas"
+        ],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Intereses: hacer algo interesante con otras personas"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.07
+    },
+    {
+      "id": "D12",
+      "kind": "profile",
+      "input": "Sé Python y SQL. He creado un panel de datos y limpiado encuestas. Me interesa la visualización y el diseño accesible. No sé Docker ni Unreal Engine 5. Quiero mejorar estadística y aprender Docker. Puedo trabajar los sábados. Prefiero colaborar con personas de otras carreras.",
+      "repeat": false,
+      "expected_skills": [
+        "Python",
+        "SQL"
+      ],
+      "forbidden_skills": [
+        "Docker",
+        "Unreal Engine 5"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [
+          "visualización",
+          "diseño accesible"
+        ],
+        "areas_mejora": [
+          "estadística",
+          "Docker"
+        ],
+        "experiencia": [
+          "creación de un panel de datos",
+          "limpieza de encuestas"
+        ],
+        "resumen_publico": "Habilidades declaradas: Python, SQL. Intereses: visualización, diseño accesible. Experiencia: creación de un panel de datos, limpieza de encuestas"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.74
+    },
+    {
+      "id": "E01",
+      "kind": "event",
+      "input": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+      "repeat": false,
+      "expected_required": [
+        "Python"
+      ],
+      "expected_preferred": [
+        "SQL"
+      ],
+      "expected_roles": [
+        "backend"
+      ],
+      "expected_constraints": [],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Python. Habilidades deseables: SQL. Roles buscados: desarrollador backend",
+        "habilidades_obligatorias": [
+          "Python"
+        ],
+        "habilidades_deseables": [
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "aplicación web"
+        ]
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.45
+    },
+    {
+      "id": "E02",
+      "kind": "event",
+      "input": "Buscamos programador de Unreal Engine 5 para crear un videojuego cooperativo. Git deseable.",
+      "repeat": false,
+      "expected_required": [
+        "Unreal Engine 5"
+      ],
+      "expected_preferred": [
+        "Git"
+      ],
+      "expected_roles": [
+        "programador"
+      ],
+      "expected_constraints": [],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Videojuegos",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Unreal Engine 5. Habilidades deseables: Git. Roles buscados: programador Unreal Engine 5",
+        "habilidades_obligatorias": [
+          "Unreal Engine 5"
+        ],
+        "habilidades_deseables": [
+          "Git"
+        ],
+        "roles_buscados": [
+          "programador Unreal Engine 5"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.26
+    },
+    {
+      "id": "E03",
+      "kind": "event",
+      "input": "Necesitamos artista 3D con Blender para modelar un escenario.",
+      "repeat": false,
+      "expected_required": [
+        "Blender"
+      ],
+      "expected_preferred": [],
+      "expected_roles": [
+        "artista"
+      ],
+      "expected_constraints": [],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Personal",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Blender. Roles buscados: artista 3D",
+        "habilidades_obligatorias": [
+          "Blender"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "artista 3D"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.19
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "input": "Equipo amateur busca portero. Entrenamos sábados en Monterrey. No exigimos experiencia profesional.",
+      "repeat": false,
+      "expected_required": [],
+      "expected_preferred": [],
+      "expected_roles": [
+        "portero"
+      ],
+      "expected_constraints": [
+        "sábados",
+        "Monterrey"
+      ],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Deportivo",
+        "titulo_normalizado": "",
+        "resumen": "Roles buscados: portero",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "portero"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Entrenamos sábados en Monterrey"
+        ]
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 0.87
+    },
+    {
+      "id": "E05",
+      "kind": "event",
+      "input": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "repeat": false,
+      "expected_required": [
+        "Figma"
+      ],
+      "expected_preferred": [],
+      "expected_roles": [
+        "diseñador"
+      ],
+      "expected_constraints": [],
+      "omissions": [
+        "Figma"
+      ],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Figma es obligatorio para prototipar una app accesible"
+        ]
+      },
+      "schema_valid": true,
+      "status": "FAIL",
+      "seconds": 2.94
+    },
+    {
+      "id": "E06",
+      "kind": "event",
+      "input": "Necesitamos analista de datos con SQL obligatorio y Python deseable para estudiar encuestas.",
+      "repeat": false,
+      "status": "BLOCKED",
+      "error": "OllamaServiceError",
+      "timeout": true,
+      "seconds": 60.01
+    },
+    {
+      "id": "E07",
+      "kind": "event",
+      "input": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "repeat": false,
+      "status": "BLOCKED",
+      "error": "OllamaServiceError",
+      "timeout": true,
+      "seconds": 60.02
+    },
+    {
+      "id": "E08",
+      "kind": "event",
+      "input": "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles.",
+      "repeat": false,
+      "expected_required": [],
+      "expected_preferred": [],
+      "expected_roles": [],
+      "expected_constraints": [],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "General",
+        "titulo_normalizado": "",
+        "resumen": "",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "herramientas",
+          "roles"
+        ]
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 0.95
+    },
+    {
+      "id": "E09",
+      "kind": "event",
+      "input": "Necesitamos tutor con Python obligatorio. Reuniones los lunes de 16:00 a 18:00 en línea.",
+      "repeat": false,
+      "expected_required": [
+        "Python"
+      ],
+      "expected_preferred": [],
+      "expected_roles": [
+        "tutor"
+      ],
+      "expected_constraints": [
+        "lunes",
+        "16:00",
+        "18:00"
+      ],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Python. Roles buscados: tutor",
+        "habilidades_obligatorias": [
+          "Python"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "tutor"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Reuniones los lunes de 16:00 a 18:00 en línea."
+        ]
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.18
+    },
+    {
+      "id": "E10",
+      "kind": "event",
+      "input": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+      "repeat": false,
+      "status": "BLOCKED",
+      "error": "OllamaServiceError",
+      "timeout": true,
+      "seconds": 60.01
+    },
+    {
+      "id": "D03-R",
+      "kind": "profile",
+      "input": "Sé programar con SQL y crear consultas.",
+      "repeat": true,
+      "expected_skills": [
+        "SQL"
+      ],
+      "forbidden_skills": [],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "programar con SQL",
+          "crear consultas",
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: programar con SQL, crear consultas, SQL"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.32
+    },
+    {
+      "id": "D04-R",
+      "kind": "profile",
+      "input": "No sé Python. Domino SQL.",
+      "repeat": true,
+      "expected_skills": [
+        "SQL"
+      ],
+      "forbidden_skills": [
+        "Python"
+      ],
+      "omissions": [],
+      "false_positives": [],
+      "learning_goal_omissions": [],
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.01
+    },
+    {
+      "id": "E01-R",
+      "kind": "event",
+      "input": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+      "repeat": true,
+      "expected_required": [
+        "Python"
+      ],
+      "expected_preferred": [
+        "SQL"
+      ],
+      "expected_roles": [
+        "backend"
+      ],
+      "expected_constraints": [],
+      "omissions": [],
+      "preferred_omissions": [],
+      "role_omissions": [],
+      "constraint_omissions": [],
+      "false_positives": [],
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Python. Habilidades deseables: SQL. Roles buscados: desarrollador backend",
+        "habilidades_obligatorias": [
+          "Python"
+        ],
+        "habilidades_deseables": [
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "aplicación web"
+        ]
+      },
+      "schema_valid": true,
+      "status": "PASS",
+      "seconds": 1.48
+    },
+    {
+      "id": "E10-R",
+      "kind": "event",
+      "input": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+      "repeat": true,
+      "status": "BLOCKED",
+      "error": "OllamaServiceError",
+      "timeout": true,
+      "seconds": 60.01
+    }
+  ],
+  "llama_quality_review": [
+    {
+      "id": "D01",
+      "status": "PASS",
+      "seconds": 4.3,
+      "note": "Python y SQL explícitos, sin invenciones relevantes."
+    },
+    {
+      "id": "D02",
+      "status": "PASS",
+      "seconds": 0.97,
+      "note": "«Sé programar en Python» normalizado a Python."
+    },
+    {
+      "id": "D03",
+      "status": "FAIL",
+      "seconds": 1.16,
+      "note": "SQL aparece junto con «programar con SQL» y «crear consultas»; duplicación semántica y etiqueta sin equivalencia canónica."
+    },
+    {
+      "id": "D04",
+      "status": "FAIL",
+      "seconds": 1.03,
+      "note": "Python no se acredita como fortaleza, pero se inventa como área de mejora sin expresar intención de aprenderlo."
+    },
+    {
+      "id": "D05",
+      "status": "PASS",
+      "seconds": 0.93,
+      "note": "SQL como habilidad; Docker solo como aprendizaje."
+    },
+    {
+      "id": "D06",
+      "status": "FAIL",
+      "seconds": 1.86,
+      "note": "Blender/UE5 quedan dentro de frases «Experiencia en…»; confirmarlas sin corregir no acredita Blender en el motor real."
+    },
+    {
+      "id": "D07",
+      "status": "PASS",
+      "seconds": 1.02,
+      "note": "Videojuegos como interés, sin habilidades técnicas inventadas."
+    },
+    {
+      "id": "D08",
+      "status": "FAIL",
+      "seconds": 1.45,
+      "note": "Portero/defensa quedan agrupados en una frase y «No tengo experiencia profesional» se guarda dentro de experiencia."
+    },
+    {
+      "id": "D09",
+      "status": "FAIL",
+      "seconds": 1.72,
+      "note": "Figma aparece dentro de una frase de UX/UI; confirmarla sin corregir deja Figma como requisito desconocido."
+    },
+    {
+      "id": "D10",
+      "status": "FAIL",
+      "seconds": 1.49,
+      "note": "Omite el objetivo diseño y añade experiencia laboral/profesional como áreas de mejora; experiencia incluye una negación."
+    },
+    {
+      "id": "D11",
+      "status": "PASS",
+      "seconds": 1.07,
+      "note": "Texto ambiguo: no inventa capacidades concretas."
+    },
+    {
+      "id": "D12",
+      "status": "PASS",
+      "seconds": 1.74,
+      "note": "Conserva Python/SQL, intereses y aprendizaje; no convierte Docker/UE5 negados en habilidades."
+    },
+    {
+      "id": "E01",
+      "status": "FAIL",
+      "seconds": 1.45,
+      "note": "Python obligatorio y SQL deseable correctos; clasifica «aplicación web» como restricción explícita."
+    },
+    {
+      "id": "E02",
+      "status": "PASS",
+      "seconds": 1.26,
+      "note": "UE5 obligatorio, Git deseable y rol programador."
+    },
+    {
+      "id": "E03",
+      "status": "PASS",
+      "seconds": 1.19,
+      "note": "Blender y artista 3D correctamente identificados."
+    },
+    {
+      "id": "E04",
+      "status": "PASS",
+      "seconds": 0.87,
+      "note": "Portero, sábados y Monterrey; sin exigir experiencia profesional."
+    },
+    {
+      "id": "E05",
+      "status": "FAIL",
+      "seconds": 2.94,
+      "note": "Omite Figma de habilidades obligatorias y lo coloca como restricción."
+    },
+    {
+      "id": "E06",
+      "status": "BLOCKED",
+      "seconds": 60.01,
+      "note": "Timeout de Llama, sin JSON evaluable."
+    },
+    {
+      "id": "E07",
+      "status": "BLOCKED",
+      "seconds": 60.02,
+      "note": "Timeout de Llama, sin JSON evaluable."
+    },
+    {
+      "id": "E08",
+      "status": "FAIL",
+      "seconds": 0.95,
+      "note": "Sin habilidades/roles inventados, pero restricciones contienen «herramientas» y «roles» sin condición real."
+    },
+    {
+      "id": "E09",
+      "status": "PASS",
+      "seconds": 1.18,
+      "note": "Python, tutor y horario lunes 16:00–18:00 identificados."
+    },
+    {
+      "id": "E10",
+      "status": "BLOCKED",
+      "seconds": 60.01,
+      "note": "Timeout de Llama; no se puede aprobar el tratamiento de Python no obligatorio."
+    },
+    {
+      "id": "D03-R",
+      "status": "FAIL",
+      "seconds": 1.32,
+      "note": "SQL aparece junto con «programar con SQL» y «crear consultas»; duplicación semántica y etiqueta sin equivalencia canónica."
+    },
+    {
+      "id": "D04-R",
+      "status": "FAIL",
+      "seconds": 1.01,
+      "note": "Python no se acredita como fortaleza, pero se inventa como área de mejora sin expresar intención de aprenderlo."
+    },
+    {
+      "id": "E01-R",
+      "status": "FAIL",
+      "seconds": 1.48,
+      "note": "Python obligatorio y SQL deseable correctos; clasifica «aplicación web» como restricción explícita."
+    },
+    {
+      "id": "E10-R",
+      "status": "BLOCKED",
+      "seconds": 60.01,
+      "note": "Timeout de Llama; no se puede aprobar el tratamiento de Python no obligatorio."
+    }
+  ],
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "bearer": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "bearer": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/interpretar",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/embedding/reintentar",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/estudiantes/",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/publico/{usuario_id}",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/{usuario_id}",
+      "bearer": true
+    },
+    {
+      "method": "PUT",
+      "path": "/perfil/{usuario_id}",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/interpretar",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/eventos/",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/{id_evento}/confirmar",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/{id_evento}/embedding/reintentar",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/eventos/{id_evento}",
+      "bearer": true
+    },
+    {
+      "method": "PUT",
+      "path": "/eventos/{id_evento}",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/invitaciones/{id_usuario}",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/{id_evento}/solicitudes",
+      "bearer": true
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/",
+      "bearer": true
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/{id_solicitud}",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/equipos/{id_usuario}",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/notificaciones/{id_usuario}",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/{id_evento}/candidatos",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/usuarios/{id_usuario}/proyectos",
+      "bearer": true
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "bearer": false
+    }
+  ],
+  "http_timings": [
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.45,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.39,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.39,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.389,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.397,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.387,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.394,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.409,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.393,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.403,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.4,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.396,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.421,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.401,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.446,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.441,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.502,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.451,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.406,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.45,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 400,
+      "seconds": 0.232,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 422,
+      "seconds": 0.263,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 401,
+      "seconds": 0.431,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "seconds": 0.422,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 200,
+      "seconds": 0.252,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 401,
+      "seconds": 0.23,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 401,
+      "seconds": 0.213,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 401,
+      "seconds": 0.252,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/3",
+      "status": 403,
+      "seconds": 0.252,
+      "offline_simulation": false
+    },
+    {
+      "method": "PUT",
+      "path": "/perfil/3",
+      "status": 403,
+      "seconds": 0.243,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 403,
+      "seconds": 0.248,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 403,
+      "seconds": 0.214,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 403,
+      "seconds": 0.406,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.416,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 500,
+      "seconds": 0.397,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/registro",
+      "status": 200,
+      "seconds": 0.402,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "seconds": 0.392,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "seconds": 0.27,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 4.821,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 2.696,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 2.833,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 2.319,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.489,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.486,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 2.704,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.462,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.534,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.438,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.437,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.433,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.469,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.425,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.476,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.435,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 0.453,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 200,
+      "seconds": 2.163,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/publico/3",
+      "status": 200,
+      "seconds": 0.202,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/publico/16",
+      "status": 404,
+      "seconds": 0.246,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/perfil/publico/15",
+      "status": 200,
+      "seconds": 0.232,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/usuarios/17/proyectos",
+      "status": 403,
+      "seconds": 0.233,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.585,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.529,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.518,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.582,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.483,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.514,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.512,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.496,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.465,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.521,
+      "offline_simulation": false
+    },
+    {
+      "method": "PUT",
+      "path": "/eventos/1?usuario_id=3",
+      "status": 403,
+      "seconds": 0.234,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/1/candidatos",
+      "status": 403,
+      "seconds": 0.25,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/invitaciones/3",
+      "status": 403,
+      "seconds": 0.218,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/equipos/3",
+      "status": 403,
+      "seconds": 0.266,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/notificaciones/3",
+      "status": 403,
+      "seconds": 0.255,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/eventos/1",
+      "status": 200,
+      "seconds": 0.25,
+      "offline_simulation": false
+    },
+    {
+      "method": "PUT",
+      "path": "/eventos/1?usuario_id=2",
+      "status": 200,
+      "seconds": 0.258,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/eventos/1",
+      "status": 200,
+      "seconds": 0.253,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/1/embedding/reintentar",
+      "status": 409,
+      "seconds": 0.244,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/1/confirmar",
+      "status": 409,
+      "seconds": 0.22,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/1/confirmar",
+      "status": 500,
+      "seconds": 2.511,
+      "offline_simulation": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/1/embedding/reintentar",
+      "status": 200,
+      "seconds": 0.459,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/confirmar",
+      "status": 500,
+      "seconds": 2.484,
+      "offline_simulation": true
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/embedding/reintentar",
+      "status": 200,
+      "seconds": 0.517,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/perfil/interpretar",
+      "status": 500,
+      "seconds": 2.46,
+      "offline_simulation": true
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.207,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/11/candidatos?top_n=20",
+      "status": 200,
+      "seconds": 0.226,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/11/candidatos?top_n=21",
+      "status": 422,
+      "seconds": 0.199,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/11/candidatos?top_n=2",
+      "status": 200,
+      "seconds": 0.246,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/11/candidatos?top_n=20",
+      "status": 200,
+      "seconds": 0.24,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/11/candidatos",
+      "status": 200,
+      "seconds": 0.262,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.205,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/12/candidatos?top_n=20",
+      "status": 200,
+      "seconds": 0.231,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.256,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.224,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 409,
+      "seconds": 0.214,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/13/solicitudes?solicitante_id=3",
+      "status": 409,
+      "seconds": 0.239,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/1",
+      "status": 403,
+      "seconds": 0.222,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/1",
+      "status": 200,
+      "seconds": 0.232,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/1",
+      "status": 409,
+      "seconds": 0.208,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 409,
+      "seconds": 0.223,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/13/solicitudes?solicitante_id=5",
+      "status": 409,
+      "seconds": 0.261,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.262,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/14/solicitudes?solicitante_id=5",
+      "status": 200,
+      "seconds": 0.238,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/2",
+      "status": 200,
+      "seconds": 0.243,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.237,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.315,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/3",
+      "status": 200,
+      "seconds": 0.347,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.357,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.269,
+      "offline_simulation": false
+    },
+    {
+      "method": "PUT",
+      "path": "/eventos/16?usuario_id=2",
+      "status": 200,
+      "seconds": 0.24,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/4",
+      "status": 409,
+      "seconds": 0.216,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.242,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.238,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/5",
+      "status": 409,
+      "seconds": 0.222,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.228,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.235,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/6",
+      "status": 403,
+      "seconds": 0.213,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.217,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.216,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.217,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/7",
+      "status": 200,
+      "seconds": 0.341,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/8",
+      "status": 409,
+      "seconds": 0.345,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.225,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.224,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.208,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/10",
+      "status": 200,
+      "seconds": 0.315,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/9",
+      "status": 409,
+      "seconds": 0.318,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.246,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/21/solicitudes?solicitante_id=3",
+      "status": 200,
+      "seconds": 0.309,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 409,
+      "seconds": 0.319,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.227,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/22/solicitudes?solicitante_id=3",
+      "status": 200,
+      "seconds": 0.231,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/12",
+      "status": 200,
+      "seconds": 0.241,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/22/solicitudes?solicitante_id=5",
+      "status": 200,
+      "seconds": 0.21,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/13",
+      "status": 200,
+      "seconds": 0.217,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/22/solicitudes?solicitante_id=6",
+      "status": 409,
+      "seconds": 0.238,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "seconds": 0.424,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/equipos/3",
+      "status": 200,
+      "seconds": 0.223,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.219,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.22,
+      "offline_simulation": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/invitaciones/14",
+      "status": 200,
+      "seconds": 0.231,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/invitaciones/?de_id=2",
+      "status": 200,
+      "seconds": 0.224,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/23/solicitudes?solicitante_id=6",
+      "status": 200,
+      "seconds": 0.239,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/23/candidatos?top_n=20",
+      "status": 200,
+      "seconds": 0.28,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.243,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/24/candidatos",
+      "status": 200,
+      "seconds": 0.236,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.234,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/25/candidatos",
+      "status": 200,
+      "seconds": 0.24,
+      "offline_simulation": false
+    },
+    {
+      "method": "POST",
+      "path": "/eventos/",
+      "status": 201,
+      "seconds": 0.23,
+      "offline_simulation": false
+    },
+    {
+      "method": "GET",
+      "path": "/recomendaciones/eventos/26/candidatos",
+      "status": 200,
+      "seconds": 0.235,
+      "offline_simulation": false
+    }
+  ],
+  "offline_diagnosis": [
+    {
+      "kind": "direct SDK",
+      "error": "OllamaServiceError",
+      "cause": "ConnectTimeout",
+      "translated": true
+    },
+    {
+      "path": "/eventos/1/confirmar",
+      "error": "ConnectionError",
+      "cause": "NoneType",
+      "frames": [
+        {
+          "file": "<repo>\\backend\\app\\api\\routes\\eventos.py",
+          "line": 136,
+          "function": "confirmar_evento"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\integration.py",
+          "line": 101,
+          "function": "process_event_embedding"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\integration.py",
+          "line": 38,
+          "function": "generate_reviewed_event_vector"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\embeddings.py",
+          "line": 84,
+          "function": "generate_event_embedding"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\embeddings.py",
+          "line": 60,
+          "function": "_generate"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\ollama_client.py",
+          "line": 99,
+          "function": "generate_embedding"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 442,
+          "function": "embed"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 203,
+          "function": "_request"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 149,
+          "function": "_request_raw"
+        }
+      ],
+      "errno": null
+    },
+    {
+      "path": "/perfil/interpretar",
+      "error": "ConnectionError",
+      "cause": "NoneType",
+      "frames": [
+        {
+          "file": "<repo>\\backend\\app\\api\\routes\\perfiles.py",
+          "line": 54,
+          "function": "interpretar_perfil"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\profile_parser.py",
+          "line": 54,
+          "function": "parse_profile"
+        },
+        {
+          "file": "<repo>\\backend\\app\\services\\ai\\ollama_client.py",
+          "line": 68,
+          "function": "generate_structured"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 391,
+          "function": "chat"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 203,
+          "function": "_request"
+        },
+        {
+          "file": "<repo>\\backend\\.venv\\Lib\\site-packages\\ollama\\_client.py",
+          "line": 149,
+          "function": "_request_raw"
+        }
+      ],
+      "errno": null
+    }
+  ],
+  "ui_retry_precondition": {
+    "http_status": 500,
+    "event_id": 28,
+    "persisted_state": "pendiente_embedding",
+    "embedding_is_null": true
+  },
+  "ui_console_errors": [
+    {
+      "level": "error",
+      "message": "%o\n\n%s\n\n%s\n Error: Objects are not valid as a React child (found: object with keys {unexpected}). If you meant to render a collection of children, use an array instead.\n    at throwOnInvalidObjectTypeImpl (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3719:10)\n    at throwOnInvalidObjectType (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3723:105)\n    at createChild (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3822:6)\n    at reconcileChildrenArray (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3916:63)\n    at reconcileChildFibersImpl (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:4022:40)\n    at http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:4047:28\n    at reconcileChildren (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:5585:46)\n    at beginWork (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:6451:1569)\n    at runWithFiberInDEV (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:944:66)\n    at performUnitOfWork (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:9148:92) The above error occurred in the <span> component. React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.",
+      "timestamp": "2026-10-26T00:40:45.553Z",
+      "url": "http://127.0.0.1:5174/@vite/client"
+    },
+    {
+      "level": "error",
+      "message": "Error al mostrar esta sección: Error: Objects are not valid as a React child (found: object with keys {unexpected}). If you meant to render a collection of children, use an array instead.\n    at throwOnInvalidObjectTypeImpl (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3719:10)\n    at throwOnInvalidObjectType (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3723:105)\n    at createChild (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3822:6)\n    at reconcileChildrenArray (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:3916:63)\n    at reconcileChildFibersImpl (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:4022:40)\n    at http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:4047:28\n    at reconcileChildren (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:5585:46)\n    at beginWork (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:6451:1569)\n    at runWithFiberInDEV (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:944:66)\n    at performUnitOfWork (http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=b9554653:9148:92) Object",
+      "timestamp": "2026-10-26T00:40:45.553Z",
+      "url": "http://127.0.0.1:5174/@vite/client"
+    }
+  ]
+}

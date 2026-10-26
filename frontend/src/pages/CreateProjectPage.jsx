@@ -312,10 +312,11 @@ export default function CreateProjectPage() {
   const [published, setPublished] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [createdProjectId, setCreatedProjectId] = useState(null)
+  const [creationAttempt, setCreationAttempt] = useState(() => readDraft()?.creationAttempt ?? null)
 
   useEffect(() => {
-    if (!published) sessionStorage.setItem(draftKey(), JSON.stringify({ form, roles, requirements, suggestedByAi }))
-  }, [form, roles, requirements, suggestedByAi, published])
+    if (!published) sessionStorage.setItem(draftKey(), JSON.stringify({ form, roles, requirements, suggestedByAi, creationAttempt }))
+  }, [form, roles, requirements, suggestedByAi, published, creationAttempt])
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -340,9 +341,16 @@ export default function CreateProjectPage() {
   }
 
   const publish = async () => {
+    if (publishing) return
     setPublishing(true)
     try {
-      const proyecto = await crearProyecto({ ...form, roles, requirements })
+      const fingerprint = JSON.stringify({ form, roles, requirements })
+      const attempt = creationAttempt?.fingerprint === fingerprint
+        ? creationAttempt : { fingerprint, key: crypto.randomUUID() }
+      setCreationAttempt(attempt)
+      // Persist before sending, including when the response is lost and the page reloads.
+      sessionStorage.setItem(draftKey(), JSON.stringify({ form, roles, requirements, suggestedByAi, creationAttempt: attempt }))
+      const proyecto = await crearProyecto({ ...form, roles, requirements, idempotencyKey: attempt.key })
       setCreatedProjectId(proyecto.id)
       setPublished(true)
       sessionStorage.removeItem(draftKey())

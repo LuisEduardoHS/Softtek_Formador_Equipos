@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import Response
+import json
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.auth import router as auth_router
 from app.api.routes.perfiles import router as perfil_router
@@ -12,6 +15,15 @@ app = FastAPI(
     description="Backend para autenticación, perfiles de usuario, convocatorias y formación de equipos.",
     version="1.0.0"
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request, error):
+    # Do not echo credentials/private input. Escaping also handles invalid Unicode
+    # submitted as JSON escapes without turning a validation failure into a 500.
+    details = [{k: item[k] for k in ("loc", "msg", "type")} for item in error.errors()]
+    return Response(json.dumps({"detail": details}, ensure_ascii=True), status_code=422,
+                    media_type="application/json")
 
 # Configuración de CORS incluyendo el puerto 5174
 app.add_middleware(

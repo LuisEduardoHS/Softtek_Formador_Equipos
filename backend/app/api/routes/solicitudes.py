@@ -8,6 +8,8 @@ from app.models.usuario import PerfilUsuario, Usuario
 from app.schemas.solicitud import SolicitudCreate, SolicitudUnirse, SolicitudUpdate
 from app.core.security import get_current_user, require_self
 from app.services.team_rules import (team_transaction, lock_event, available_role, reject_pending_pair)
+from app.schemas.profile_data import safe_profile_data
+from app.schemas.event_details import safe_event_details, safe_event_requirements, safe_roles
 
 router = APIRouter()
 MARCADOR_SOLICITUD_UNIRSE = "[SOLICITUD_UNIRSE]"
@@ -197,7 +199,7 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
 
         miembros = []
         for usuario, perfil in usuarios:
-            datos = (perfil.datos_crudos or {}) if perfil else {}
+            datos = safe_profile_data(perfil.datos_crudos if perfil else {})
             if not isinstance(datos, dict):
                 datos = {}
             visibilidad = datos.get("visibilidad") or {}
@@ -226,14 +228,14 @@ def obtener_equipos(id_usuario: int, db: Session = Depends(get_db),
                 "rol": participacion.rol if participacion else "Creador",
             })
 
-        detalles = evento.detalles_especificos or {}
-        requisitos = evento.requisitos_ia or {}
+        detalles = safe_event_details(evento.detalles_especificos)
+        requisitos = safe_event_requirements(evento.requisitos_ia)
         detalles = detalles if isinstance(detalles, dict) else {}
         requisitos = requisitos if isinstance(requisitos, dict) else {}
         roles_evento = detalles.get("roles")
         if not isinstance(roles_evento, list):
             roles_evento = requisitos.get("roles", [])
-        roles_evento = roles_evento if isinstance(roles_evento, list) else []
+        roles_evento = safe_roles(roles_evento)
         roles = []
         for index, rol in enumerate(roles_evento):
             if not isinstance(rol, dict):

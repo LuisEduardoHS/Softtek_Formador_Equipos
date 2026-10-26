@@ -9,11 +9,12 @@ const CATEGORIES = { academico: "Academico", personal: "Personal", deportivo: "D
 const toCategory = (tipo) => CATEGORIES[tipo] ?? "General"
 
 // Cliente HTTP conectado a tu backend local
-async function request(path, { method = "GET", body } = {}) {
+async function request(path, { method = "GET", body, idempotencyKey } = {}) {
   const token = sessionStorage.getItem("access_token")
   const res = await fetch(`${API_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   })
   
@@ -197,8 +198,9 @@ function mapEventoAProyecto(evento) {
     fuente_revision: evento.fuente_revision,
     soy_integrante: evento.soy_integrante === true,
     cupos_disponibles: evento.cupos_disponibles ?? 0,
-    roles: rolesEvento.map((rol, index) => {
-      const habilidades = Array.isArray(rol.habilidades) ? rol.habilidades : []
+    roles: rolesEvento.filter((rol) => rol && typeof rol === "object" && !Array.isArray(rol)).map((rol, index) => {
+      const habilidades = Array.isArray(rol.habilidades)
+        ? rol.habilidades.filter((skill) => typeof skill === "string" && skill.trim()) : []
       const nombre = typeof rol.nombre === "string" ? rol.nombre.trim() : ""
       return {
         id: String(rol.id ?? index),
@@ -218,7 +220,7 @@ export function obtenerProyectos() {
   return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
 }
 
-export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles, requirements }) {
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles, requirements, idempotencyKey }) {
   const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
   const creadorId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(creadorId) || creadorId <= 0) {
@@ -227,6 +229,7 @@ export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes,
 
   return request("/eventos/", {
     method: "POST",
+    idempotencyKey,
     body: {
       creador_id: creadorId,
       titulo,

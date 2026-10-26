@@ -139,9 +139,18 @@ def event_from_orm(event: Evento, members: list[ParticipanteEvento]) -> EventInp
         occupied = Counter(apply_equivalence(member.rol) for member in members if _safe_fact(member.rol))
         defined_roles = details.get("roles", [])
         defined_roles = defined_roles if isinstance(defined_roles, list) else []
-        vacancies = {apply_equivalence(role["nombre"]): role.get("vacantes", 1)
-                     for role in defined_roles if isinstance(role, dict) and _safe_fact(role.get("nombre"))}
-        if all(member.rol for member in members):
+        vacancies = {}
+        valid_vacancies = True
+        for role in defined_roles:
+            if not isinstance(role, dict) or not _safe_fact(role.get("nombre")):
+                valid_vacancies = False
+                continue
+            slots = role.get("vacantes", 1)
+            if type(slots) is not int or not 1 <= slots <= 8:
+                valid_vacancies = False
+                continue
+            vacancies[apply_equivalence(role["nombre"])] = slots
+        if valid_vacancies and all(member.rol for member in members):
             outstanding = _evidence("organizer_confirmed", "role", [
                 role for role in requirements.roles_buscados
                 if occupied[apply_equivalence(role)] < vacancies.get(apply_equivalence(role), 1)

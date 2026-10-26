@@ -1,7 +1,9 @@
 """Authenticated event drafts and confirmed AI requirements."""
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
+from sqlalchemy import update
+from uuid import UUID
 from app.core.security import get_current_user
 from app.db.database import get_db
 from app.models.participante import ParticipanteEvento
@@ -9,6 +11,7 @@ from app.models.evento import Evento
 from app.models.usuario import Usuario
 from app.schemas.ai_integration import EventInterpretRequest, EventReviewed
 from app.schemas.evento import EventoCreate, EventoOut, EventoUpdate
+from app.schemas.event_details import safe_event_details, safe_event_requirements
 from app.services.ai.event_parser import EventParser
 from app.services.ai.integration import content_revision, process_event_embedding, utc_now, event_source_revision
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
@@ -20,7 +23,7 @@ router = APIRouter(prefix="/eventos", tags=["Eventos y Convocatorias"])
 
 def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
     creator = db.get(Usuario, evento.creador_id)
-    details = dict(evento.detalles_especificos or {})
+    details = safe_event_details(evento.detalles_especificos)
     participants = db.query(ParticipanteEvento).filter(
         ParticipanteEvento.id_evento == evento.id_evento).all()
     member_ids = {p.id_usuario for p in participants} | {evento.creador_id}
@@ -41,7 +44,7 @@ def _visible(evento: Evento, actor: Usuario, db: Session) -> EventoOut:
         categoria_principal=evento.categoria_principal, titulo=evento.titulo,
         descripcion_libre=evento.descripcion_libre,
         detalles_especificos=details,
-        requisitos_ia=(evento.requisitos_ia or {}) if evento.requisitos_confirmados_at else {},
+        requisitos_ia=safe_event_requirements(evento.requisitos_ia) if evento.requisitos_confirmados_at else {},
         requisitos_confirmados=bool(evento.requisitos_confirmados_at),
         estado_ia=evento.estado_ia if evento.creador_id == actor.id_usuario else None,
         fuente_revision=event_source_revision(evento) if evento.creador_id == actor.id_usuario else None,
@@ -92,9 +95,33 @@ async def interpretar_evento(payload: EventInterpretRequest,
 
 @router.post("/", response_model=EventoOut, status_code=status.HTTP_201_CREATED)
 async def crear_evento(payload: EventoCreate, db: Session = Depends(get_db),
-                      actor: Usuario = Depends(get_current_user)):
+                      actor: Usuario = Depends(get_current_user),
+                      idempotency_key: UUID | None = Header(default=None, alias="Idempotency-Key")):
     if payload.creador_id is not None and payload.creador_id != actor.id_usuario:
         raise HTTPException(403, "El creador debe ser el usuario autenticado.")
+    request_key = str(idempotency_key) if idempotency_key else None
+    payload_revision = content_revision(payload.model_dump(mode="json"))
+    if request_key:
+        # End the authentication snapshot before serializing this actor's creates.
+        # The first consistent read after obtaining the actor lock must see a
+        # preceding create. Replay reads stay non-locking to avoid reversing the
+        # event -> user lock order used by invitation/acceptance transactions.
+        actor_id = actor.id_usuario
+        db.commit()
+        if db.get_bind().dialect.name == "sqlite":
+            db.execute(update(Usuario).where(Usuario.id_usuario == actor_id)
+                       .values(nombre=Usuario.nombre).execution_options(synchronize_session=False))
+        actor = db.query(Usuario).filter_by(id_usuario=actor_id).populate_existing().with_for_update().one()
+        if actor.estado_cuenta != "Activa":
+            raise HTTPException(403, "Cuenta inactiva.")
+        existing = db.query(Evento).filter(
+            Evento.creador_id == actor_id,
+            Evento.detalles_especificos["_creation_request_id"].as_string() == request_key,
+        ).populate_existing().first()
+        if existing:
+            if existing.detalles_especificos.get("_creation_payload_revision") != payload_revision:
+                raise HTTPException(409, "Esta clave de publicación ya se usó con otros datos. Revisa el borrador.")
+            return _visible(existing, actor, db)
     evento = Evento(
         creador_id=actor.id_usuario, titulo=payload.titulo,
         categoria_principal=payload.categoria_principal or "Academico",
@@ -108,6 +135,8 @@ async def crear_evento(payload: EventoCreate, db: Session = Depends(get_db),
         capacity(details)
     if "roles" in details:
         details["roles"] = validated_roles(details)
+    if request_key:
+        details.update(_creation_request_id=request_key, _creation_payload_revision=payload_revision)
     evento.detalles_especificos = details
     confirmed = None
     if payload.requisitos_confirmados is not None:
@@ -203,6 +232,8 @@ def actualizar_evento(
     if len({p.id_usuario for p in participantes} | {evento.creador_id}) > cambios.integrantes:
         raise HTTPException(409, "La capacidad no puede ser menor que los integrantes actuales.")
     detalles = dict(cambios.detalles_especificos)
+    previous_details = evento.detalles_especificos if isinstance(evento.detalles_especificos, dict) else {}
+    detalles.update({k: v for k, v in previous_details.items() if k.startswith("_creation_")})
     detalles["roles"] = validated_roles(detalles, participantes)
     detalles["tipo"] = cambios.categoria_principal.casefold()
     detalles["integrantes"] = cambios.integrantes
