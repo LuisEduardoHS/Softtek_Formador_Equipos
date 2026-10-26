@@ -47,7 +47,9 @@ function SectionHeader({ title, desc, action, id }) {
 
 /* ------------------------- Perfil completo ------------------------- */
 
-function ProfileProgress({ value, status }) {
+export function ProfileProgress({ value, status }) {
+  if (status === "success" && value === 100) return null
+
   const r = 22
   const c = 2 * Math.PI * r
   const progress = value ?? 0
