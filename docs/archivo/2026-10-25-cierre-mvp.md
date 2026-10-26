@@ -1,6 +1,6 @@
 # Cierre funcional del MVP: equipos e IA
 
-Fecha: 25 de octubre de 2026. Rama: `feat/ai-matching`. Este documento actualiza los pendientes del diagnóstico [ESTADO_PROYECTO_2026-10-25.md](ESTADO_PROYECTO_2026-10-25.md) dentro del alcance solicitado.
+Fecha: 25 de octubre de 2026. Rama: `feat/ai-matching`. Este documento actualiza los pendientes del diagnóstico [ESTADO_PROYECTO_2026-10-25.md](2026-10-25-estado-proyecto.md) dentro del alcance solicitado.
 
 ## Punto de partida y protección
 
@@ -53,7 +53,7 @@ El árbol estaba limpio en `59742f3`. Se verificó que el merge `696e2bc` tiene 
 ## Límites y operación
 
 1. No hay `backend/.env` en este checkout. En la observación final `MySQL80` está activo, pero no se dispone de una conexión configurada para comprobar tablas o ejecutar el recorrido contra MySQL. Las pruebas de concurrencia se ejecutaron en SQLite; queda por validar `FOR UPDATE`, aislamiento e índices sobre la instancia real con InnoDB. No se crearon/migraron tablas reales.
-2. Preparar MySQL conforme al [README](../README.md) y [runbook de 6A](RUNBOOK_FASE6A.md), incluyendo unicidad de participantes. El cambio no requiere columnas nuevas: usa el esquema y endpoints existentes. Las escrituras manuales fuera de estos endpoints deben respetar las mismas reglas.
+2. Preparar MySQL conforme al [README](../../README.md) y [runbook de 6A](../operacion/ia-perfiles-proyectos.md), incluyendo unicidad de participantes. El cambio no requiere columnas nuevas: usa el esquema y endpoints existentes. Las escrituras manuales fuera de estos endpoints deben respetar las mismas reglas.
 3. Para eventos antiguos sin capacidad explícita se conserva una capacidad de ocho personas; los roles definidos tienen una vacante salvo `vacantes` explícito. Revisar configuraciones antiguas ambiguas antes de operar sobre ellas.
 4. El contrato admite clientes anteriores que no envían `fuente_revision`; la interfaz actual sí la envía. Para obligar a clientes externos a usar control de revisión habrá que hacer el campo obligatorio tras migrarlos.
 5. Ollama puede omitir datos o proponer etiquetas incorrectas fuera del vocabulario acotado. La confirmación humana permanece obligatoria. No se cambia la política del ranking ni se afirma que una coincidencia garantice idoneidad.

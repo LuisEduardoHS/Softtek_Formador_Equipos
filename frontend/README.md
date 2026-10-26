@@ -1,16 +1,26 @@
-# React + Vite
+# Frontend de Complementa
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cliente React + Vite de la plataforma de formación de equipos. Consume FastAPI para autenticación, perfiles revisados, proyectos, recomendaciones, invitaciones y equipos.
 
-Currently, two official plugins are available:
+La instalación completa (MySQL, Ollama, backend y frontend) está en el [README principal](../README.md). Para un frontend ya instalado, desde esta carpeta:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```powershell
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
 
-## React Compiler
+La API por defecto es `http://127.0.0.1:8000`. Para un backend QA aislado:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+$env:VITE_API_URL='http://127.0.0.1:8011'
+npm run dev -- --host 127.0.0.1 --port 5174 --strictPort
+```
 
-## Expanding the ESLint configuration
+No apuntes ese servidor QA a la base principal. La preparación y los datos están en la [guía manual](../docs/pruebas-manuales/guia-completa.md). Las variables Vite se leen al iniciar el proceso; reinícialo después de cambiarlas.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```powershell
+npm test
+npm run build
+npm run lint
+```
+
+La landing y la ruta de diseño contienen ejemplos identificados como demostración; las recomendaciones del flujo autenticado proceden del backend. Las constantes de calendario se comparten con esos ejemplos, pero no deben utilizarse personas de mockData como identidad o resultados reales.

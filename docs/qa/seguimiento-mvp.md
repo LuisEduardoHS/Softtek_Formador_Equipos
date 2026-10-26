@@ -1,10 +1,10 @@
 # Seguimiento QA del MVP — 2026-10-25
 
-**Actualización 2026-10-26, cuarta ronda:** **365 pytest + 21 pruebas frontend aprobadas**, 14 escenarios MySQL, recorridos visuales completos de web/videojuegos/fútbol y repetición crítica en otra base vacía. Se corrigieron peticiones IA duplicadas, resultados antiguos, identidad entre pestañas, omisiones literales y requisitos duplicados. La principal conserva sus conteos/checksums/DDL/revisión. El cierre vigente y sus límites están en [QA de escenarios reales](QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md); las rondas anteriores conservan sus resultados históricos.
+**Actualización 2026-10-26, cuarta ronda:** **365 pytest + 21 pruebas frontend aprobadas**, 14 escenarios MySQL, recorridos visuales completos de web/videojuegos/fútbol y repetición crítica en otra base vacía. Se corrigieron peticiones IA duplicadas, resultados antiguos, identidad entre pestañas, omisiones literales y requisitos duplicados. La principal conserva sus conteos/checksums/DDL/revisión. El cierre vigente y sus límites están en [QA de escenarios reales](informes/2026-10-26-escenarios-matching.md); las rondas anteriores conservan sus resultados históricos.
 
 Repositorio: `D:\projects\Softtek_Formador_Equipos`. Rama: `feat/ai-matching`. La primera ronda partió de `568026a` y después se integró en el commit local `2157a43`. La segunda ronda semántica parte de `2157a43`; sus resultados y límites se detallan al final. No se hicieron push, merges ni cambios de rama.
 
-Se leyó el [informe integral](REPORTE_QA_REAL_2026-10-25.md) y su [evidencia JSON](qa_evidencia_20261025/datos_auditoria.json). Esta entrega implementa las correcciones de estabilidad, recuperación y autenticación solicitadas. No modifica arquitectura, framework, dependencias, esquema ni datos de la base principal. Conserva el diseño de Isaac y el motor de matching.
+Se leyó el [informe integral](informes/2026-10-25-auditoria-real.md) y su [evidencia JSON](evidencias/2026-10-25-auditoria/datos_auditoria.json). Esta entrega implementa las correcciones de estabilidad, recuperación y autenticación solicitadas. No modifica arquitectura, framework, dependencias, esquema ni datos de la base principal. Conserva el diseño de Isaac y el motor de matching.
 
 ## Resultado por hallazgo
 
@@ -58,7 +58,7 @@ Compatibilidad: clientes antiguos sin `Idempotency-Key` siguen funcionando y rec
 | `frontend/src/components/auth/AuthCard.jsx` | Longitudes visibles, política de altas y login compatible con contraseñas cortas anteriores. |
 | `frontend/src/pages/CreateProjectPage.jsx`, `frontend/src/services/api.js` | Persistencia de la clave del intento de publicación, envío del encabezado y defensas del mapper de roles. |
 | `backend/tests/test_qa_stability_security.py` (nuevo) | Regresiones HTTP/ORM para los hallazgos y concurrencia de publicación. No se alteraron los tests existentes. |
-| Este documento y `docs/qa_estabilidad_20261025/` | Seguimiento y evidencia filtrada de las ejecuciones reales. El informe original y sus evidencias se conservan intactos. |
+| Este documento y `docs/qa/evidencias/2026-10-25-estabilidad/` | Seguimiento y evidencia filtrada de las ejecuciones reales. El informe original y sus evidencias se conservan intactos. |
 
 ## Regresiones y controles automáticos
 
@@ -82,7 +82,7 @@ Cobertura nueva: dos usuarios HTTP y directorio tras peticiones malformadas; lec
 
 Base nueva y vacía: **`softtek_formador_equipos_qa_fix_20261025_29e772`**, con DDL de las cinco tablas principales y revisión Alembic `20261022_6a`. No se copiaron registros de usuarios. Se mantuvo InnoDB, MySQL 8.0.46 y REPEATABLE READ. Se usaron las dependencias instaladas y los modelos locales `llama3.1:8b` y `nomic-embed-text` del informe original.
 
-**63 comprobaciones reales aprobadas**: lote principal 51, comprobaciones de la versión final de idempotencia 5 y cierre 7. Algunas verifican distintos pasos del mismo recorrido; no representan 63 errores independientes. Se conservaron respuestas/estados SQL filtrados en [resultados.json](qa_estabilidad_20261025/resultados.json).
+**63 comprobaciones reales aprobadas**: lote principal 51, comprobaciones de la versión final de idempotencia 5 y cierre 7. Algunas verifican distintos pasos del mismo recorrido; no representan 63 errores independientes. Se conservaron respuestas/estados SQL filtrados en [resultados.json](evidencias/2026-10-25-estabilidad/resultados.json).
 
 - Registro, políticas de contraseña y longitudes: 422 sin insertar; ASCII/Unicode largos autentican solo con la clave completa; cuenta bcrypt previa migra al verificar; sufijo ambiguo heredado da 422 sin tocar su hash.
 - Perfil propio malformado: 422; otro usuario sigue consultando el directorio con 200. Perfil y estructura IA legados dañados se leen sin 500 ni corrección persistida automática; privacidad inválida no publica correo/campos.
@@ -95,7 +95,7 @@ Base nueva y vacía: **`softtek_formador_equipos_qa_fix_20261025_29e772`**, con 
 
 Cuatro recorridos visuales adicionales en navegador IAB contra Vite 5174 y FastAPI QA 8011: login; detalle legado con candidatos; directorio/perfil legado con privacidad cerrada; publicación desde React y recarga del proyecto. **Cero errores de consola capturados**. La publicación visual quedó en evento QA **5**, una fila, clave del intento y huella persistidas, vector de 768 y estado listo. La recarga conservó el resultado.
 
-Capturas: [detalle legado protegido](qa_estabilidad_20261025/detalle_legado_protegido.png), [directorio protegido](qa_estabilidad_20261025/directorio_perfil_legado.png), [publicación confirmada](qa_estabilidad_20261025/publicacion_react_confirmada.png), [proyecto listo tras recargar](qa_estabilidad_20261025/proyecto_persistido_listo.png).
+Capturas: [detalle legado protegido](evidencias/2026-10-25-estabilidad/detalle_legado_protegido.png), [directorio protegido](evidencias/2026-10-25-estabilidad/directorio_perfil_legado.png), [publicación confirmada](evidencias/2026-10-25-estabilidad/publicacion_react_confirmada.png), [proyecto listo tras recargar](evidencias/2026-10-25-estabilidad/proyecto_persistido_listo.png).
 
 Al cierre QA conserva únicamente datos ficticios: 6 usuarios, 6 perfiles, 5 eventos, 2 solicitudes y 2 participantes. Los scripts temporales siguen en `backend/.venv/qa_fix_20261025/`, ignorados por Git. No se borró la base QA. Se cerró la pestaña y se detuvieron exclusivamente los procesos QA creados en 8011/8012/5174; los procesos anteriores de 8000/5173/3306/11434 conservaron sus PID.
 
@@ -158,7 +158,7 @@ Se mantiene la advertencia de deprecación de Starlette/httpx. No se debilitaron
 
 ### Corpus real y errores observados
 
-Se usó exclusivamente **llama3.1:8b** instalado, sin cambiar el modelo. Hubo **22 llamadas secuenciales**: 10 perfiles + 6 proyectos + 2 repeticiones, 3 comprobaciones focalizadas y una última comprobación de opcionales. Se conservaron todas las salidas crudas y duraciones en [resultados semánticos](qa_semantica_20261025/resultados.json).
+Se usó exclusivamente **llama3.1:8b** instalado, sin cambiar el modelo. Hubo **22 llamadas secuenciales**: 10 perfiles + 6 proyectos + 2 repeticiones, 3 comprobaciones focalizadas y una última comprobación de opcionales. Se conservaron todas las salidas crudas y duraciones en [resultados semánticos](evidencias/2026-10-25-semantica/resultados.json).
 
 **Las 22 devolvieron JSON válido y ninguna agotó 60 s**, pero no todas fueron semánticamente correctas en la versión ejecutada en ese momento:
 
@@ -199,7 +199,7 @@ Se creó vacía **softtek_formador_equipos_qa_semantics_20261025_77dd5b**, copia
 
 Los análisis Llama del corpus se ejecutaron contra el servicio real; para limitar llamadas, MySQL recibió por HTTP sus salidas capturadas, reprocesadas por el código final y revisadas como fixtures humanos. No se afirma que las confirmaciones volvieran a invocar Llama. La persistencia y todos los vectores de estas comprobaciones fueron reales.
 
-Se comprobó visualmente el perfil P05 en React: mensaje **Datos confirmados; falta contenido para el análisis**, meta diseño conservada, fortalezas vacías y **sin botón Reintentar análisis**. Cero errores de consola capturados. [Captura del estado](qa_semantica_20261025/perfil_sin_contenido.png).
+Se comprobó visualmente el perfil P05 en React: mensaje **Datos confirmados; falta contenido para el análisis**, meta diseño conservada, fortalezas vacías y **sin botón Reintentar análisis**. Cero errores de consola capturados. [Captura del estado](evidencias/2026-10-25-semantica/perfil_sin_contenido.png).
 
 La base principal conserva los mismos conteos/checksums/DDL/revisión de la tabla de la primera ronda: **no se modificó**. QA quedó con 12 usuarios/perfiles, 7 eventos, una solicitud y un participante ficticios. No se creó ni ejecutó migración sobre la principal.
 
@@ -257,13 +257,13 @@ La primera ejecución completa durante la implementación detectó además una r
 | npm run build | Correcto; 1990 módulos | 0.98 s |
 | npm run lint | 0 errores; 1 advertencia anterior | 3.45 s |
 
-Se mantienen las advertencias previas de Starlette TestClient/httpx y de dependencia state en RequireSession.jsx:29. Los tests backend automáticos usan SQLite aislado y embeddings simulados; no son prueba de MySQL ni de calidad Llama. El frontend renderiza componentes reales y comprueba contratos, pero no sustituye la interacción visual descrita a continuación. [Resultados completos de comandos](qa_frontend_20261025/checks.json).
+Se mantienen las advertencias previas de Starlette TestClient/httpx y de dependencia state en RequireSession.jsx:29. Los tests backend automáticos usan SQLite aislado y embeddings simulados; no son prueba de MySQL ni de calidad Llama. El frontend renderiza componentes reales y comprueba contratos, pero no sustituye la interacción visual descrita a continuación. [Resultados completos de comandos](evidencias/2026-10-25-frontend/checks.json).
 
 ### MySQL QA y servicios reales
 
 Se creó vacía **softtek_formador_equipos_qa_frontend_20261025_979b6c** copiando únicamente DDL y revisión Alembic, sin registros de la principal. Se usaron MySQL **8.0.46/InnoDB**, Python **3.13.15**, FastAPI **0.143.0**, SQLAlchemy **2.1.4**, React **19.3.0**, Node **24.19.0**, npm **11.17.0**, Vite **8.3.4** y Ollama **0.40.5** con Nomic Embed Text real de **768 dimensiones**. FastAPI QA en 8011 y Vite QA en 5174; el frontend de prueba apuntó exclusivamente a ese backend.
 
-**48 comprobaciones reales aprobadas:** 33 del lote inicial, 10 adicionales y 5 de cierre; la última es una inspección de la principal sin escrituras. Son pasos de recorridos y controles, no 48 defectos independientes. Evidencias: [lote inicial](qa_frontend_20261025/mysql_results.json), [adicionales](qa_frontend_20261025/additional_results.json), [cierre](qa_frontend_20261025/closeout_results.json).
+**48 comprobaciones reales aprobadas:** 33 del lote inicial, 10 adicionales y 5 de cierre; la última es una inspección de la principal sin escrituras. Son pasos de recorridos y controles, no 48 defectos independientes. Evidencias: [lote inicial](evidencias/2026-10-25-frontend/mysql_results.json), [adicionales](evidencias/2026-10-25-frontend/additional_results.json), [cierre](evidencias/2026-10-25-frontend/closeout_results.json).
 
 - Registro/login ficticios, perfiles revisados, privacidad de fortalezas y búsqueda por Python/SQL/alias; pausa y falta de consentimiento excluyen también búsqueda por nombre. Filtros combinados y de bloque se verifican sobre MySQL antes del límite.
 - Proyecto de capacidad 4, creador y un integrante: quedan 2 cupos globales pero el único rol ya está ocupado. La respuesta declara sin vacantes, candidatos devuelve [], la recomendación de proyectos lo excluye y el intento directo sigue protegido con 409.
@@ -278,20 +278,20 @@ Al cierre QA conserva **7 usuarios, 7 perfiles, 3 eventos, 3 solicitudes y 2 par
 
 Navegador IAB con React QA y backend/MySQL reales, usando tres cuentas ficticias. No se simularon interacciones mediante lectura de código:
 
-1. Login del creador; Inicio, directorio y búsqueda programar con SQL; selección de otro perfil con lun-tarde/sab-manana frente al calendario vacío del creador, sin bloques compartidos inventados. [Captura](qa_frontend_20261025/busqueda_sql_comparacion_real.png).
-2. Equipos con requisitos globales: [Python 1/2, SQL por acreditar](qa_frontend_20261025/cobertura_global_real.png); [cobertura desconocida](qa_frontend_20261025/cobertura_desconocida.png) para proyecto sin revisión.
-3. El creador acepta una adhesión en Invitaciones y ve [Solicitud aceptada](qa_frontend_20261025/solicitud_aceptada_creador.png). Su fila real se comprobó después con ORM.
-4. Edición del proyecto: [requiere revisión y desaparecen los candidatos anteriores](qa_frontend_20261025/edicion_requiere_revision.png); revisión manual Python/SQL y [reconfirmación lista](qa_frontend_20261025/proyecto_reconfirmado.png), conservada al recargar. No se pulsó Interpretar descripción con IA; la revisión fue humana.
-5. Corrección y guardado de biografía desde Mi perfil, confirmación y persistencia verificadas por SQL/HTTP. [Aviso de privacidad](qa_frontend_20261025/aviso_privacidad_biografia.png).
-6. Login de candidato: [Inicio](qa_frontend_20261025/inicio_recomendacion_real.png) y [Coincidencias](qa_frontend_20261025/coincidencias_motor_real.png) muestran el mismo proyecto real del motor. Abrir detalle, elegir Backend, [enviar solicitud](qa_frontend_20261025/solicitud_real_enviada.png) y recargar conserva Solicitud enviada deshabilitado.
-7. Otro usuario ajeno al equipo abre el proyecto con rol ocupado y capacidad sobrante: [sin botón de solicitar, con motivo explícito](qa_frontend_20261025/proyecto_sin_vacantes_utilizables.png).
-8. [Reuniones no disponibles](qa_frontend_20261025/reuniones_no_disponibles.png); acceso a /match tras cerrar sesión redirige a autenticación.
+1. Login del creador; Inicio, directorio y búsqueda programar con SQL; selección de otro perfil con lun-tarde/sab-manana frente al calendario vacío del creador, sin bloques compartidos inventados. [Captura](evidencias/2026-10-25-frontend/busqueda_sql_comparacion_real.png).
+2. Equipos con requisitos globales: [Python 1/2, SQL por acreditar](evidencias/2026-10-25-frontend/cobertura_global_real.png); [cobertura desconocida](evidencias/2026-10-25-frontend/cobertura_desconocida.png) para proyecto sin revisión.
+3. El creador acepta una adhesión en Invitaciones y ve [Solicitud aceptada](evidencias/2026-10-25-frontend/solicitud_aceptada_creador.png). Su fila real se comprobó después con ORM.
+4. Edición del proyecto: [requiere revisión y desaparecen los candidatos anteriores](evidencias/2026-10-25-frontend/edicion_requiere_revision.png); revisión manual Python/SQL y [reconfirmación lista](evidencias/2026-10-25-frontend/proyecto_reconfirmado.png), conservada al recargar. No se pulsó Interpretar descripción con IA; la revisión fue humana.
+5. Corrección y guardado de biografía desde Mi perfil, confirmación y persistencia verificadas por SQL/HTTP. [Aviso de privacidad](evidencias/2026-10-25-frontend/aviso_privacidad_biografia.png).
+6. Login de candidato: [Inicio](evidencias/2026-10-25-frontend/inicio_recomendacion_real.png) y [Coincidencias](evidencias/2026-10-25-frontend/coincidencias_motor_real.png) muestran el mismo proyecto real del motor. Abrir detalle, elegir Backend, [enviar solicitud](evidencias/2026-10-25-frontend/solicitud_real_enviada.png) y recargar conserva Solicitud enviada deshabilitado.
+7. Otro usuario ajeno al equipo abre el proyecto con rol ocupado y capacidad sobrante: [sin botón de solicitar, con motivo explícito](evidencias/2026-10-25-frontend/proyecto_sin_vacantes_utilizables.png).
+8. [Reuniones no disponibles](evidencias/2026-10-25-frontend/reuniones_no_disponibles.png); acceso a /match tras cerrar sesión redirige a autenticación.
 
-**Cero errores de consola capturados** en la pestaña de estos recorridos: [consola.json](qa_frontend_20261025/consola.json). No se inspeccionó una traza HAR completa de todas las llamadas; estados HTTP relevantes se conservaron en los lotes dirigidos. No se declara probado el onboarding/registro completo desde navegador en esta ronda; registro y confirmación sí se comprobaron por HTTP real, y el recorrido visual de análisis inicial corresponde a rondas anteriores.
+**Cero errores de consola capturados** en la pestaña de estos recorridos: [consola.json](evidencias/2026-10-25-frontend/consola.json). No se inspeccionó una traza HAR completa de todas las llamadas; estados HTTP relevantes se conservaron en los lotes dirigidos. No se declara probado el onboarding/registro completo desde navegador en esta ronda; registro y confirmación sí se comprobaron por HTTP real, y el recorrido visual de análisis inicial corresponde a rondas anteriores.
 
 ### Principal, Git y cierre operativo
 
-**La base principal softtek_formador_equipos no fue alterada.** Solo SELECT, SHOW y CHECKSUM para inspección. Coinciden antes/después: usuarios 1/checksum 101962764; perfiles 1/checksum 2746401420; eventos, solicitudes y participantes 0/checksum 0. DDL SHA-256 `000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe`; revisión `20261022_6a`. [Estado final verificable](qa_frontend_20261025/final_state.json).
+**La base principal softtek_formador_equipos no fue alterada.** Solo SELECT, SHOW y CHECKSUM para inspección. Coinciden antes/después: usuarios 1/checksum 101962764; perfiles 1/checksum 2746401420; eventos, solicitudes y participantes 0/checksum 0. DDL SHA-256 `000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe`; revisión `20261022_6a`. [Estado final verificable](evidencias/2026-10-25-frontend/final_state.json).
 
 Se cerró la pestaña temporal y se detuvieron exclusivamente los procesos QA en 8011/5174. Los servicios previos conservaron PID: backend 8000/29204, Vite 5173/42856, MySQL 3306/9036 y Ollama 11434/10056. No se reconfiguraron. Para presentar el código nuevo en esos procesos hace falta su recarga/reinicio habitual; no se ejecutó contra la principal para evitar escrituras accidentales.
 
@@ -311,7 +311,7 @@ Siguiente encargo acotado recomendado: ensayo de presentación con dos cuentas f
 
 ## Cuarta ronda — escenarios reales y confiabilidad, 2026-10-26
 
-Informe completo vigente: [QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md](QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md). Inicio limpio en `9fb42cd`, misma rama `feat/ai-matching`; se conservan `2157a43`, `033f97f` y los avances anteriores. No hubo push, merges ni cambios de esquema/arquitectura.
+Informe completo vigente: [QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md](informes/2026-10-26-escenarios-matching.md). Inicio limpio en `9fb42cd`, misma rama `feat/ai-matching`; se conservan `2157a43`, `033f97f` y los avances anteriores. No hubo push, merges ni cambios de esquema/arquitectura.
 
 - El proyecto real «Gestor de tareas inteligente» tiene dos vacantes utilizables y requisitos confirmados. Los tres perfiles ajenos al creador no tienen consentimiento; ORM y endpoint devuelven correctamente cero candidatos. No se cambiaron preferencias reales. Se mejoró el estado vacío con explicación y actualización sin divulgar excluidos.
 - Se reprodujeron dos POST de interpretación por las suscripciones de StrictMode y un 409 competidor. React ahora comparte solo solicitudes idénticas en vuelo por sesión, sin cachear resultados ni desactivar StrictMode. El backend además rechaza un análisis cuyo texto pendiente ya cambió. El primer error visible relatado no se reprodujo naturalmente: los intentos frío/caliente mostraron resultado pese al 409. La caída aislada sí mostró 503 recuperable y el reintento visual funcionó sin repetir el formulario.
@@ -322,7 +322,7 @@ Informe completo vigente: [QA_ESCENARIOS_REALES_MATCHING_2026-10-26.md](QA_ESCEN
 - **36 intentos Llama**: 34 respuestas obtenidas y dos ConnectionError deliberados, cero timeouts observados. Corpus inicial de 14 llamadas conserva sus omisiones; replay final de esas salidas 14/14 y cuatro repeticiones reales 4/4. El replay usa cliente simulado y no cuenta como llamadas nuevas. Se mantiene revisión humana: la salida cruda todavía puede clasificar mal o redactar experiencia redundante.
 - Dos QA aisladas, **57 usuarios y 23 proyectos ficticios** en total; 23 solicitudes/invitaciones y 22 filas de participantes incorporados. Primera QA: 46 perfiles listos, uno sin_contenido y uno obsoleto deliberado. Sus 46 vectores de perfil y 20 de evento son finitos, de 768 dimensiones y revisión vigente; cero incompatibles al cierre.
 
-**Principal sin alterar:** en esta ronda ya tenía cuatro usuarios, cuatro perfiles y un evento, añadidos desde la entrega anterior. Se comparó ese estado inicial actual: conteos, checksums, DDL y Alembic siguen iguales, sin escrituras reales. La evidencia anonimizada, trazas, salidas Llama y capturas están en `docs/qa_matching_20261026/`. Los procesos habituales no se reconfiguraron; solo se detuvieron los servidores QA y se cerraron las pestañas temporales.
+**Principal sin alterar:** en esta ronda ya tenía cuatro usuarios, cuatro perfiles y un evento, añadidos desde la entrega anterior. Se comparó ese estado inicial actual: conteos, checksums, DDL y Alembic siguen iguales, sin escrituras reales. La evidencia anonimizada, trazas, salidas Llama y capturas están en `docs/qa/evidencias/2026-10-26-matching/`. Los procesos habituales no se reconfiguraron; solo se detuvieron los servidores QA y se cerraron las pestañas temporales.
 
 Pendientes explícitos: un candidato con evidencia parcial Git puede preceder a uno con Blender cuando obligatorias siguen desconocidas; requisitos globales se evalúan por persona y la asignación a roles sigue manual; QA-11 no deduce horas exactas de bloques; vocabulario fuera del catálogo y latencia requieren revisión. No se declara ranking perfecto ni fiabilidad universal de Llama. Continúa la limitación heredada de bcrypt >72 bytes. No se implementaron reuniones, feedback ni infraestructura nueva.
 
@@ -332,6 +332,6 @@ El commit local de esta ronda usa el mensaje `fix(mvp): stabilize analysis sessi
 
 Se repitió el flujo principal desde React en otra QA vacía, con tres cuentas nuevas y Llama/Nomic/MySQL reales: **perfil IA → confirmación/consentimiento → proyecto → dos candidatos recomendados → invitaciones → aceptaciones → equipo completo tras recargar**. Antes de confirmar no aparecían; después aparecieron SQL y Figma con explicaciones respaldadas, sin convertir negaciones o aprendizaje en fortalezas. Cuatro interpretaciones al primer intento, sin POST generativos duplicados; cuatro vectores reales vigentes de 768 dimensiones en ese recorrido y uno adicional de otra convocatoria. También se comprobó con nueva sesión React que ambos integrantes siguen siendo recomendables para un proyecto diferente con vacantes. No hizo falta cambiar prompts ni producción adicionalmente.
 
-La suite volvió a pasar: **365 backend y 21 frontend**, pip check/build correctos y lint sin errores, con avisos previos conservados. Treinta y tres comprobaciones finales MySQL/HTTP aprobadas; principal intacta y servicios habituales preservados. Los detalles, tiempos, las incidencias exclusivas del arnés y las capturas están en [VALIDACION_FLUJO_WEB_2026-10-26.md](VALIDACION_FLUJO_WEB_2026-10-26.md).
+La suite volvió a pasar: **365 backend y 21 frontend**, pip check/build correctos y lint sin errores, con avisos previos conservados. Treinta y tres comprobaciones finales MySQL/HTTP aprobadas; principal intacta y servicios habituales preservados. Los detalles, tiempos, las incidencias exclusivas del arnés y las capturas están en [VALIDACION_FLUJO_WEB_2026-10-26.md](informes/2026-10-26-flujo-web.md).
 
 La corrección anterior quedó en `0c1085b`. Para esta entrega el usuario autorizó commit y push a la rama actual, `feat/ai-matching`; se publica la corrección junto con el commit de evidencia, sin merges ni force. Los límites de horarios, requisitos globales y variabilidad generativa del informe amplio siguen vigentes. Los perfiles reales sin consentimiento no se modificaron automáticamente.

@@ -2,7 +2,7 @@
 
 Fecha: 25 de octubre de 2026. Revisión del código integrado en `feat/ai-matching`.
 
-**Actualización posterior:** los cuatro bloques solicitados de participación e IA se implementaron y verificaron en el [cierre del MVP](CIERRE_MVP_2026-10-25.md). El análisis siguiente conserva el diagnóstico previo; consultar el cierre para conocer las correcciones y límites vigentes.
+**Actualización posterior:** los cuatro bloques solicitados de participación e IA se implementaron y verificaron en el [cierre del MVP](2026-10-25-cierre-mvp.md). El análisis siguiente conserva el diagnóstico previo; consultar el cierre para conocer las correcciones y límites vigentes.
 
 ## Conclusión
 
@@ -90,7 +90,7 @@ El flujo real es: texto → sugerencia IA → revisión de la persona → confir
 
 ## 4. Base de datos: existe el diseño, falta comprobar la instalación
 
-[SQL inicial](../database/db_actividad.sql) define cinco tablas: `usuarios`, `perfiles_usuarios`, `eventos`, `solicitudes_equipo` y `participantes_evento`. Los modelos ya incluyen estructura IA, borradores, fechas de confirmación y metadatos de embeddings. Los participantes tienen unicidad por evento/usuario en SQL y ORM.
+[SQL inicial](../../database/db_actividad.sql) define cinco tablas: `usuarios`, `perfiles_usuarios`, `eventos`, `solicitudes_equipo` y `participantes_evento`. Los modelos ya incluyen estructura IA, borradores, fechas de confirmación y metadatos de embeddings. Los participantes tienen unicidad por evento/usuario en SQL y ORM.
 
 La migración `20261022_6a` agrega columnas IA faltantes y conserva filas existentes. Supone que las tablas base ya existen: no inicializa una base vacía. El arranque de FastAPI no crea ni modifica tablas.
 

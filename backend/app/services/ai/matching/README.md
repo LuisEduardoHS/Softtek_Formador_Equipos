@@ -1,3 +1,5 @@
+> Este documento describe el módulo y su entrega original. La aplicación ya integra IA, JWT, MySQL y React; consulta la [operación actual](../../../../../docs/operacion/recomendaciones-equipos.md) para el flujo completo y sus permisos.
+
 # Motor puro de matching — subfase 4.5
 
 Este paquete ordena candidatos para **un evento** a partir de contratos ya validados. No consulta MySQL, no llama a Ollama y no expone un endpoint. Los escenarios de `backend/tests/test_matching_scenarios.py` evalúan la cadena completa de contratos, elegibilidad, requisitos, complementariedad, coseno, ranking y explicación con datos controlados.
@@ -74,4 +76,4 @@ Los fixtures cubren proyectos académicos, deportes, game jam/videojuegos y cate
 2. Debe persistir junto al vector el modelo, versión de origen y marca de actualización; el contrato actual solo compara cadenas de versión y no puede detectar por sí solo un embedding obsoleto respecto del texto. Los modelos distintos jamás se comparan aunque tengan igual dimensión.
 3. El equipo debe acordar qué condiciones son realmente excluyentes, cómo representar varios cupos del mismo rol y qué hacer con evidencia contradictoria. La disponibilidad, ubicación o experiencia no se infieren a partir de un perfil incompleto.
 4. Antes de exponer recomendaciones reales se necesitan contratos ORM/SQL consistentes, autorización y visibilidad verificadas, confirmación de requisitos por organizador, fuente fiable de participantes y evaluación humana por categoría. Medir errores de exclusión, cobertura, utilidad del orden, estabilidad y latencia; revisar pesos y equivalencias con esos datos.
-5. Este trabajo no integra rutas, persistencia, frontend, generación de embeddings, parsers ni autenticación. El diseño de referencia está en `docs/DISENO_MOTOR_MATCHING_FASE4.md`; ese documento describe una propuesta anterior al código y puede contener estados históricos.
+5. Este trabajo no integra rutas, persistencia, frontend, generación de embeddings, parsers ni autenticación. El diseño de referencia está en `docs/arquitectura/diseno-matching.md`; ese documento describe una propuesta anterior al código y puede contener estados históricos.

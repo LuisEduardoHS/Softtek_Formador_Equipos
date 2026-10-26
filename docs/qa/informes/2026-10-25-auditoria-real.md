@@ -114,7 +114,7 @@ Se esperaba confirmación persistida con estado recuperable y respuesta útil, o
 
 ### QA-04 — ALTO: roles con habilidades no textuales se guardan y rompen React
 
-Casos E16/I15. Crear un proyecto revisado con un rol cuya propiedad sea `"habilidades":[{"unexpected":"object"}]`. La API devuelve **201** y guarda el evento QA 27. Abrir el proyecto en React produce ErrorBoundary y consola: `Objects are not valid as a React child (found: object with keys {unexpected})`. Se esperaba 422, sin persistir un contrato incompatible. El validador de roles no valida cada habilidad como texto; el frontend recibe y renderiza esos datos. No se ha demostrado que rompa toda la plataforma, sí la pantalla del proyecto abierto. Captura: [rol_malformado_error_react.png](qa_evidencia_20261025/rol_malformado_error_react.png).
+Casos E16/I15. Crear un proyecto revisado con un rol cuya propiedad sea `"habilidades":[{"unexpected":"object"}]`. La API devuelve **201** y guarda el evento QA 27. Abrir el proyecto en React produce ErrorBoundary y consola: `Objects are not valid as a React child (found: object with keys {unexpected})`. Se esperaba 422, sin persistir un contrato incompatible. El validador de roles no valida cada habilidad como texto; el frontend recibe y renderiza esos datos. No se ha demostrado que rompa toda la plataforma, sí la pantalla del proyecto abierto. Captura: [rol_malformado_error_react.png](../evidencias/2026-10-25-auditoria/rol_malformado_error_react.png).
 
 ### QA-05 — ALTO: IA omite un requisito obligatorio y etiquetas confirmadas pierden valor para matching
 
@@ -122,15 +122,15 @@ Casos E05, G-RAW-D06, G-RAW-D09 y G-SQL-CON. Con «Figma es obligatorio», Llama
 
 ### QA-06 — MEDIO: recomendaciones/pantalla anuncian disponibilidad sin vacante utilizable
 
-Casos G16/I03. Proyecto QA G_occupied: único rol Backend ya ocupado, aún hay capacidad global. Candidatos devuelve recomendaciones y la tarjeta de Inicio muestra **Disponible**; solicitar/invitar para ese rol da **409** correctamente. `eligible` del núcleo es elegibilidad de evidencias y no autorización de acción, pero el producto lo traduce como disponibilidad. Se esperaba filtrar la vacante imposible o explicar que no hay acción disponible. No hay sobrecupo ni elusión de autorización. Captura: [recomendacion_sin_vacante.png](qa_evidencia_20261025/recomendacion_sin_vacante.png).
+Casos G16/I03. Proyecto QA G_occupied: único rol Backend ya ocupado, aún hay capacidad global. Candidatos devuelve recomendaciones y la tarjeta de Inicio muestra **Disponible**; solicitar/invitar para ese rol da **409** correctamente. `eligible` del núcleo es elegibilidad de evidencias y no autorización de acción, pero el producto lo traduce como disponibilidad. Se esperaba filtrar la vacante imposible o explicar que no hay acción disponible. No hay sobrecupo ni elusión de autorización. Captura: [recomendacion_sin_vacante.png](../evidencias/2026-10-25-auditoria/recomendacion_sin_vacante.png).
 
 ### QA-07 — MEDIO: cobertura del equipo da tranquilidad falsa con 0/0
 
-Caso I08. Crear por el asistente React un proyecto con requisitos globales Python/SQL. Los roles generados tienen `habilidades:[]` (`CreateProjectPage.jsx:193`); `TeamCoverageChart` calcula únicamente desde habilidades de roles y muestra **0/0**, «¡Ninguna! Tu equipo cubre todo lo necesario». La ausencia de mapeo no demuestra cobertura total; se esperaba cobertura según requisitos confirmados o estado desconocido. Captura: [equipo_cobertura_cero.png](qa_evidencia_20261025/equipo_cobertura_cero.png).
+Caso I08. Crear por el asistente React un proyecto con requisitos globales Python/SQL. Los roles generados tienen `habilidades:[]` (`CreateProjectPage.jsx:193`); `TeamCoverageChart` calcula únicamente desde habilidades de roles y muestra **0/0**, «¡Ninguna! Tu equipo cubre todo lo necesario». La ausencia de mapeo no demuestra cobertura total; se esperaba cobertura según requisitos confirmados o estado desconocido. Captura: [equipo_cobertura_cero.png](../evidencias/2026-10-25-auditoria/equipo_cobertura_cero.png).
 
 ### QA-08 — MEDIO: horarios/intereses en común comparados con usuario mock
 
-Caso I17. El organizador QA tiene disponibilidad confirmada vacía. Abrir perfil ajeno con lun-tarde/sab-manana muestra ambos **en común**. `components/profile/PublicProfile.jsx` importa `currentUser` de mockData; `RecommendationCard.jsx` conserva el mismo patrón por lectura estática. Solo PublicProfile se verificó visualmente. Se esperaba comparar con el usuario autenticado real o no declarar coincidencias. Captura: [comparacion_horarios_mock.png](qa_evidencia_20261025/comparacion_horarios_mock.png).
+Caso I17. El organizador QA tiene disponibilidad confirmada vacía. Abrir perfil ajeno con lun-tarde/sab-manana muestra ambos **en común**. `components/profile/PublicProfile.jsx` importa `currentUser` de mockData; `RecommendationCard.jsx` conserva el mismo patrón por lectura estática. Solo PublicProfile se verificó visualmente. Se esperaba comparar con el usuario autenticado real o no declarar coincidencias. Captura: [comparacion_horarios_mock.png](../evidencias/2026-10-25-auditoria/comparacion_horarios_mock.png).
 
 ### QA-09 — MEDIO: revisión obsoleta aceptada si se omite la huella de fuente
 
@@ -166,7 +166,7 @@ Caso I14. El creador acepta desde React al solicitante, el equipo persiste corre
 
 ### QA-17 — MEDIO: pantalla de reuniones aparenta envío sin persistencia
 
-Caso I18. Abrir `/meeting`, proponer horario y enviar: toast «Propuesta enviada al equipo», seguido de navegación a `/equipos/t1` y error al cargar ese equipo ficticio. `MeetingPage.jsx:24–25` solo muestra toast/navega; no hay operación de guardado ni endpoint/modelo correspondiente. Se esperaba marcar la pantalla como demostración o no presentar un envío exitoso. Está fuera del cierre IA solicitado; se documenta el engaño observado, sin proponer desarrollar reuniones ni ampliar el alcance. Captura: [reunion_exito_aparente.png](qa_evidencia_20261025/reunion_exito_aparente.png).
+Caso I18. Abrir `/meeting`, proponer horario y enviar: toast «Propuesta enviada al equipo», seguido de navegación a `/equipos/t1` y error al cargar ese equipo ficticio. `MeetingPage.jsx:24–25` solo muestra toast/navega; no hay operación de guardado ni endpoint/modelo correspondiente. Se esperaba marcar la pantalla como demostración o no presentar un envío exitoso. Está fuera del cierre IA solicitado; se documenta el engaño observado, sin proponer desarrollar reuniones ni ampliar el alcance. Captura: [reunion_exito_aparente.png](../evidencias/2026-10-25-auditoria/reunion_exito_aparente.png).
 
 ## 6. Seguridad y controles que sí respondieron
 
@@ -278,13 +278,13 @@ Se usó navegador automatizado IAB con lectura del DOM/árbol accesible, interac
 
 Se inspeccionó consola: sin errores registrados durante los recorridos normales observados; el payload de rol produjo el error React citado. Se verificaron estados vacío/sin requisitos, revisión, pendiente y reintento, mensajes tras acciones y error de equipo inexistente. No se ensayó cada spinner ni cada error de red de todas las pantallas.
 
-Capturas: [perfil confirmado](qa_evidencia_20261025/perfil_confirmado.png), [recomendación sin vacante](qa_evidencia_20261025/recomendacion_sin_vacante.png), [cobertura 0/0](qa_evidencia_20261025/equipo_cobertura_cero.png), [ErrorBoundary](qa_evidencia_20261025/rol_malformado_error_react.png), [horarios mock](qa_evidencia_20261025/comparacion_horarios_mock.png), [reunión aparente](qa_evidencia_20261025/reunion_exito_aparente.png).
+Capturas: [perfil confirmado](../evidencias/2026-10-25-auditoria/perfil_confirmado.png), [recomendación sin vacante](../evidencias/2026-10-25-auditoria/recomendacion_sin_vacante.png), [cobertura 0/0](../evidencias/2026-10-25-auditoria/equipo_cobertura_cero.png), [ErrorBoundary](../evidencias/2026-10-25-auditoria/rol_malformado_error_react.png), [horarios mock](../evidencias/2026-10-25-auditoria/comparacion_horarios_mock.png), [reunión aparente](../evidencias/2026-10-25-auditoria/reunion_exito_aparente.png).
 
 mockData conserva constantes útiles (días/franjas) y datos de presentación de Landing/DesignSystem; eso no es por sí mismo un defecto de persistencia. Sí se verificó un uso incorrecto de currentUser en PublicProfile y un flujo ficticio de MeetingPage. RecommendationCard conserva comparación con currentUser por inspección estática, sin atribuirle una reproducción visual independiente.
 
 ## 13. Evidencia, persistencia y reproducción segura
 
-[datos_auditoria.json](qa_evidencia_20261025/datos_auditoria.json) contiene resultados por identificador, respuestas HTTP filtradas, entradas/salidas Llama ficticias, tiempos, metadatos del esquema y trazas sin credenciales. No contiene tokens ni valores de la fila real del usuario. Los payloads visibles en capturas pertenecen a QA. Los scripts y resultados temporales permanecen en `backend/.venv/qa_audit_20261025/` (ignorados por Git). No se entregan como código de producción ni se configuran para ejecutarse en la principal.
+[datos_auditoria.json](../evidencias/2026-10-25-auditoria/datos_auditoria.json) contiene resultados por identificador, respuestas HTTP filtradas, entradas/salidas Llama ficticias, tiempos, metadatos del esquema y trazas sin credenciales. No contiene tokens ni valores de la fila real del usuario. Los payloads visibles en capturas pertenecen a QA. Los scripts y resultados temporales permanecen en `backend/.venv/qa_audit_20261025/` (ignorados por Git). No se entregan como código de producción ni se configuran para ejecutarse en la principal.
 
 Ejemplos de consultas de comprobación, **solo dentro de la base QA identificada**:
 

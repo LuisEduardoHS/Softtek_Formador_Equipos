@@ -1,3 +1,5 @@
+> Este documento describe el módulo y su entrega original. La aplicación ya integra IA, JWT, MySQL y React; consulta la [operación actual](../../../../../docs/operacion/recomendaciones-equipos.md) para el flujo completo y sus permisos.
+
 # Recomendaciones de candidatos y proyectos (Fase 5)
 
 Este paquete implementa servicios **puros** sobre instantáneas ya autorizadas. No consulta MySQL, no valida credenciales, no escribe solicitudes, no ejecuta tareas periódicas y no expone rutas. Usa el motor de `matching/` para elegibilidad, cobertura de requisitos y ranking. Los contextos de autorización deben construirse en un futuro adaptador confiable, nunca desde datos enviados por el cliente.

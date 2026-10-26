@@ -1,3 +1,5 @@
+> Diseño de referencia histórico. Los contratos operativos actuales están en [operación](../operacion/recomendaciones-equipos.md); la validación está en [QA](../qa/seguimiento-mvp.md).
+
 # Diseño de recomendaciones — Fase 5.0
 
 **Fecha:** 22 de octubre de 2026. **Estado:** diseño, sin implementación. **Rama examinada:** `feat/ai-matching` en `f883c4f`; `origin/isaac` en `d90b7e5` tras `git fetch origin`. El árbol local contiene trabajo de 4.5 sin confirmar, por lo que **no se integró** `origin/isaac`. Las observaciones sobre esa rama describen su commit remoto, no código disponible aún en esta rama.
