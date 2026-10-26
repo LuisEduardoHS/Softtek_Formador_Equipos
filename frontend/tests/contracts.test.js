@@ -22,6 +22,51 @@ test("QA-08: unknown viewer never claims shared interests or schedules", async (
   assert.doesNotMatch(html, /en común|los intereses que compartes/)
 })
 
+test("profile setup pre-fills the name from the registered session user", async (t) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage")
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: { getItem: () => JSON.stringify({ nombre: "Persona registrada" }) },
+  })
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original)
+    else delete globalThis.sessionStorage
+  })
+
+  const html = await render("pages/ProfileSetupPage")
+  assert.match(html, /name="name"[^>]*value="Persona registrada"/)
+})
+
+test("home hides profile progress only after a successful 100 percent result", async () => {
+  const { ProfileProgress } = await server.ssrLoadModule("/src/pages/HomePage.jsx")
+  const complete = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 100, status: "success" })))
+  const incomplete = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 75, status: "success" })))
+  const loading = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 100, status: "loading" })))
+
+  assert.equal(complete, "")
+  assert.match(incomplete, /75%/)
+  assert.match(loading, /100%/)
+})
+
+test("app layout keeps navigation inside a closed hamburger menu", async (t) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage")
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: { getItem: () => null, removeItem: () => {} },
+  })
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original)
+    else delete globalThis.sessionStorage
+  })
+
+  const html = await render("components/layout/AppLayout")
+  assert.match(html, /aria-label="Abrir menú"[^>]*aria-expanded="false"/)
+  assert.doesNotMatch(html, /aria-label="Menú principal"/)
+})
+
 test("QA-07: missing coverage never claims the team covers everything", async () => {
   const html = await render("components/team/TeamCoverageChart", { roles: [] })
   assert.doesNotMatch(html, /cubre todo lo necesario/)

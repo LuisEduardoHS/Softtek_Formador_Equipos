@@ -271,7 +271,17 @@ function Done({ consent }) {
 export default function ProfileSetupPage() {
   const toast = useToast()
   const [step, setStep] = useState(0)
-  const [textos, setTextos] = useState({ nombre: "", foto: null, idiomas: "", fortalezas: "", reforzar: "", intereses: "" })
+  const [textos, setTextos] = useState(() => {
+    const nombre = getSessionUser().nombre
+    return {
+      nombre: typeof nombre === "string" ? nombre : "",
+      foto: null,
+      idiomas: "",
+      fortalezas: "",
+      reforzar: "",
+      intereses: "",
+    }
+  })
   const [disponibilidad, setDisponibilidad] = useState([])
   const [perfil, setPerfil] = useState(null)
   const [consent, setConsent] = useState(false)

@@ -1,6 +1,6 @@
-import { Link, NavLink, Outlet } from "react-router-dom"
-import { Bell, FolderKanban, Home, LogOut, Plus, UserRound, Users, UsersRound } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
+import { Bell, FolderKanban, Home, LogOut, Menu, Plus, UserRound, Users, UsersRound, X } from "lucide-react"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
 import { getSessionUser } from "../../lib/session"
@@ -31,9 +31,19 @@ export function Logo({ to = "/inicio", className = "" }) {
 
 export default function AppLayout() {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
   const usuario = getSessionUser()
   const nombre = usuario.nombre || "Usuario"
   const detalle = usuario.carrera || usuario.correo || ""
+
+  useEffect(() => {
+    if (!menuOpen) return undefined
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setMenuOpen(false)
+    }
+    window.addEventListener("keydown", closeOnEscape)
+    return () => window.removeEventListener("keydown", closeOnEscape)
+  }, [menuOpen])
 
   function cerrarSesion() {
     sessionStorage.removeItem("access_token")
@@ -42,83 +52,99 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
+    <div className="min-h-dvh">
       <a href="#contenido" className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
         Saltar al contenido
       </a>
 
-      {/* Barra lateral (escritorio) */}
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-line bg-surface px-4 py-6 lg:flex">
-        <Logo className="px-2" />
-        <Link
-          to="/proyectos/nuevo"
-          className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-card transition-all hover:bg-primary-hover active:scale-[0.98]"
-        >
-          <Plus aria-hidden="true" className="size-4" /> Crear proyecto
-        </Link>
-        <nav aria-label="Principal">
-          <ul className="space-y-1">
-            {NAV.map(({ to, label, icon: Icon }) => (
-              <li key={to}>
-                <NavLink
-                  to={to}
-                  className={({ isActive }) =>
-                    `flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
-                      isActive ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2/70 hover:text-ink"
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <Icon aria-hidden="true" className={`size-5 ${isActive ? "text-primary" : ""}`} />
-                      <span className="flex-1">{label}</span>
-                    </>
-                  )}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <Link
-          to="/perfil"
-          className="mt-auto flex items-center gap-3 rounded-xl border border-line p-3 transition-colors hover:bg-surface-2"
-        >
-          <Avatar name={nombre} size="sm" />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-ink">{nombre}</span>
-            {detalle && <span className="block truncate text-xs text-ink-2">{detalle}</span>}
-          </span>
-        </Link>
-        <Button
-          variant="ghost"
-          onClick={cerrarSesion}
-          className="w-full justify-start"
-        >
-          <LogOut aria-hidden="true" className="size-4" />
-          Cerrar sesión
-        </Button>
-      </aside>
-
-      {/* Encabezado (móvil) */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-surface/90 px-4 backdrop-blur lg:hidden">
-        <Logo />
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-surface/90 px-4 backdrop-blur">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
-            onClick={cerrarSesion}
-            aria-label="Cerrar sesión"
-            title="Cerrar sesión"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            aria-controls="navigation-drawer"
             className="px-2"
           >
-            <LogOut aria-hidden="true" className="size-4" />
-            <span>Salir</span>
+            <Menu aria-hidden="true" className="size-5" />
           </Button>
-          <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
-            <Avatar name={nombre} size="sm" />
-          </Link>
+          <Logo />
         </div>
+        <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
+          <Avatar name={nombre} size="sm" />
+        </Link>
       </header>
+
+      {menuOpen && (
+        <>
+          <button
+            type="button"
+            aria-label="Cerrar menú"
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 cursor-default bg-ink/40"
+          />
+          <aside
+            id="navigation-drawer"
+            aria-label="Menú principal"
+            className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-6 overflow-y-auto border-r border-line bg-surface px-4 py-6 pb-24 shadow-pop"
+          >
+            <div className="flex items-center justify-between px-2">
+              <Logo />
+              <Button variant="ghost" size="sm" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú">
+                <X aria-hidden="true" className="size-5" />
+              </Button>
+            </div>
+            <Link
+              to="/proyectos/nuevo"
+              onClick={() => setMenuOpen(false)}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-card transition-all hover:bg-primary-hover active:scale-[0.98]"
+            >
+              <Plus aria-hidden="true" className="size-4" /> Crear proyecto
+            </Link>
+            <nav aria-label="Principal">
+              <ul className="space-y-1">
+                {NAV.map(({ to, label, icon: Icon }) => (
+                  <li key={to}>
+                    <NavLink
+                      to={to}
+                      onClick={() => setMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
+                          isActive ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2/70 hover:text-ink"
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <Icon aria-hidden="true" className={`size-5 ${isActive ? "text-primary" : ""}`} />
+                          <span className="flex-1">{label}</span>
+                        </>
+                      )}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <Link
+              to="/perfil"
+              onClick={() => setMenuOpen(false)}
+              className="mt-auto flex items-center gap-3 rounded-xl border border-line p-3 transition-colors hover:bg-surface-2"
+            >
+              <Avatar name={nombre} size="sm" />
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold text-ink">{nombre}</span>
+                {detalle && <span className="block truncate text-xs text-ink-2">{detalle}</span>}
+              </span>
+            </Link>
+            <Button variant="ghost" onClick={cerrarSesion} className="w-full justify-start">
+              <LogOut aria-hidden="true" className="size-4" />
+              Cerrar sesión
+            </Button>
+          </aside>
+        </>
+      )}
 
       <main id="contenido" className="min-w-0 pb-28 lg:pb-0">
         <Outlet />
