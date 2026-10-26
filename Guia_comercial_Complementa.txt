@@ -1,0 +1,139 @@
+COMPLEMENTA
+Guia comercial para mercadotecnia y ventas
+
+Proposito
+Este documento resume la propuesta de valor y las funciones de Complementa para ayudar al equipo de mercadotecnia y ventas a preparar presentaciones, demostraciones y un pitch dirigido a estudiantes y comunidades escolares. Describe el producto con base en las funciones visibles y el codigo disponible; distingue las capacidades conectadas de las que siguen en desarrollo.
+
+1. Que es Complementa
+Complementa es una plataforma web para que estudiantes encuentren personas con habilidades e intereses complementarios y formen equipos para proyectos academicos o personales. En lugar de limitarse a reunir a personas que estudian lo mismo o que ya se conocen, ayuda a hacer visibles las aportaciones que cada integrante puede hacer y los roles que aun hacen falta.
+
+La idea central es sencilla: un equipo puede avanzar mejor cuando sus integrantes aportan fortalezas diferentes y acuerdan como colaborar.
+
+2. Necesidad que atiende
+Al comenzar un proyecto, muchos estudiantes se enfrentan a preguntas como:
+- Con quien puedo formar equipo?
+- Que habilidades nos faltan?
+- Como encuentro a alguien de otra carrera o con intereses parecidos?
+- Como explico lo que puedo aportar si aun estoy aprendiendo?
+- Como coordino las invitaciones y se quien ya se integro?
+
+Complementa busca facilitar el descubrimiento de colaboradores, la presentacion de proyectos y la organizacion inicial del equipo desde un solo espacio.
+
+3. A quien se dirige
+- Estudiantes que necesitan equipo para una materia, una tarea o un proyecto escolar.
+- Estudiantes que quieren iniciar una idea personal fuera de una asignatura.
+- Personas que desean aportar una habilidad y aprender otras trabajando con companeros.
+- Planteles, docentes y comunidades estudiantiles que quieren impulsar colaboracion entre carreras, grupos e intereses.
+
+El producto esta pensado para fomentar la participacion estudiantil. La institucion debe definir sus reglas de uso, acompanamiento y privacidad, especialmente cuando participen menores de edad.
+
+4. Beneficios para comunicar
+- Encuentra colaboradores mas alla de tu grupo habitual.
+- Presenta tanto lo que ya sabes hacer como lo que quieres fortalecer.
+- Define los roles y habilidades que necesita tu proyecto.
+- Explora proyectos academicos y personales.
+- Invita a estudiantes a participar y administra las respuestas.
+- Consulta los equipos a los que perteneces y quienes los integran.
+- Da visibilidad a las aportaciones individuales y a las necesidades pendientes del equipo.
+
+Mensaje de valor: no se trata de buscar personas identicas, sino de conectar aportaciones distintas alrededor de una meta compartida.
+
+5. Funciones que ofrece la aplicacion
+
+5.1 Cuenta y acceso
+- Registro de cuenta con nombre, correo, carrera y contrasena; estado y municipio son opcionales.
+- Inicio de sesion.
+- El perfil nuevo se crea asociado a la cuenta.
+
+5.2 Perfil del estudiante
+- Informacion basica como carrera y semestre.
+- Fortalezas o habilidades con un nivel indicado por la persona.
+- Temas que desea reforzar, intereses y disponibilidad semanal.
+- Controles para mostrar u ocultar ciertos datos del perfil.
+- Opcion de pausar el perfil para que no aparezca en las recomendaciones de otras personas.
+- Enlace opcional a un grupo externo, por ejemplo Discord o WhatsApp. No debe presentarse como una integracion de esos servicios.
+- Vista de perfiles publicos de otros estudiantes, respetando la informacion que el producto expone.
+
+5.3 Proyectos academicos y personales
+- Crear y publicar un proyecto con titulo y descripcion.
+- Elegir si el proyecto es academico o personal.
+- Para proyectos academicos se puede indicar la materia.
+- Definir el tamano del equipo, una fecha limite y los roles que hacen falta.
+- Asociar habilidades a los roles e indicar si son indispensables.
+- Explorar proyectos de otras personas y consultar los proyectos propios.
+- Buscar por titulo o nombre de rol, filtrar por tipo y mostrar proyectos con roles abiertos.
+- Consultar el detalle del proyecto y el estado de cobertura de sus roles.
+
+5.4 Directorio, invitaciones y equipos
+- Explorar estudiantes registrados y buscar por nombre o carrera.
+- Consultar el perfil de un posible colaborador.
+- Invitar a una persona a un proyecto propio, con un rol propuesto y un mensaje.
+- Revisar invitaciones recibidas y enviadas, filtradas por estado.
+- Aceptar o rechazar una invitacion.
+- Al aceptar, la persona se agrega como participante del proyecto.
+- Consultar los equipos propios, sus proyectos y sus integrantes.
+- Ver notificaciones relacionadas con invitaciones, respuestas y coincidencias de perfiles con roles de proyectos.
+
+6. Ejemplos de uso
+
+Ejemplo academico:
+Un grupo debe entregar un proyecto de una materia y tiene personas para programar, pero necesita alguien que investigue a los usuarios y alguien que trabaje en el diseno. Publica el proyecto, describe lo que quiere lograr, agrega los roles que faltan y explora perfiles para invitar a posibles colaboradores.
+
+Ejemplo personal:
+Una estudiante quiere iniciar un club o crear una aplicacion para organizar actividades deportivas. Publica la idea como proyecto personal, explica que aportes busca y puede invitar a personas con intereses o fortalezas diferentes.
+
+Ejemplo de desarrollo de habilidades:
+Un estudiante quiere participar aunque todavia no domine todas las herramientas necesarias. En su perfil puede mostrar sus fortalezas e indicar que quiere reforzar. La plataforma permite que el equipo conozca tanto lo que ya puede aportar como sus intereses de aprendizaje.
+
+7. Pitch sugerido de 30 segundos
+"A veces tenemos una buena idea para un proyecto, pero no sabemos con quien hacerla realidad. Complementa ayuda a estudiantes a descubrir colaboradores con habilidades e intereses distintos, publicar proyectos academicos o personales y definir que roles hacen falta. Puedes mostrar lo que sabes, lo que quieres aprender, explorar perfiles e invitar a otras personas. Porque un buen equipo no tiene que ser de personas iguales: puede ser un grupo que se complementa."
+
+8. Demostracion sugerida
+1. Presentar la idea de Complementa y el problema de encontrar colaboradores.
+2. Mostrar un perfil de ejemplo y explicar fortalezas, intereses y disponibilidad.
+3. Crear o abrir un proyecto de demostracion, academico o personal.
+4. Mostrar como se describen los roles y las habilidades que hacen falta.
+5. Explorar el directorio de estudiantes y abrir un perfil.
+6. Mostrar el flujo de invitacion, respuesta y equipo.
+7. Cerrar invitando a la persona a pensar en una idea que le gustaria desarrollar con otros.
+
+Usar cuentas y datos ficticios o autorizados para la demostracion. No proyectar datos personales reales sin permiso.
+
+9. Estado actual y limites que ventas debe conocer
+La aplicacion cuenta con pantallas y servicios conectados para cuentas, perfiles, proyectos, directorio de estudiantes, invitaciones, equipos y notificaciones. La disponibilidad real depende de que el backend, la base de datos y la configuracion del entorno esten operativos.
+
+Hay partes de inteligencia artificial que estan representadas en la interfaz, pero no estan conectadas como funciones completas del producto:
+- El analisis automatico de texto del perfil devuelve actualmente una respuesta vacia de ejemplo desde el frontend.
+- La interpretacion automatica de la descripcion del proyecto y la sugerencia automatica de roles tambien son funciones pendientes de conexion.
+- Las recomendaciones de candidatos y el envio de una solicitud para unirse directamente a un proyecto tienen respuestas de ejemplo o marcadores temporales.
+- El backend contiene una capa experimental para analizar perfiles y requisitos de eventos con modelos locales, pero su documentacion indica que la persistencia e integracion con rutas y matching corresponden a una fase futura.
+- Existen coincidencias basicas en notificaciones entre habilidades visibles del perfil y roles de proyectos. No deben venderse como un matching inteligente completo ni como una garantia de compatibilidad.
+- La agenda o coordinacion de reuniones no debe anunciarse como integrada con calendarios externos sin confirmacion del equipo de producto.
+
+La pagina publica incluye perfiles, cifras y testimonios de muestra. No utilizar esos datos como metricas reales, evidencia de adopcion ni testimonios autenticos.
+
+Por lo anterior, presentar como disponibles las funciones descritas en la seccion 5 solo despues de probarlas en el entorno de demostracion que se vaya a utilizar. Describir las capacidades experimentales como vision o trabajo en desarrollo, no como promesas actuales.
+
+10. Mensajes y llamados a la accion
+- "Encuentra a quienes complementan tu idea."
+- "Tu carrera no define todo lo que puedes aportar."
+- "Muestra tus fortalezas y descubre nuevas formas de colaborar."
+- "Publica lo que quieres crear; encuentra a las personas que te hacen falta."
+- "Un buen equipo se construye con aportaciones diferentes."
+
+Llamados a la accion posibles:
+- "Crea tu perfil."
+- "Publica tu proyecto."
+- "Explora proyectos y encuentra tu proximo equipo."
+- "Invita a alguien que complemente tu idea."
+
+11. Recomendaciones para el equipo comercial
+- Enfocar la conversacion en colaboracion y complementariedad, no en prometer que la plataforma garantiza equipos exitosos.
+- Adaptar los ejemplos a proyectos cotidianos de estudiantes: tareas, materias, clubes, actividades y proyectos personales.
+- Invitar a estudiantes de distintas carreras a participar, sin sugerir que una carrera o nivel es superior a otro.
+- No prometer resultados automaticos de IA, reuniones agendadas, mensajeria integrada ni uso institucional a escala hasta que el equipo de producto confirme esas capacidades.
+- No presentar cifras, perfiles o testimonios de muestra de la pagina de inicio como datos reales.
+- Para pilotos con una escuela, acordar con el plantel reglas de acceso, moderacion, privacidad y acompanamiento.
+
+Resumen
+Complementa busca convertir una idea individual en una oportunidad de colaboracion: permite presentar proyectos academicos o personales, mostrar aportaciones, encontrar estudiantes, enviar invitaciones y organizar equipos. Su propuesta es ayudar a que cada estudiante encuentre un lugar donde contribuir y una oportunidad para aprender junto con otras personas.
