@@ -79,7 +79,7 @@ class OllamaClient:
                     {"role": "user", "content": prompt},
                 ],
                 format=schema,
-                options={"temperature": 0},
+                options={"temperature": 0, "num_predict": 1024},
             )
         except TRANSPORT_ERRORS as error:
             raise OllamaServiceError("Error al consultar Ollama. Servicio no disponible.") from error

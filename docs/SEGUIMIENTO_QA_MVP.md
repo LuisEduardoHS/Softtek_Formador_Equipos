@@ -1,6 +1,6 @@
 # Seguimiento QA del MVP — 2026-10-25
 
-Repositorio: `D:\projects\Softtek_Formador_Equipos`. Rama: `feat/ai-matching`. HEAD de partida y final: `568026a`. Cambios disponibles en el árbol de trabajo, sin commit, push, merge ni cambio de rama.
+Repositorio: `D:\projects\Softtek_Formador_Equipos`. Rama: `feat/ai-matching`. La primera ronda partió de `568026a` y después se integró en el commit local `2157a43`. La segunda ronda semántica parte de `2157a43`; sus resultados y límites se detallan al final. No se hicieron push, merges ni cambios de rama.
 
 Se leyó el [informe integral](REPORTE_QA_REAL_2026-10-25.md) y su [evidencia JSON](qa_evidencia_20261025/datos_auditoria.json). Esta entrega implementa las correcciones de estabilidad, recuperación y autenticación solicitadas. No modifica arquitectura, framework, dependencias, esquema ni datos de la base principal. Conserva el diseño de Isaac y el motor de matching.
 
@@ -13,6 +13,9 @@ Se leyó el [informe integral](REPORTE_QA_REAL_2026-10-25.md) y su [evidencia JS
 | QA-03 | Corregido | ConnectionError incorporado, TimeoutError, errores httpx y del SDK se traducen a errores controlados. Confirmar/crear conserva los datos y devuelve pendiente_embedding ante fallo del vector; interpretación fallida devuelve 503 y restaura el estado confirmado anterior. Se conservan los borradores y las rutas de reintento existentes. Publicación con Idempotency-Key recupera la misma fila y detecta un cuerpo distinto con 409. |
 | QA-02 | Corregido con límite heredado explícito | Altas nuevas usan bcrypt_sha256 y verifican la contraseña completa. Se admiten Unicode y contraseñas largas sin colisión por el byte 72. Login conserva compatibilidad con bcrypt existente de hasta 72 bytes y migra el hash al verificar correctamente una cuenta activa. Un intento de más de 72 bytes contra bcrypt heredado se rechaza explícitamente; no se migra a partir de un prefijo ambiguo. |
 | QA-13 | Corregido | Nombre 1–150, carrera 1–100, correo hasta 100, estado/municipio hasta 50 caracteres en registro; nombre/carrera también acotados en edición. La validación sucede antes de insertar, evitando el 500 de MySQL estricto por nombre de 151 caracteres. |
+| QA-05 | Corregido en el corpus delimitado, ronda 2 | Catálogo compartido v3, etiquetas atómicas explícitas, SQL con y sin preposición, herramientas Blender/UE5/UX/UI/Figma y recuperación de requisitos obligatorios como Figma. No se cambia la política de ranking. |
+| QA-14 | Corregido en los casos verificados, ronda 2 | Se separan negación, habilidad afirmada, interés y aprendizaje; ausencia de experiencia no es experiencia positiva ni meta automática. Perfil sin contenido semántico confirmado queda sin_contenido, distinto de una caída de Nomic. |
+| QA-15 | Mitigado y medido, ronda 2 | Generación JSON limitada a 1024 tokens, instrucciones sin ejemplos de roles ajenos y sin repetir listas. Se registraron 22 llamadas reales, cero timeouts; no demuestra ausencia universal de timeouts ni fiabilidad del JSON crudo. |
 
 Los fallos de validación no devuelven el contenido de entrada: evita reflejar contraseñas o texto privado y permite responder 422 ante Unicode inválido enviado como escapes JSON.
 
@@ -111,11 +114,101 @@ Huella DDL SHA-256: `000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9f
 ## Pendientes y límites
 
 1. Restablecimiento seguro de contraseñas bcrypt históricas ambiguas de más de 72 bytes; no es posible recuperar el sufijo original del hash. No se creó un flujo nuevo en este encargo.
-2. QA-05 y aspectos semánticos de QA-14/15: extracción atómica, equivalencias SQL/Blender/Figma, negaciones, distinción de falta de contenido y evaluación amplia de timeouts. Se mantuvo la revisión humana; estos problemas de calidad no se declaran resueltos por pasar validación de tipos.
+2. Fuera de los casos cubiertos en ronda 2, siguen pendientes evaluación amplia de calidad/latencia, vocabulario no catalogado y construcciones complejas. Llama todavía puede producir datos crudos incorrectos; la revisión humana sigue siendo obligatoria. No se declara calidad universal por pasar un corpus limitado.
 3. QA-06/07/08: disponibilidad accionable por rol, cobertura 0/0 y comparaciones con currentUser de demostración.
 4. QA-09/10/11/12/16/17: huella opcional en clientes heredados, expectativas de privacidad de biografía, contrato de horarios, búsqueda por habilidad, mensaje de adhesión y reunión ficticia. No se añadieron reuniones ni otras funcionalidades.
 5. No se ejecutó carga sostenida, prueba de todas las carreras posibles, migración desde cero, ni auditoría de seguridad exhaustiva. No se inyectó pérdida de respuesta en el navegador: las repeticiones y su concurrencia se verificaron mediante HTTP/MySQL, y la clave emitida por React se verificó en la fila persistida. Se verificaron los recorridos documentados; las advertencias previas de herramientas siguen visibles.
 
-Los cambios de código y tests quedan sin commit para revisión. El informe integral previo y sus evidencias ya eran archivos sin seguimiento al iniciar este encargo y se conservaron. No hubo push ni merges.
+La primera ronda se entregó inicialmente sin commit y después quedó en `2157a43`. El informe integral previo y sus evidencias se conservaron. No hubo push ni merges.
 
 Los servidores habituales no se reiniciaron; para ejecutar el código actualizado en esos procesos debe aplicarse su recarga/reinicio normal. La comprobación de esta entrega se hizo en procesos QA separados, ya detenidos.
+
+## Segunda ronda — precisión semántica, QA-05/14/15
+
+### Cambios acotados
+
+- `services/ai/skill_catalog.py` define **8 conceptos y 62 alias finitos**, versión **2026-10-25.v3**: Python, SQL, Blender, Unreal Engine 5, UX/UI, Figma, Docker y Git. Incluye UE5 y prefijos afirmativos específicos como experiencia en/con y programar en/con. Extracción, confirmación y matching usan el mismo catálogo. No se añadieron equivalencias por embeddings, distancia de texto o afinidad temática.
+- `skill_terms.py` clasifica menciones como afirmadas, negadas, objetivos, intereses, menciones inciertas, objetivos negados e intereses negados. Negar interés o aprendizaje no borra una habilidad afirmada en otra frase. Las contradicciones sobre competencia se tratan de forma conservadora. Las negaciones originales permanecen en el texto del borrador; **no se transforman automáticamente en una declaración negativa confirmada ni se publican como nueva evidencia**. El matching sigue reservando la polaridad negativa a evidencia explícitamente confirmada de su contrato existente.
+- `profile_parser.py` exige apoyo literal de la fuente, recupera herramientas explícitas del catálogo, elimina experiencia negativa y no conserva un resumen que repita hechos descartados. Las metas se recuperan solo de intención de aprender/mejorar expresada. El prefijo aprender se elimina para deduplicar **dentro de metas**, nunca para convertir una meta en habilidad. La experiencia no combina herramientas y acciones de frases distintas si esa relación no está expresada: conserva las frases positivas originales como alternativa.
+- `event_parser.py` recupera Figma/Python/SQL y otras herramientas catalogadas solo con requisitos explícitos; separa obligatorias y opcionales coordinadas. Descarta temas, herramientas sueltas, campos internos y placeholders usados como restricciones. Recupera algunos roles literalmente pedidos, sin inferir una profesión a partir de una tecnología. Conserva los contratos anteriores de programador Python/UE5, artista Blender y portero.
+- `schemas/ai_integration.py` fusiona alias duplicados en la revisión humana. Si la misma habilidad aparece con dos niveles incompatibles, devuelve **422** para que la persona resuelva el conflicto. No elige un nivel por inferencia.
+- `integration.py`, `routes/perfiles.py`, `recommendations/orm_adapter.py` y `AIStatus.jsx` distinguen **sin_contenido** de **pendiente_embedding**. Un perfil confirmado con solo metas o sin hechos útiles no llama a Nomic ni ofrece un reintento inútil; mantiene sus datos confirmados. Añadir contenido y reconfirmar permite generar el vector. Una caída temporal con contenido sigue siendo reintentable y una interpretación fallida conserva también el estado sin_contenido previo.
+- `ollama_client.py` conserva temperatura 0 y añade **num_predict=1024** a la generación estructurada. Los analizadores mantienen timeout de 60 s. No se añaden reintentos automáticos ilimitados ni se sustituyen errores de formato por resultados supuestamente correctos.
+
+No se tocaron pesos, elegibilidad, desempates ni scoring del motor. Los módulos de autenticación, creación idempotente y reglas transaccionales de equipos de la primera ronda permanecen preservados. No hubo cambios de esquema, modelos generativos, dependencias, framework o infraestructura.
+
+### Reproducción y regresiones
+
+El primer lote semántico, antes de estas correcciones, produjo **19 fallos y 1 aprobado**. Se añadieron regresiones con las salidas reales observadas durante esta ronda: meta aprender diseño duplicada, restricciones Figma mal clasificadas, tecnología opcional como restricción, placeholder de ausencia de condiciones, relación inventada entre experiencias y omisión de rol literal. También se verificaron duplicados/niveles humanos y negación de interés separada de negación de competencia.
+
+Archivos permanentes: `backend/tests/test_semantic_quality.py` (**34 casos nuevos**) y `backend/tests/semantic_corpus.py` (datos ficticios del corpus, sin llamadas automáticas a modelos durante pytest). Se ajustaron tres pruebas existentes sin reducir sus comprobaciones funcionales: versión esperada del catálogo; presupuesto de generación; y redacción del prompt sin portero ajeno al texto. El fixture antiguo de C++ ahora lo declara explícitamente en la fuente; una regresión adicional comprueba que C++ desaparece cuando no está declarado. El test de portero mantiene sus tres salidas inconsistentes y la misma exigencia funcional.
+
+Resultado final automático:
+
+| Control | Resultado | Duración del proceso |
+| --- | --- | --- |
+| python -m pytest -q | **331 aprobadas**: 297 anteriores + 34 nuevas | 26.14 s; pytest 25.07 s |
+| python -m pip check | Sin dependencias rotas | 0.50 s |
+| npm run build | Correcto | 1.00 s |
+| npm run lint | 0 errores; advertencia previa de RequireSession.jsx | 3.42 s |
+
+Se mantiene la advertencia de deprecación de Starlette/httpx. No se debilitaron tests para forzar aprobación; la comprobación completa detectó una regresión de recuperación del programador Python/UE5 y se corrigió conservando las aserciones originales.
+
+### Corpus real y errores observados
+
+Se usó exclusivamente **llama3.1:8b** instalado, sin cambiar el modelo. Hubo **22 llamadas secuenciales**: 10 perfiles + 6 proyectos + 2 repeticiones, 3 comprobaciones focalizadas y una última comprobación de opcionales. Se conservaron todas las salidas crudas y duraciones en [resultados semánticos](qa_semantica_20261025/resultados.json).
+
+**Las 22 devolvieron JSON válido y ninguna agotó 60 s**, pero no todas fueron semánticamente correctas en la versión ejecutada en ese momento:
+
+- Primera fase: detector inicial **14 PASS / 4 FAIL**. Fallaron P05 (aprender diseño/diseño duplicados), E02 y su repetición (Figma como restricción), E04 (opcionales como restricciones). La revisión también identificó E05 como texto ambiguo convertido en restricción, E03 con rol analista omitido y P02 con una relación entre acciones/herramientas no explicitada en una misma frase. Se agregaron controles para estas observaciones; no se presenta el detector inicial como una evaluación exhaustiva.
+- Llama propuso portero en proyectos Figma/web y llegó a repetir accesible en Figma cerca de cien veces. Los filtros retiraron los roles ajenos al texto. Se eliminó del prompt el ejemplo de portero y se conservó la recuperación literal del caso deportivo.
+- En las tres llamadas focalizadas, **2 PASS / 1 FAIL**: Figma obligatorio y diseño quedaron correctos; E04 todavía contenía condiciones de participación no especificadas. Ese fallo se conservó y originó otra regresión. La última llamada nueva de E04, tras corregir el apoyo de palabras significativas, fue **PASS**.
+- Incluso la salida cruda fresca de Figma inventó frases de lugar/horario sin datos. La extracción final las descarta porque no están respaldadas por la fuente; esto **no significa que Llama haya dejado de inventarlas**.
+
+Duraciones reales: **0.952–21.306 s**, mediana **1.298 s**. P01 tardó 21.306 s en la primera llamada; E02 inicial/repetición 17.749/17.676 s, comprobación focalizada 4.740 s. No se atribuye causalidad ni una garantía de latencia a esta muestra. El presupuesto de tokens puede producir JSON incompleto en otros textos; ese error seguiría siendo un fallo de formato, distinto de timeout o defecto semántico.
+
+Con la versión final se **reprocesaron las 22 respuestas reales capturadas**, sin nuevas llamadas a Ollama: **22/22 verificaciones del corpus final aprobadas**. Se midieron omisiones, falsas habilidades catalogadas, metas inesperadas, roles y restricciones. Los tiempos del replay son de procesamiento local y están separados del tiempo real de Llama. No se repitieron las 22 llamadas con cada ajuste: se usó replay para limitar carga y llamadas focalizadas para comprobar el modelo. Los resultados originales fallidos permanecen en la evidencia.
+
+Ejemplos de salida final:
+
+| Fuente | Resultado relevante |
+| --- | --- |
+| Sé programar con SQL y crear consultas | SQL una sola vez; crear consultas se conserva como capacidad explícita distinta, no como sinónimo inventado de SQL |
+| Tengo experiencia en Blender y Unreal Engine 5 | Habilidades Blender y Unreal Engine 5; experiencias basadas en frases originales |
+| Diseño interfaces UX/UI en Figma | UX/UI y Figma como etiquetas separadas |
+| No sé Python. Domino SQL | Solo SQL como habilidad; ninguna meta Python inferida |
+| No tengo experiencia laboral ni profesional. Quiero aprender diseño | Sin experiencia positiva; meta diseño, sin duplicar aprender diseño |
+| Me gustan los videojuegos | Interés, sin habilidad técnica acreditada |
+| Figma es obligatorio | Figma en obligatorias, no como condición logística |
+| Python y SQL son opcionales | Ambas deseables; ninguna obligatoria |
+| SQL obligatorio. Python no es obligatorio. No exigimos Docker | Solo SQL obligatorio; no se inventa preferencia por Python o Docker |
+
+### MySQL QA, Nomic y frontend
+
+Se creó vacía **softtek_formador_equipos_qa_semantics_20261025_77dd5b**, copiando solo DDL y revisión Alembic, sin registros de la principal. Se probaron FastAPI real (8011), MySQL 8/InnoDB, Nomic real y otro FastAPI aislado (8012) con host Ollama inaccesible. No se detuvieron servicios compartidos.
+
+**54 comprobaciones aprobadas**:
+
+- Los 10 perfiles y 6 proyectos del corpus final se confirmaron por HTTP con sus salidas revisadas, persistieron en JSON y mantuvieron revisión de fuente correcta. Los casos con contenido generaron vectores Nomic reales, finitos, de **768 dimensiones**. Antes de confirmar, el adaptador no acreditó habilidades a partir del borrador.
+- P05/P07/P08 quedaron sin_contenido, con metas conservadas y sin vector; reintentar devolvió **409**. Intereses reales sin habilidades (P09) sí proporcionan contenido semántico, pero no prueban competencias.
+- SQL/programar con SQL, Blender/experiencia en Blender, UE5 y Figma coincidieron con requisitos reales después de confirmar. No sé Python, deseo de aprender Docker e interés en videojuegos **no** dieron un requisito por cumplido. La recomendación Docker quedó needs_review con requisito desconocido y sin fortaleza Docker inventada, aunque había un vector real del perfil.
+- El perfil vacío siguió sin_contenido con Ollama inaccesible; el perfil con contenido quedó pendiente_embedding y el reintento recuperó listo. Una interpretación fallida devolvió 503 y conservó la confirmación sin_contenido anterior. Añadir contenido y reconfirmar produjo un embedding.
+- La confirmación humana fusionó alias duplicados. Publicar dos veces con la misma clave recuperó la misma fila. Recomendaciones, invitación, aceptación y equipo continuaron funcionando.
+
+Los análisis Llama del corpus se ejecutaron contra el servicio real; para limitar llamadas, MySQL recibió por HTTP sus salidas capturadas, reprocesadas por el código final y revisadas como fixtures humanos. No se afirma que las confirmaciones volvieran a invocar Llama. La persistencia y todos los vectores de estas comprobaciones fueron reales.
+
+Se comprobó visualmente el perfil P05 en React: mensaje **Datos confirmados; falta contenido para el análisis**, meta diseño conservada, fortalezas vacías y **sin botón Reintentar análisis**. Cero errores de consola capturados. [Captura del estado](qa_semantica_20261025/perfil_sin_contenido.png).
+
+La base principal conserva los mismos conteos/checksums/DDL/revisión de la tabla de la primera ronda: **no se modificó**. QA quedó con 12 usuarios/perfiles, 7 eventos, una solicitud y un participante ficticios. No se creó ni ejecutó migración sobre la principal.
+
+### Límites y pendientes de esta ronda
+
+- Catálogo intencionalmente limitado: fuera de esos ocho conceptos, etiquetas compuestas, paráfrasis, correferencias o intenciones complejas pueden necesitar corrección humana. No se promete comprensión general del español. No se fusionan conceptos no catalogados por semejanza; crear consultas no equivale automáticamente a SQL, ni Unreal Engine 4 a UE5.
+- Las negaciones no se convierten automáticamente en hechos negativos publicados. La fuente del borrador y su clasificación interna conservan la distinción; acreditar una negación como evidencia confirmada requeriría una revisión explícita de ese contrato, que no se amplió en esta ronda.
+- Los perfiles existentes no se reescriben. Los ya pendientes sin contenido adoptan sin_contenido al reintentar/reconfirmar. Etiquetas antiguas compuestas fuera de los alias exactos requieren revisión. No hay migración masiva ni regeneración automática.
+- Llama crudo sigue produciendo errores; los filtros y el corpus no sustituyen la confirmación humana. Los casos fuera del catálogo y textos más largos pueden omitir hechos válidos por el control conservador de apoyo literal. La extracción literal de roles también es limitada.
+- QA-06/07/08/09/10/11/12/16/17 y el restablecimiento de contraseñas bcrypt antiguas ambiguas siguen fuera de este encargo. No se agregaron reuniones, feedback, nuevos modelos o infraestructura.
+
+La segunda ronda se entrega en un commit local de corrección semántica después de validar. No se hace push ni merge. El runner y resultados intermedios de laboratorio permanecen en `backend/.venv/qa_semantics_20261025/`; el corpus de entrada y las regresiones sí están en el repositorio. Los procesos habituales no se reiniciaron: su aplicación requiere la recarga normal del backend.
+
+La pestaña y los tres procesos QA creados para esta ronda se cerraron al terminar. Se conserva la base aislada para reproducir las evidencias; no se limpió ni restableció la base principal.

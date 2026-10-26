@@ -14,6 +14,7 @@ from app.models.usuario import PerfilUsuario, Usuario
 from app.services.ai.matching.normalization import apply_equivalence
 from app.services.ai.matching.schemas import CandidateInput, EventInput, Evidence, Location, Participant
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
+from app.services.ai.integration import PROFILE_CONFIRMED_STATES
 
 from .candidates import recommend_candidates
 from .contracts import OrganizerRecommendationContext, UserRecommendationContext
@@ -64,7 +65,7 @@ def candidate_from_orm(user: Usuario, profile: PerfilUsuario | None,
         return CandidateInput(user_id=user.id_usuario, visibility="hidden",
                               account_state="active" if active else "inactive")
     confirmed = bool(profile and profile.perfil_confirmado_at
-                     and profile.perfil_estado_ia in {"listo", "pendiente_embedding"})
+                     and profile.perfil_estado_ia in PROFILE_CONFIRMED_STATES)
     structured = None
     if confirmed:
         try:

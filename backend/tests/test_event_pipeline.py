@@ -99,7 +99,7 @@ def test_explicit_goalkeeper_survives_inconsistent_model_responses():
         parsed = parser.parse_event(description, categoria_principal="Deportivo")
         assert parsed.roles_buscados == ["portero"]
         assert parsed.habilidades_obligatorias == []
-    assert "incluye \"portero\" en roles_buscados" in ai.generate_structured.call_args.kwargs["prompt"]
+    assert "funciones pedidas explícitamente" in ai.generate_structured.call_args.kwargs["prompt"]
 
 
 @pytest.mark.parametrize("description", [

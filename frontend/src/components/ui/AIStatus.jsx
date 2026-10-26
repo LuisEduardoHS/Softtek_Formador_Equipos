@@ -3,6 +3,7 @@ import Button from "./Button"
 const STATES = {
   listo: ["Análisis listo", "Los datos revisados y su representación para recomendaciones están actualizados."],
   pendiente_embedding: ["Datos confirmados; análisis pendiente", "Tus datos están guardados. Puedes reintentar el análisis; las recomendaciones pueden usar la información que confirmaste."],
+  sin_contenido: ["Datos confirmados; falta contenido para el análisis", "Agrega habilidades, intereses o experiencia y confirma el perfil. Los objetivos de aprendizaje no se consideran habilidades adquiridas; reintentar sin nuevos datos no generará un análisis."],
   interpretando: ["Revisión pendiente", "Revisa tus datos o vuelve a interpretarlos antes de confirmar."],
   interpretacion_pendiente: ["Interpretación pendiente", "El servicio no completó la interpretación. Puedes revisar los datos manualmente o volver a intentarlo."],
   pendiente_revision: ["Requiere tu revisión", "Revisa y confirma los datos actuales para usarlos en las recomendaciones."],

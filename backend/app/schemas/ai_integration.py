@@ -56,6 +56,15 @@ class ProfileReviewed(_Strict):
             raise ValueError("Campo de visibilidad desconocido.")
         if set(self.visibilidad) != allowed:
             raise ValueError("Confirma la visibilidad de todos los campos del perfil.")
+        unique = {}
+        for item in self.fortalezas:
+            key = item.nombre.casefold()
+            previous = unique.get(key)
+            if previous and previous.nivel and item.nivel and folded(previous.nivel) != folded(item.nivel):
+                raise ValueError("Una habilidad aparece con niveles distintos; revisa los duplicados antes de confirmar.")
+            if previous is None or (previous.nivel is None and item.nivel is not None):
+                unique[key] = item
+        self.fortalezas = list(unique.values())
         return self
 
     def structured(self) -> StructuredProfile:

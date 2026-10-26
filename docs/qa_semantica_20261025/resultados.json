@@ -1,0 +1,3486 @@
+{
+  "generated_at_utc": "2026-10-26T03:00:32.984245+00:00",
+  "base_commit": "2157a43",
+  "catalog": {
+    "version": "2026-10-25.v3",
+    "skills": [
+      "Python",
+      "SQL",
+      "Blender",
+      "Unreal Engine 5",
+      "UX/UI",
+      "Figma",
+      "Docker",
+      "Git"
+    ],
+    "aliases": {
+      "UE5": "Unreal Engine 5",
+      "UX UI": "UX/UI",
+      "UI/UX": "UX/UI",
+      "experiencia en Python": "Python",
+      "experiencia con Python": "Python",
+      "tengo experiencia en Python": "Python",
+      "experiencia en SQL": "SQL",
+      "experiencia con SQL": "SQL",
+      "tengo experiencia en SQL": "SQL",
+      "experiencia en Blender": "Blender",
+      "experiencia con Blender": "Blender",
+      "tengo experiencia en Blender": "Blender",
+      "experiencia en Unreal Engine 5": "Unreal Engine 5",
+      "experiencia con Unreal Engine 5": "Unreal Engine 5",
+      "tengo experiencia en Unreal Engine 5": "Unreal Engine 5",
+      "experiencia en UE5": "Unreal Engine 5",
+      "experiencia con UE5": "Unreal Engine 5",
+      "tengo experiencia en UE5": "Unreal Engine 5",
+      "experiencia en UX/UI": "UX/UI",
+      "experiencia con UX/UI": "UX/UI",
+      "tengo experiencia en UX/UI": "UX/UI",
+      "experiencia en UX UI": "UX/UI",
+      "experiencia con UX UI": "UX/UI",
+      "tengo experiencia en UX UI": "UX/UI",
+      "experiencia en UI/UX": "UX/UI",
+      "experiencia con UI/UX": "UX/UI",
+      "tengo experiencia en UI/UX": "UX/UI",
+      "experiencia en Figma": "Figma",
+      "experiencia con Figma": "Figma",
+      "tengo experiencia en Figma": "Figma",
+      "experiencia en Docker": "Docker",
+      "experiencia con Docker": "Docker",
+      "tengo experiencia en Docker": "Docker",
+      "experiencia en Git": "Git",
+      "experiencia con Git": "Git",
+      "tengo experiencia en Git": "Git",
+      "programar Python": "Python",
+      "programación Python": "Python",
+      "sé programar Python": "Python",
+      "programar en Python": "Python",
+      "programar con Python": "Python",
+      "programación en Python": "Python",
+      "programación con Python": "Python",
+      "sé programar en Python": "Python",
+      "sé programar con Python": "Python",
+      "sé Python": "Python",
+      "domino Python": "Python",
+      "manejo Python": "Python",
+      "conozco Python": "Python",
+      "programar SQL": "SQL",
+      "programación SQL": "SQL",
+      "sé programar SQL": "SQL",
+      "programar en SQL": "SQL",
+      "programar con SQL": "SQL",
+      "programación en SQL": "SQL",
+      "programación con SQL": "SQL",
+      "sé programar en SQL": "SQL",
+      "sé programar con SQL": "SQL",
+      "sé SQL": "SQL",
+      "domino SQL": "SQL",
+      "manejo SQL": "SQL",
+      "conozco SQL": "SQL"
+    }
+  },
+  "regressions_before": {
+    "cases": 20,
+    "failed": 19,
+    "passed": 1
+  },
+  "real_llama_calls": [
+    {
+      "id": "P01",
+      "kind": "profile",
+      "source": "Sé programar con SQL y crear consultas.",
+      "expected": {
+        "id": "P01",
+        "text": "Sé programar con SQL y crear consultas.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "SQL",
+          "crear consultas"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL, crear consultas"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "programar con SQL",
+          "crear consultas"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [
+        "crear consultas"
+      ],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 21.306,
+      "phase": "initial"
+    },
+    {
+      "id": "P02",
+      "kind": "profile",
+      "source": "Tengo experiencia en Blender y Unreal Engine 5. He modelado escenarios 3D.",
+      "expected": {
+        "id": "P02",
+        "text": "Tengo experiencia en Blender y Unreal Engine 5. He modelado escenarios 3D.",
+        "skills": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Modelado de escenarios 3D en Blender y Unreal Engine 5"
+        ],
+        "resumen_publico": "Habilidades declaradas: Blender, Unreal Engine 5. Experiencia: Modelado de escenarios 3D en Blender y Unreal Engine 5"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Modelado de escenarios 3D en Blender y Unreal Engine 5"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Blender": [
+          "affirmed"
+        ],
+        "Unreal Engine 5": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 1.41,
+      "phase": "initial"
+    },
+    {
+      "id": "P03",
+      "kind": "profile",
+      "source": "Diseño interfaces UX/UI en Figma y he realizado prototipos para una app.",
+      "expected": {
+        "id": "P03",
+        "text": "Diseño interfaces UX/UI en Figma y he realizado prototipos para una app.",
+        "skills": [
+          "UX/UI",
+          "Figma"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "UX/UI",
+          "Figma"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Figma"
+        ],
+        "resumen_publico": "Habilidades declaradas: UX/UI, Figma. Experiencia: Figma"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Diseño de interfaces UX/UI"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Figma",
+          "Prototipado para aplicaciones móviles"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "UX/UI": [
+          "affirmed"
+        ],
+        "Figma": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 1.444,
+      "phase": "initial"
+    },
+    {
+      "id": "P04",
+      "kind": "profile",
+      "source": "No sé Python. Domino SQL.",
+      "expected": {
+        "id": "P04",
+        "text": "No sé Python. Domino SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "denied"
+        ],
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.972,
+      "phase": "initial"
+    },
+    {
+      "id": "P05",
+      "kind": "profile",
+      "source": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+      "expected": {
+        "id": "P05",
+        "text": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+        "skills": [],
+        "goals": [
+          "diseño"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "aprender diseño",
+          "diseño"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "diseño"
+        ],
+        "areas_mejora": [
+          "aprender diseño"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [
+        "aprender diseno"
+      ],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "FAIL",
+      "seconds": 1.012,
+      "phase": "initial"
+    },
+    {
+      "id": "P06",
+      "kind": "profile",
+      "source": "Quiero aprender Docker. Mi habilidad actual es SQL.",
+      "expected": {
+        "id": "P06",
+        "text": "Quiero aprender Docker. Mi habilidad actual es SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [
+          "Docker"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "SQL": [
+          "affirmed"
+        ],
+        "Docker": [
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.978,
+      "phase": "initial"
+    },
+    {
+      "id": "P07",
+      "kind": "profile",
+      "source": "Me gustaría hacer algo interesante con otras personas, todavía no sé qué aportar.",
+      "expected": {
+        "id": "P07",
+        "text": "Me gustaría hacer algo interesante con otras personas, todavía no sé qué aportar.",
+        "skills": [],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "hacer algo interesante con otras personas"
+        ],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 1.073,
+      "phase": "initial"
+    },
+    {
+      "id": "P08",
+      "kind": "profile",
+      "source": "No he usado Blender ni UE5. Quiero aprender Figma.",
+      "expected": {
+        "id": "P08",
+        "text": "No he usado Blender ni UE5. Quiero aprender Figma.",
+        "skills": [],
+        "goals": [
+          "Figma"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "Figma"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "Figma"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Blender": [
+          "denied"
+        ],
+        "Unreal Engine 5": [
+          "denied"
+        ],
+        "Figma": [
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.952,
+      "phase": "initial"
+    },
+    {
+      "id": "P09",
+      "kind": "profile",
+      "source": "Me gustan los videojuegos y los juegos de estrategia; no afirmo tener habilidades de programación.",
+      "expected": {
+        "id": "P09",
+        "text": "Me gustan los videojuegos y los juegos de estrategia; no afirmo tener habilidades de programación.",
+        "skills": [],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [],
+        "intereses": [
+          "videojuegos",
+          "juegos de estrategia"
+        ],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Intereses: videojuegos, juegos de estrategia"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "videojuegos",
+          "juegos de estrategia"
+        ],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 1.03,
+      "phase": "initial"
+    },
+    {
+      "id": "P10",
+      "kind": "profile",
+      "source": "Sé Python y SQL. He creado un panel de datos y limpiado encuestas. Me interesa la visualización y el diseño accesible. No sé Docker ni Unreal Engine 5. Quiero mejorar estadística y aprender Docker. Puedo trabajar los sábados.",
+      "expected": {
+        "id": "P10",
+        "text": "Sé Python y SQL. He creado un panel de datos y limpiado encuestas. Me interesa la visualización y el diseño accesible. No sé Docker ni Unreal Engine 5. Quiero mejorar estadística y aprender Docker. Puedo trabajar los sábados.",
+        "skills": [
+          "Python",
+          "SQL"
+        ],
+        "goals": [
+          "estadística",
+          "Docker"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [
+          "visualización",
+          "diseño accesible"
+        ],
+        "areas_mejora": [
+          "estadística",
+          "Docker"
+        ],
+        "experiencia": [
+          "creación de un panel de datos",
+          "limpieza de encuestas"
+        ],
+        "resumen_publico": "Habilidades declaradas: Python, SQL. Intereses: visualización, diseño accesible. Experiencia: creación de un panel de datos, limpieza de encuestas"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [
+          "visualización",
+          "diseño accesible"
+        ],
+        "areas_mejora": [
+          "estadística",
+          "Docker"
+        ],
+        "experiencia": [
+          "creación de un panel de datos",
+          "limpieza de encuestas"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "affirmed"
+        ],
+        "SQL": [
+          "affirmed"
+        ],
+        "Unreal Engine 5": [
+          "denied"
+        ],
+        "Docker": [
+          "denied",
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 1.7,
+      "phase": "initial"
+    },
+    {
+      "id": "E01",
+      "kind": "event",
+      "source": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+      "expected": {
+        "id": "E01",
+        "text": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+        "required": [
+          "Python"
+        ],
+        "preferred": [
+          "SQL"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Python. Habilidades deseables: SQL. Roles buscados: desarrollador backend",
+        "habilidades_obligatorias": [
+          "Python"
+        ],
+        "habilidades_deseables": [
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "restricciones_explicitas": [
+          "Python obligatorio",
+          "SQL deseable",
+          "aplicación web"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "status": "PASS",
+      "seconds": 1.337,
+      "phase": "initial"
+    },
+    {
+      "id": "E02",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "diseñador UX/UI",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [
+        "prototipar una app accesible en Figma",
+        "accesible en Figma"
+      ],
+      "status": "FAIL",
+      "seconds": 17.749,
+      "phase": "initial"
+    },
+    {
+      "id": "E03",
+      "kind": "event",
+      "source": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+      "expected": {
+        "id": "E03",
+        "text": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+        "required": [
+          "SQL"
+        ],
+        "preferred": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: SQL",
+        "habilidades_obligatorias": [
+          "SQL"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "habilidades_obligatorias": [
+          "SQL"
+        ],
+        "habilidades_deseables": [
+          "Python"
+        ],
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "No exigimos Docker"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "status": "PASS",
+      "seconds": 1.259,
+      "phase": "initial"
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Python",
+          "SQL",
+          "no obligatorio"
+        ]
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "desarrollador web",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "Python",
+          "SQL",
+          "opcional",
+          "no obligatorio",
+          "QA E04"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [
+        "Python",
+        "SQL"
+      ],
+      "status": "FAIL",
+      "seconds": 1.347,
+      "phase": "initial"
+    },
+    {
+      "id": "E05",
+      "kind": "event",
+      "source": "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles.",
+      "expected": {
+        "id": "E05",
+        "text": "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles.",
+        "required": [],
+        "preferred": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles."
+        ]
+      },
+      "raw_model": {
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles."
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "status": "PASS",
+      "seconds": 1.011,
+      "phase": "initial"
+    },
+    {
+      "id": "E06",
+      "kind": "event",
+      "source": "Blender obligatorio y Unreal Engine 5 deseable para modelar un escenario. Reuniones los sábados en línea.",
+      "expected": {
+        "id": "E06",
+        "text": "Blender obligatorio y Unreal Engine 5 deseable para modelar un escenario. Reuniones los sábados en línea.",
+        "required": [
+          "Blender"
+        ],
+        "preferred": [
+          "Unreal Engine 5"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Blender. Habilidades deseables: Unreal Engine 5",
+        "habilidades_obligatorias": [
+          "Blender"
+        ],
+        "habilidades_deseables": [
+          "Unreal Engine 5"
+        ],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Reuniones los sábados en línea"
+        ]
+      },
+      "raw_model": {
+        "habilidades_obligatorias": [
+          "Blender"
+        ],
+        "habilidades_deseables": [
+          "Unreal Engine 5"
+        ],
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "Reuniones los sábados en línea"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "status": "PASS",
+      "seconds": 1.349,
+      "phase": "initial"
+    },
+    {
+      "id": "P04-R",
+      "kind": "profile",
+      "source": "No sé Python. Domino SQL.",
+      "expected": {
+        "id": "P04",
+        "text": "No sé Python. Domino SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "denied"
+        ],
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 1.0,
+      "phase": "initial"
+    },
+    {
+      "id": "E02-R",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": []
+      },
+      "catalog": "2026-10-25.v3",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "diseñador UX/UI",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [
+        "prototipar una app accesible en Figma",
+        "accesible en Figma"
+      ],
+      "status": "FAIL",
+      "seconds": 17.676,
+      "phase": "initial"
+    },
+    {
+      "id": "P05",
+      "kind": "profile",
+      "source": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+      "expected": {
+        "id": "P05",
+        "text": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+        "skills": [],
+        "goals": [
+          "diseño"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "real_llama_final",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "diseño"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "diseño"
+        ],
+        "areas_mejora": [
+          "aprender diseño"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 4.014,
+      "phase": "focused"
+    },
+    {
+      "id": "E02",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": [],
+        "roles": [
+          "diseñador UX/UI"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "real_llama_final",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma en un lugar específico, pero no se proporciona la ubicación",
+          "horario específico, pero no se proporciona la fecha",
+          "condición de participación: no se proporciona información adicional sobre la condición de participación",
+          "requisito de habilidades: Figma es obligatorio",
+          "requisito de habilidades: no se proporciona información adicional sobre el requisito de habilidades",
+          "rol_buscado: diseñador UX/UI",
+          "habilidades_obligatorias: Figma",
+          "habilidades_deseables: no se proporciona información adicional sobre las habilidades deseables",
+          "categoria_principal: Académico"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 4.74,
+      "phase": "focused"
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador web"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "real_llama_final",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "condiciones de participación no especificadas"
+        ]
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "horario",
+          "lugar",
+          "condiciones de participación no especificadas"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [
+        "condiciones de participación no especificadas"
+      ],
+      "status": "FAIL",
+      "seconds": 1.044,
+      "phase": "focused"
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador web"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "real_llama_final_check",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "horario",
+          "lugar",
+          "condiciones de participación no especificadas"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 1.046,
+      "phase": "last_check"
+    }
+  ],
+  "final_replay": [
+    {
+      "id": "P01",
+      "kind": "profile",
+      "source": "Sé programar con SQL y crear consultas.",
+      "expected": {
+        "id": "P01",
+        "text": "Sé programar con SQL y crear consultas.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "SQL",
+          "crear consultas"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL, crear consultas"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "programar con SQL",
+          "crear consultas"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [
+        "crear consultas"
+      ],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.002,
+      "phase": "initial",
+      "llama_seconds": 21.306
+    },
+    {
+      "id": "P02",
+      "kind": "profile",
+      "source": "Tengo experiencia en Blender y Unreal Engine 5. He modelado escenarios 3D.",
+      "expected": {
+        "id": "P02",
+        "text": "Tengo experiencia en Blender y Unreal Engine 5. He modelado escenarios 3D.",
+        "skills": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Tengo experiencia en Blender y Unreal Engine 5",
+          "He modelado escenarios 3D"
+        ],
+        "resumen_publico": "Habilidades declaradas: Blender, Unreal Engine 5. Experiencia: Tengo experiencia en Blender y Unreal Engine 5, He modelado escenarios 3D"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Modelado de escenarios 3D en Blender y Unreal Engine 5"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Blender": [
+          "affirmed"
+        ],
+        "Unreal Engine 5": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.41
+    },
+    {
+      "id": "P03",
+      "kind": "profile",
+      "source": "Diseño interfaces UX/UI en Figma y he realizado prototipos para una app.",
+      "expected": {
+        "id": "P03",
+        "text": "Diseño interfaces UX/UI en Figma y he realizado prototipos para una app.",
+        "skills": [
+          "UX/UI",
+          "Figma"
+        ],
+        "goals": []
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "UX/UI",
+          "Figma"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Figma"
+        ],
+        "resumen_publico": "Habilidades declaradas: UX/UI, Figma. Experiencia: Figma"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Diseño de interfaces UX/UI"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [
+          "Figma",
+          "Prototipado para aplicaciones móviles"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "UX/UI": [
+          "affirmed"
+        ],
+        "Figma": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.444
+    },
+    {
+      "id": "P04",
+      "kind": "profile",
+      "source": "No sé Python. Domino SQL.",
+      "expected": {
+        "id": "P04",
+        "text": "No sé Python. Domino SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "denied"
+        ],
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "initial",
+      "llama_seconds": 0.972
+    },
+    {
+      "id": "P05",
+      "kind": "profile",
+      "source": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+      "expected": {
+        "id": "P05",
+        "text": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+        "skills": [],
+        "goals": [
+          "diseño"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "diseño"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "diseño"
+        ],
+        "areas_mejora": [
+          "aprender diseño"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.012
+    },
+    {
+      "id": "P06",
+      "kind": "profile",
+      "source": "Quiero aprender Docker. Mi habilidad actual es SQL.",
+      "expected": {
+        "id": "P06",
+        "text": "Quiero aprender Docker. Mi habilidad actual es SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [
+          "Docker"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "SQL": [
+          "affirmed"
+        ],
+        "Docker": [
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 0.978
+    },
+    {
+      "id": "P07",
+      "kind": "profile",
+      "source": "Me gustaría hacer algo interesante con otras personas, todavía no sé qué aportar.",
+      "expected": {
+        "id": "P07",
+        "text": "Me gustaría hacer algo interesante con otras personas, todavía no sé qué aportar.",
+        "skills": [],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "hacer algo interesante con otras personas"
+        ],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "initial",
+      "llama_seconds": 1.073
+    },
+    {
+      "id": "P08",
+      "kind": "profile",
+      "source": "No he usado Blender ni UE5. Quiero aprender Figma.",
+      "expected": {
+        "id": "P08",
+        "text": "No he usado Blender ni UE5. Quiero aprender Figma.",
+        "skills": [],
+        "goals": [
+          "Figma"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "Figma"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "Figma"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Blender": [
+          "denied"
+        ],
+        "Unreal Engine 5": [
+          "denied"
+        ],
+        "Figma": [
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "initial",
+      "llama_seconds": 0.952
+    },
+    {
+      "id": "P09",
+      "kind": "profile",
+      "source": "Me gustan los videojuegos y los juegos de estrategia; no afirmo tener habilidades de programación.",
+      "expected": {
+        "id": "P09",
+        "text": "Me gustan los videojuegos y los juegos de estrategia; no afirmo tener habilidades de programación.",
+        "skills": [],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [],
+        "intereses": [
+          "videojuegos",
+          "juegos de estrategia"
+        ],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Intereses: videojuegos, juegos de estrategia"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "videojuegos",
+          "juegos de estrategia"
+        ],
+        "areas_mejora": [],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "initial",
+      "llama_seconds": 1.03
+    },
+    {
+      "id": "P10",
+      "kind": "profile",
+      "source": "Sé Python y SQL. He creado un panel de datos y limpiado encuestas. Me interesa la visualización y el diseño accesible. No sé Docker ni Unreal Engine 5. Quiero mejorar estadística y aprender Docker. Puedo trabajar los sábados.",
+      "expected": {
+        "id": "P10",
+        "text": "Sé Python y SQL. He creado un panel de datos y limpiado encuestas. Me interesa la visualización y el diseño accesible. No sé Docker ni Unreal Engine 5. Quiero mejorar estadística y aprender Docker. Puedo trabajar los sábados.",
+        "skills": [
+          "Python",
+          "SQL"
+        ],
+        "goals": [
+          "estadística",
+          "Docker"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [
+          "visualización",
+          "diseño accesible"
+        ],
+        "areas_mejora": [
+          "estadística",
+          "Docker"
+        ],
+        "experiencia": [
+          "He creado un panel de datos y limpiado encuestas"
+        ],
+        "resumen_publico": "Habilidades declaradas: Python, SQL. Intereses: visualización, diseño accesible. Experiencia: He creado un panel de datos y limpiado encuestas"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "Python",
+          "SQL"
+        ],
+        "intereses": [
+          "visualización",
+          "diseño accesible"
+        ],
+        "areas_mejora": [
+          "estadística",
+          "Docker"
+        ],
+        "experiencia": [
+          "creación de un panel de datos",
+          "limpieza de encuestas"
+        ]
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "affirmed"
+        ],
+        "SQL": [
+          "affirmed"
+        ],
+        "Unreal Engine 5": [
+          "denied"
+        ],
+        "Docker": [
+          "denied",
+          "goal"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.7
+    },
+    {
+      "id": "E01",
+      "kind": "event",
+      "source": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+      "expected": {
+        "id": "E01",
+        "text": "Buscamos un desarrollador backend con Python obligatorio y SQL deseable para una aplicación web.",
+        "required": [
+          "Python"
+        ],
+        "preferred": [
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador backend"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Python. Habilidades deseables: SQL. Roles buscados: desarrollador backend",
+        "habilidades_obligatorias": [
+          "Python"
+        ],
+        "habilidades_deseables": [
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "desarrollador backend"
+        ],
+        "restricciones_explicitas": [
+          "Python obligatorio",
+          "SQL deseable",
+          "aplicación web"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.003,
+      "phase": "initial",
+      "llama_seconds": 1.337
+    },
+    {
+      "id": "E02",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": [],
+        "roles": [
+          "diseñador UX/UI"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "diseñador UX/UI",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 17.749
+    },
+    {
+      "id": "E03",
+      "kind": "event",
+      "source": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+      "expected": {
+        "id": "E03",
+        "text": "Buscamos analista con SQL obligatorio. Python no es obligatorio. No exigimos Docker.",
+        "required": [
+          "SQL"
+        ],
+        "preferred": [],
+        "roles": [
+          "analista"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: SQL. Roles buscados: analista",
+        "habilidades_obligatorias": [
+          "SQL"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "analista"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "habilidades_obligatorias": [
+          "SQL"
+        ],
+        "habilidades_deseables": [
+          "Python"
+        ],
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "No exigimos Docker"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.259
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador web"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "desarrollador web",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "Python",
+          "SQL",
+          "opcional",
+          "no obligatorio",
+          "QA E04"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.347
+    },
+    {
+      "id": "E05",
+      "kind": "event",
+      "source": "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles.",
+      "expected": {
+        "id": "E05",
+        "text": "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles.",
+        "required": [],
+        "preferred": []
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "Queremos hacer algo creativo juntos; todavía no hemos decidido herramientas ni roles."
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.011
+    },
+    {
+      "id": "E06",
+      "kind": "event",
+      "source": "Blender obligatorio y Unreal Engine 5 deseable para modelar un escenario. Reuniones los sábados en línea.",
+      "expected": {
+        "id": "E06",
+        "text": "Blender obligatorio y Unreal Engine 5 deseable para modelar un escenario. Reuniones los sábados en línea.",
+        "required": [
+          "Blender"
+        ],
+        "preferred": [
+          "Unreal Engine 5"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Blender. Habilidades deseables: Unreal Engine 5",
+        "habilidades_obligatorias": [
+          "Blender"
+        ],
+        "habilidades_deseables": [
+          "Unreal Engine 5"
+        ],
+        "roles_buscados": [],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": [
+          "Reuniones los sábados en línea"
+        ]
+      },
+      "raw_model": {
+        "habilidades_obligatorias": [
+          "Blender"
+        ],
+        "habilidades_deseables": [
+          "Unreal Engine 5"
+        ],
+        "roles_buscados": [],
+        "restricciones_explicitas": [
+          "Reuniones los sábados en línea"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 1.349
+    },
+    {
+      "id": "P04-R",
+      "kind": "profile",
+      "source": "No sé Python. Domino SQL.",
+      "expected": {
+        "id": "P04",
+        "text": "No sé Python. Domino SQL.",
+        "skills": [
+          "SQL"
+        ],
+        "goals": [],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [],
+        "experiencia": [],
+        "resumen_publico": "Habilidades declaradas: SQL"
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [
+          "SQL"
+        ],
+        "intereses": [],
+        "areas_mejora": [
+          "Python"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {
+        "Python": [
+          "denied"
+        ],
+        "SQL": [
+          "affirmed"
+        ]
+      },
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "initial",
+      "llama_seconds": 1.0
+    },
+    {
+      "id": "E02-R",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": [],
+        "roles": [
+          "diseñador UX/UI"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "roles_buscados": [
+          "diseñador UX/UI",
+          "portero"
+        ],
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma",
+          "accesible en Figma"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "initial",
+      "llama_seconds": 17.676
+    },
+    {
+      "id": "P05",
+      "kind": "profile",
+      "source": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+      "expected": {
+        "id": "P05",
+        "text": "No tengo experiencia laboral ni profesional. Quiero aprender diseño.",
+        "skills": [],
+        "goals": [
+          "diseño"
+        ],
+        "no_experience": true
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "habilidades": [],
+        "intereses": [],
+        "areas_mejora": [
+          "diseño"
+        ],
+        "experiencia": [],
+        "resumen_publico": ""
+      },
+      "raw_model": {
+        "resumen_publico": "",
+        "habilidades": [],
+        "intereses": [
+          "diseño"
+        ],
+        "areas_mejora": [
+          "aprender diseño"
+        ],
+        "experiencia": []
+      },
+      "schema_valid": true,
+      "omissions": [],
+      "false_positive_catalog_skills": [],
+      "additional_skill_labels": [],
+      "goal_omissions": [],
+      "unexpected_goals": [],
+      "unexpected_experience": [],
+      "source_polarity": {},
+      "status": "PASS",
+      "seconds": 0.0,
+      "phase": "focused",
+      "llama_seconds": 4.014
+    },
+    {
+      "id": "E02",
+      "kind": "event",
+      "source": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+      "expected": {
+        "id": "E02",
+        "text": "Buscamos diseñador UX/UI. Figma es obligatorio para prototipar una app accesible.",
+        "required": [
+          "Figma"
+        ],
+        "preferred": [],
+        "roles": [
+          "diseñador UX/UI"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades obligatorias: Figma. Roles buscados: diseñador UX/UI",
+        "habilidades_obligatorias": [
+          "Figma"
+        ],
+        "habilidades_deseables": [],
+        "roles_buscados": [
+          "diseñador UX/UI"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "prototipar una app accesible en Figma en un lugar específico, pero no se proporciona la ubicación",
+          "horario específico, pero no se proporciona la fecha",
+          "condición de participación: no se proporciona información adicional sobre la condición de participación",
+          "requisito de habilidades: Figma es obligatorio",
+          "requisito de habilidades: no se proporciona información adicional sobre el requisito de habilidades",
+          "rol_buscado: diseñador UX/UI",
+          "habilidades_obligatorias: Figma",
+          "habilidades_deseables: no se proporciona información adicional sobre las habilidades deseables",
+          "categoria_principal: Académico"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "focused",
+      "llama_seconds": 4.74
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador web"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "horario",
+          "lugar",
+          "condiciones de participación no especificadas"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "focused",
+      "llama_seconds": 1.044
+    },
+    {
+      "id": "E04",
+      "kind": "event",
+      "source": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+      "expected": {
+        "id": "E04",
+        "text": "Buscamos desarrollador web. Python y SQL son opcionales, no son obligatorios.",
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ],
+        "roles": [
+          "desarrollador web"
+        ]
+      },
+      "catalog": "2026-10-25.v3",
+      "execution": "captured_real_llama_final_code",
+      "data": {
+        "categoria": "Academico",
+        "titulo_normalizado": "",
+        "resumen": "Habilidades deseables: Python, SQL. Roles buscados: desarrollador web",
+        "habilidades_obligatorias": [],
+        "habilidades_deseables": [
+          "Python",
+          "SQL"
+        ],
+        "roles_buscados": [
+          "desarrollador web"
+        ],
+        "intereses_relacionados": [],
+        "restricciones_explicitas": []
+      },
+      "raw_model": {
+        "categoria": "Academico",
+        "restricciones_explicitas": [
+          "horario",
+          "lugar",
+          "condiciones de participación no especificadas"
+        ]
+      },
+      "schema_valid": true,
+      "required_omissions": [],
+      "required_false_positives": [],
+      "preferred_omissions": [],
+      "preferred_false_positives": [],
+      "misclassified_constraints": [],
+      "role_omissions": [],
+      "role_false_positives": [],
+      "unexpected_constraints": [],
+      "status": "PASS",
+      "seconds": 0.001,
+      "phase": "last_check",
+      "llama_seconds": 1.046
+    }
+  ],
+  "mysql_cases": [
+    {
+      "id": "unreviewed-P01",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P01",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "SQL",
+          "crear consultas"
+        ],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P02",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P02",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "Blender",
+          "Unreal Engine 5"
+        ],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P03",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P03",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "UX/UI",
+          "Figma"
+        ],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P04",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P04",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "SQL"
+        ],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P05",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P05",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "sin_contenido",
+        "dimensions": null,
+        "skills": [],
+        "goals": [
+          "diseño"
+        ],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "empty-retry-P05",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      }
+    },
+    {
+      "id": "unreviewed-P06",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P06",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "SQL"
+        ],
+        "goals": [
+          "Docker"
+        ],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P07",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P07",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "sin_contenido",
+        "dimensions": null,
+        "skills": [],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "empty-retry-P07",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      }
+    },
+    {
+      "id": "unreviewed-P08",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P08",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "sin_contenido",
+        "dimensions": null,
+        "skills": [],
+        "goals": [
+          "Figma"
+        ],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "empty-retry-P08",
+      "status": "PASS",
+      "evidence": {
+        "http": 409
+      }
+    },
+    {
+      "id": "unreviewed-P09",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P09",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [],
+        "goals": [],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "unreviewed-P10",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "confirm-real-P10",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "listo",
+        "dimensions": 768,
+        "skills": [
+          "Python",
+          "SQL"
+        ],
+        "goals": [
+          "estadística",
+          "Docker"
+        ],
+        "source_preserved": true
+      }
+    },
+    {
+      "id": "confirmed-alias-dedup",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      }
+    },
+    {
+      "id": "project-real-E01",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [
+          "Python"
+        ],
+        "preferred": [
+          "SQL"
+        ]
+      }
+    },
+    {
+      "id": "idempotent-E01",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-real-E02",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [
+          "Figma"
+        ],
+        "preferred": []
+      }
+    },
+    {
+      "id": "idempotent-E02",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-real-E03",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [
+          "SQL"
+        ],
+        "preferred": []
+      }
+    },
+    {
+      "id": "idempotent-E03",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-real-E04",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [],
+        "preferred": [
+          "Python",
+          "SQL"
+        ]
+      }
+    },
+    {
+      "id": "idempotent-E04",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-real-E05",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [],
+        "preferred": []
+      }
+    },
+    {
+      "id": "idempotent-E05",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "project-real-E06",
+      "status": "PASS",
+      "evidence": {
+        "http": 201,
+        "dimensions": 768,
+        "required": [
+          "Blender"
+        ],
+        "preferred": [
+          "Unreal Engine 5"
+        ]
+      }
+    },
+    {
+      "id": "idempotent-E06",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "matching-E01-P01-SQL",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "SQL",
+        "status": "met"
+      }
+    },
+    {
+      "id": "matching-E06-P02-Blender",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Blender",
+        "status": "met"
+      }
+    },
+    {
+      "id": "matching-E06-P02-Unreal Engine 5",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Unreal Engine 5",
+        "status": "met"
+      }
+    },
+    {
+      "id": "matching-E02-P03-Figma",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Figma",
+        "status": "met"
+      }
+    },
+    {
+      "id": "matching-E01-P04-Python",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Python",
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "matching-E06-P09-Blender",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Blender",
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "matching-E01-P05-Python",
+      "status": "PASS",
+      "evidence": {
+        "requirement": "Python",
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "goal-not-competence",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "recommendation-no-goal-credit",
+      "status": "PASS",
+      "evidence": {
+        "eligibility": "needs_review",
+        "explanation": {
+          "strengths": [],
+          "gaps": [],
+          "unknowns": [
+            "Por verificar habilidad obligatoria: Docker.",
+            "No hay datos suficientes para evaluar la complementariedad del equipo.",
+            "No hay requisitos con evidencia confirmada para este candidato.",
+            "Hay requisitos sin evidencia suficiente."
+          ]
+        }
+      }
+    },
+    {
+      "id": "empty-even-if-nomic-offline",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "sin_contenido"
+      }
+    },
+    {
+      "id": "offline-with-content",
+      "status": "PASS",
+      "evidence": {
+        "http": 200,
+        "state": "pendiente_embedding"
+      }
+    },
+    {
+      "id": "retry-still-recovers",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      }
+    },
+    {
+      "id": "failed-interpretation-preserves-empty-confirmation",
+      "status": "PASS",
+      "evidence": {
+        "http": 503
+      }
+    },
+    {
+      "id": "add-content-after-empty",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      }
+    },
+    {
+      "id": "invitation",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      }
+    },
+    {
+      "id": "membership",
+      "status": "PASS",
+      "evidence": {
+        "http": 200
+      }
+    },
+    {
+      "id": "teams",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "principal-unchanged",
+      "status": "PASS",
+      "evidence": {
+        "counts": {
+          "usuarios": 1,
+          "perfiles_usuarios": 1,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "checksums": {
+          "usuarios": 101962764,
+          "perfiles_usuarios": 2746401420,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+        "alembic": [
+          "20261022_6a"
+        ]
+      }
+    }
+  ],
+  "initial": {
+    "qa_database": "softtek_formador_equipos_qa_semantics_20261025_77dd5b",
+    "principal_before": {
+      "counts": {
+        "usuarios": 1,
+        "perfiles_usuarios": 1,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "checksums": {
+        "usuarios": 101962764,
+        "perfiles_usuarios": 2746401420,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+      "alembic": [
+        "20261022_6a"
+      ]
+    },
+    "qa_created_empty": true
+  },
+  "final": {
+    "principal_after": {
+      "counts": {
+        "usuarios": 1,
+        "perfiles_usuarios": 1,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "checksums": {
+        "usuarios": 101962764,
+        "perfiles_usuarios": 2746401420,
+        "eventos": 0,
+        "solicitudes_equipo": 0,
+        "participantes_evento": 0
+      },
+      "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+      "alembic": [
+        "20261022_6a"
+      ]
+    },
+    "principal_unchanged": true,
+    "qa_counts": {
+      "usuarios": 12,
+      "perfiles_usuarios": 12,
+      "eventos": 7,
+      "solicitudes_equipo": 1,
+      "participantes_evento": 1
+    },
+    "qa_database": "softtek_formador_equipos_qa_semantics_20261025_77dd5b"
+  },
+  "principal_final_inspection": {
+    "counts": {
+      "usuarios": 1,
+      "perfiles_usuarios": 1,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 101962764,
+      "perfiles_usuarios": 2746401420,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "checks": [
+    {
+      "name": "pytest",
+      "seconds": 26.14,
+      "exit_code": 0,
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 43%]\n........................................................................ [ 65%]\n........................................................................ [ 87%]\n...........................................                              [100%]\n============================== warnings summary ===============================\n.venv\\Lib\\site-packages\\fastapi\\testclient.py:1\n  D:\\projects\\Softtek_Formador_Equipos\\backend\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n331 passed, 1 warning in 25.07s\n"
+    },
+    {
+      "name": "pip_check",
+      "seconds": 0.5,
+      "exit_code": 0,
+      "output": "No broken requirements found.\n"
+    },
+    {
+      "name": "build",
+      "seconds": 1.0,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 build\n> vite build\n\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 1989 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.80 kB │ gzip:   0.44 kB\ndist/assets/index-DLKJuhXE.css   54.51 kB │ gzip:  10.14 kB\ndist/assets/index-N3ZmhUHj.js   484.44 kB │ gzip: 139.99 kB\n\n✓ built in 246ms\n"
+    },
+    {
+      "name": "lint",
+      "seconds": 3.42,
+      "exit_code": 0,
+      "output": "\n> frontend@0.0.0 lint\n> eslint .\n\n\nD:\\projects\\Softtek_Formador_Equipos\\frontend\\src\\components\\auth\\RequireSession.jsx\n  29:6  warning  React Hook useEffect has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps\n\n✖ 1 problem (0 errors, 1 warning)\n\n"
+    }
+  ],
+  "ui": {
+    "state_visible": true,
+    "retry_button_visible": false,
+    "console_errors": []
+  },
+  "environment": {
+    "llm_model": "llama3.1:8b",
+    "embedding_model": "nomic-embed-text",
+    "ollama": {
+      "version": "0.40.5"
+    },
+    "models": [
+      {
+        "name": "nomic-embed-text:latest",
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "size": 274302450
+      },
+      {
+        "name": "llama3.1:8b",
+        "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+        "size": 4920753328
+      }
+    ]
+  },
+  "latency": {
+    "real_calls": 22,
+    "min_seconds": 0.952,
+    "max_seconds": 21.306,
+    "median_seconds": 1.298
+  },
+  "scope": "No ranking weights/rules changed; no migrations or main DB writes. Replays do not call Ollama."
+}

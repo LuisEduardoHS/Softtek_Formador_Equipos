@@ -11,7 +11,7 @@ from app.schemas.ai_integration import ProfileInterpretRequest, ProfileReviewed
 from app.services.ai.profile_parser import ProfileParser
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from app.services.ai.schemas import StructuredProfile
-from app.services.ai.integration import content_revision, utc_now, process_profile_embedding
+from app.services.ai.integration import content_revision, utc_now, process_profile_embedding, PROFILE_CONFIRMED_STATES
 
 router = APIRouter(prefix="/perfil", tags=["Perfil de Usuario"])
 
@@ -27,7 +27,7 @@ def _own_profile(db: Session, actor: Usuario) -> PerfilUsuario:
 
 def _private_profile(usuario: Usuario, perfil: PerfilUsuario) -> PerfilOut:
     structured = None
-    if perfil.perfil_estado_ia in {"listo", "pendiente_embedding"}:
+    if perfil.perfil_estado_ia in PROFILE_CONFIRMED_STATES:
         try:
             structured = StructuredProfile.model_validate(perfil.perfil_estructurado_ia).model_dump(mode="json")
         except (ValueError, TypeError):
@@ -67,7 +67,7 @@ async def interpretar_perfil(payload: ProfileInterpretRequest,
         db.refresh(perfil, with_for_update=True)
         # Do not overwrite a confirmation made while this request was running.
         if perfil.perfil_estado_ia == "interpretando" and perfil.perfil_fuente_revision == previous_revision:
-            perfil.perfil_estado_ia = (previous_state if previous_state in {"listo", "pendiente_embedding"}
+            perfil.perfil_estado_ia = (previous_state if previous_state in PROFILE_CONFIRMED_STATES
                                       else "interpretacion_pendiente")
         db.commit()
         raise HTTPException(status_code=503, detail="La interpretación no está disponible. Conservamos el borrador; puedes revisar manualmente y reintentar.") from error
@@ -123,6 +123,8 @@ async def confirmar_perfil(payload: ProfileReviewed,
 async def reintentar_embedding_perfil(db: Session = Depends(get_db),
                                      actor: Usuario = Depends(get_current_user)):
     perfil = _own_profile(db, actor)
+    if perfil.perfil_estado_ia == "sin_contenido":
+        raise HTTPException(409, "Agrega habilidades, intereses o experiencia y confirma el perfil antes de generar el análisis.")
     if (not perfil.perfil_estructurado_ia or not perfil.perfil_confirmado_at or not perfil.perfil_fuente_revision
             or perfil.perfil_estado_ia not in {"listo", "pendiente_embedding"}):
         raise HTTPException(status_code=409, detail="Primero confirma el perfil.")

@@ -7,11 +7,12 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy import update
 
 from app.services.ai.config import EMBEDDING_MODEL
-from app.services.ai.embeddings import generate_event_embedding, generate_profile_embedding
+from app.services.ai.embeddings import generate_event_embedding, generate_profile_embedding, build_profile_embedding_text
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from app.services.ai.schemas import StructuredEventRequirements, StructuredProfile
 
 PIPELINE_VERSION = "2026-10-22.v1"
+PROFILE_CONFIRMED_STATES = {"listo", "pendiente_embedding", "sin_contenido"}
 
 
 def content_revision(data: dict) -> str:
@@ -47,6 +48,12 @@ def store_profile_embedding(perfil, structured: StructuredProfile,
     perfil.perfil_estado_ia = "pendiente_embedding"
     perfil.embedding_perfil = None
     perfil.perfil_embedding_fuente_revision = None
+    if not build_profile_embedding_text(structured).strip():
+        perfil.perfil_estado_ia = "sin_contenido"
+        perfil.perfil_embedding_model = None
+        perfil.perfil_embedding_pipeline = None
+        perfil.perfil_procesado_at = None
+        return
     try:
         vector = (generator or generate_reviewed_profile_vector)(structured)
     except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
@@ -79,13 +86,16 @@ def store_event_embedding(evento, requirements: StructuredEventRequirements,
 async def process_profile_embedding(db, perfil, structured: StructuredProfile, *, expected_revision=None) -> None:
     """Compute off the request loop; discard a result for an older confirmation."""
     revision = expected_revision if expected_revision is not None else perfil.perfil_fuente_revision
-    try:
-        vector = await run_in_threadpool(generate_reviewed_profile_vector, structured)
-    except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
-        vector = None
+    has_content = bool(build_profile_embedding_text(structured).strip())
+    vector = None
+    if has_content:
+        try:
+            vector = await run_in_threadpool(generate_reviewed_profile_vector, structured)
+        except (OllamaServiceError, ConnectionError, TimeoutError, ValueError):
+            pass
     from app.models.usuario import PerfilUsuario
     values = dict(embedding_perfil=vector, perfil_embedding_fuente_revision=revision if vector else None,
-                  perfil_estado_ia="listo" if vector else "pendiente_embedding",
+                  perfil_estado_ia="listo" if vector else "pendiente_embedding" if has_content else "sin_contenido",
                   perfil_embedding_model=EMBEDDING_MODEL if vector else None,
                   perfil_embedding_pipeline=PIPELINE_VERSION if vector else None,
                   perfil_procesado_at=utc_now() if vector else None)
@@ -93,7 +103,7 @@ async def process_profile_embedding(db, perfil, structured: StructuredProfile, *
         PerfilUsuario.usuario_id == perfil.usuario_id,
         PerfilUsuario.perfil_fuente_revision == revision,
         PerfilUsuario.perfil_confirmado_at.is_not(None),
-        PerfilUsuario.perfil_estado_ia.in_(["listo", "pendiente_embedding"] if vector else ["pendiente_embedding"]),
+        PerfilUsuario.perfil_estado_ia.in_(PROFILE_CONFIRMED_STATES if vector else ["pendiente_embedding", "sin_contenido"]),
     ).values(**values).execution_options(synchronize_session=False))
     db.refresh(perfil, with_for_update=True)
     return
