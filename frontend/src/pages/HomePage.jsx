@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react"
-import { responseMessage } from "../lib/contracts"
 import { Link } from "react-router-dom"
-import { ArrowRight, Compass, Inbox, Plus, UserPen, Users } from "lucide-react"
+import { ArrowRight, Compass, Plus, UserPen, Users } from "lucide-react"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import { LocalProcessing } from "../components/ui/AIBadge"
 import { CardSkeleton, EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
-import { useToast } from "../components/ui/Toast"
 import Carousel, { CarouselItem } from "../components/ui/Carousel"
-import InvitationItem from "../components/invite/InvitationItem"
 import TeamSummaryCard from "../components/team/TeamSummaryCard"
 import StudentSearch from "../components/search/StudentSearch"
 import RecommendationConsentStatus from "../components/profile/RecommendationConsentStatus"
 import useAsync from "../hooks/useAsync"
 import {
   obtenerEquipos,
-  obtenerInvitaciones,
-  responderInvitacion,
   obtenerPerfil,
   obtenerProyectos,
   obtenerRecomendaciones,
@@ -201,75 +196,6 @@ function Recommendations() {
   )
 }
 
-/* ------------------------ Invitaciones pendientes ------------------------ */
-
-function PendingInvitations() {
-  const toast = useToast()
-  const inv = useAsync(obtenerInvitaciones)
-  const [busy, setBusy] = useState(null)
-
-  const respond = async (invitation, estado) => {
-    setBusy(invitation.id)
-    try {
-      const result = await responderInvitacion(invitation.id, estado)
-      inv.setData((list) => list.map((i) => (i.id === invitation.id ? { ...i, estado: result.estado } : i)))
-      toast(responseMessage(invitation, estado), estado === "aceptada" ? "success" : "info")
-    } catch (error) {
-      toast(error.message || "No pudimos registrar tu respuesta. Inténtalo de nuevo.", "error")
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  let body
-  if (inv.loading) {
-    body = (
-      <div className="space-y-2">
-        <Skeleton className="h-28 w-full rounded-xl" />
-      </div>
-    )
-  } else if (inv.status === "error") {
-    body = <ErrorState message="No pudimos cargar tus invitaciones." onRetry={inv.reload} />
-  } else {
-    const pendientes = inv.data.filter((i) => i.tipo === "recibida" && i.estado === "pendiente")
-    body =
-      pendientes.length === 0 ? (
-        <EmptyState icon={Inbox} title="Sin invitaciones por ahora" className="py-8">
-          Cuando alguien quiera sumarte a su equipo, aparecerá aquí.
-        </EmptyState>
-      ) : (
-        <ul className="space-y-2">
-          {pendientes.map((i) => (
-            <InvitationItem
-              key={i.id}
-              invitation={i}
-              person={i.remitente}
-              project={i.proyecto}
-              busy={busy === i.id}
-              onRespond={(estado) => respond(i, estado)}
-              compact
-            />
-          ))}
-        </ul>
-      )
-  }
-
-  return (
-    <section aria-labelledby="inv-title">
-      <SectionHeader
-        id="inv-title"
-        title="Invitaciones"
-        action={
-          <Link to="/invitaciones" className="text-sm font-semibold text-primary hover:underline">
-            Ver todas
-          </Link>
-        }
-      />
-      {body}
-    </section>
-  )
-}
-
 /* ------------------------------ Mis equipos ------------------------------ */
 
 function MyTeams() {
@@ -328,10 +254,24 @@ export default function HomePage() {
           </h1>
           <p className="mt-1 text-ink-2">Esto es lo que encontramos para ti hoy en la plataforma.</p>
         </div>
-        <Button as={Link} to="/proyectos/nuevo" className="hidden lg:inline-flex">
-          <Plus aria-hidden="true" className="size-4" /> Crear proyecto
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button as={Link} to="/proyectos/nuevo" className="hidden lg:inline-flex">
+            <Plus aria-hidden="true" className="size-4" /> Crear proyecto
+          </Button>
+        </div>
       </header>
+
+      <section
+        aria-labelledby="search-title"
+        className="mb-10 animate-fade-up [animation-delay:60ms]"
+      >
+        <SectionHeader
+          id="search-title"
+          title="¿Buscas a alguien en particular?"
+          desc="Busca por nombre o habilidad y filtra por carrera, horario o semestre."
+        />
+        <StudentSearch />
+      </section>
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-10">
@@ -351,18 +291,9 @@ export default function HomePage() {
             <Recommendations />
           </section>
 
-          <section aria-labelledby="search-title" className="animate-fade-up [animation-delay:180ms]">
-            <SectionHeader
-              id="search-title"
-              title="¿Buscas a alguien en particular?"
-              desc="Busca por nombre o habilidad y filtra por carrera, horario o semestre."
-            />
-            <StudentSearch />
-          </section>
         </div>
 
         <aside className="animate-fade-up space-y-10 [animation-delay:150ms]">
-          <PendingInvitations />
           <MyTeams />
           <Link
             to="/proyectos"
