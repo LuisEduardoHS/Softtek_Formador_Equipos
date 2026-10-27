@@ -1,6 +1,10 @@
-import { Check, Clock, X } from "lucide-react"
+import { useState } from "react"
+import { Check, Clock, Eye, X } from "lucide-react"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
+import Modal from "../ui/Modal"
+import PublicProfile from "../profile/PublicProfile"
+import { obtenerPerfilUsuario } from "../../services/api"
 
 const ESTADOS = {
   pendiente: { label: "Pendiente", cls: "border-warn-line bg-warn-soft text-warn-ink", Icon: Clock },
@@ -25,11 +29,30 @@ export function StatusBadge({ estado }) {
  */
 export default function InvitationItem({ invitation, person, project, onRespond, busy = false, compact = false }) {
   const { tipo, estado, rol, mensaje } = invitation
+  const [profile, setProfile] = useState(null)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileError, setProfileError] = useState("")
   const recibida = tipo === "recibida"
   const solicitudUnirse = invitation.tipoSolicitud === "unirse"
   const canRespond = recibida && estado === "pendiente" && onRespond
   const nombrePersona = person?.nombre || "Usuario"
   const tituloProyecto = project?.titulo || invitation.proyecto?.titulo || "proyecto"
+
+  const showProfile = async () => {
+    if (!person?.id) return
+    setProfileOpen(true)
+    setProfileError("")
+    if (profile) return
+    setProfileLoading(true)
+    try {
+      setProfile(await obtenerPerfilUsuario(person.id))
+    } catch (error) {
+      setProfileError(error.message || "No pudimos cargar este perfil.")
+    } finally {
+      setProfileLoading(false)
+    }
+  }
 
   return (
     <li className="flex animate-fade-up flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-colors">
@@ -62,6 +85,17 @@ export default function InvitationItem({ invitation, person, project, onRespond,
         </div>
         {!canRespond && <StatusBadge estado={estado} />}
       </div>
+      {person?.id && (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="self-start"
+          onClick={showProfile}
+          aria-label={`Ver perfil de ${nombrePersona}`}
+        >
+          <Eye aria-hidden="true" className="size-4" /> Ver perfil
+        </Button>
+      )}
       {mensaje && !compact && <p className="rounded-lg bg-surface-2 p-3 text-sm text-ink-2 italic">“{mensaje}”</p>}
       {canRespond && (
         <div className="flex gap-2">
@@ -73,6 +107,21 @@ export default function InvitationItem({ invitation, person, project, onRespond,
           </Button>
         </div>
       )}
+      <Modal
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        title={`Perfil de ${nombrePersona}`}
+        description="Información visible según las preferencias de privacidad de esta persona."
+        size="lg"
+      >
+        {profileLoading && <p className="py-8 text-center text-sm text-ink-2">Cargando perfil…</p>}
+        {!profileLoading && profileError && (
+          <p className="rounded-lg border border-dashed border-line p-4 text-sm text-ink-2" role="alert">
+            {profileError}
+          </p>
+        )}
+        {!profileLoading && !profileError && profile && <PublicProfile student={profile} />}
+      </Modal>
     </li>
   )
 }

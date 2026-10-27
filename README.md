@@ -139,6 +139,19 @@ Abre la **[guía manual: 12 perfiles, 5 proyectos y recorridos](docs/pruebas-man
 
 Para ver candidatos, cada persona debe confirmar su perfil, activar Recomendaciones y mantenerlo sin pausa. El proyecto debe tener vacantes utilizables. Miembros del mismo proyecto y personas con una acción pendiente se excluyen; un listado vacío puede ser correcto.
 
+### Datos demo completos
+
+Para cargar perfiles y eventos ficticios listos para recorrer el flujo de recomendaciones, desde `backend/` ejecuta:
+
+```powershell
+# Si tu entorno se llama venv:
+.\venv\Scripts\python.exe scripts\seed_demo_data.py
+# Si lo creaste como .venv, usa:
+# .\.venv\Scripts\python.exe scripts\seed_demo_data.py
+```
+
+La carga es idempotente: actualiza los registros demo por correo y por título/creador sin duplicarlos. Crea dieciséis perfiles completos y dieciocho eventos (académicos y personales). Todos usan la contraseña `12345678`; sus correos siguen el formato `primerNombre@uni.com`. Los datos son ficticios y están pensados únicamente para desarrollo local.
+
 ## Comprobaciones de desarrollo
 
 Desde `backend/`:
