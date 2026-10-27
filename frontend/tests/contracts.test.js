@@ -22,6 +22,105 @@ test("QA-08: unknown viewer never claims shared interests or schedules", async (
   assert.doesNotMatch(html, /en común|los intereses que compartes/)
 })
 
+test("profile setup pre-fills the name from the registered session user", async (t) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage")
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: { getItem: () => JSON.stringify({ nombre: "Persona registrada" }) },
+  })
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original)
+    else delete globalThis.sessionStorage
+  })
+
+  const html = await render("pages/ProfileSetupPage")
+  assert.match(html, /name="name"[^>]*value="Persona registrada"/)
+})
+
+test("home hides profile progress only after a successful 100 percent result", async () => {
+  const { ProfileProgress } = await server.ssrLoadModule("/src/pages/HomePage.jsx")
+  const complete = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 100, status: "success" })))
+  const incomplete = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 75, status: "success" })))
+  const loading = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(ProfileProgress, { value: 100, status: "loading" })))
+
+  assert.equal(complete, "")
+  assert.match(incomplete, /75%/)
+  assert.match(loading, /100%/)
+})
+
+test("app layout keeps navigation inside a closed hamburger menu", async (t) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage")
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: { getItem: () => null, removeItem: () => {} },
+  })
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original)
+    else delete globalThis.sessionStorage
+  })
+
+  const html = await render("components/layout/AppLayout")
+  assert.match(html, /aria-label="Abrir menú"[^>]*aria-expanded="false"/)
+  assert.doesNotMatch(html, /aria-label="Menú principal"/)
+})
+
+test("home invitation icon links to received invitations and shows the pending count", async () => {
+  const { InvitationInboxButton } = await server.ssrLoadModule("/src/components/layout/InvitationInboxButton.jsx")
+  const { countPendingInvitations } = await server.ssrLoadModule("/src/lib/invitations.js")
+  const received = [
+    { tipo: "recibida", estado: "pendiente" },
+    { tipo: "recibida", estado: "pendiente" },
+    { tipo: "recibida", estado: "aceptada" },
+    { tipo: "enviada", estado: "pendiente" },
+  ]
+  const count = countPendingInvitations(received)
+  const html = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(InvitationInboxButton, { count })))
+
+  assert.equal(count, 2)
+  assert.match(html, /href="\/invitaciones"/)
+  assert.match(html, /aria-label="Invitaciones, 2 pendientes"/)
+  assert.match(html, />2<\/span>/)
+})
+
+test("home invitation icon shows a dot for one pending invitation and no badge for none", async () => {
+  const { InvitationInboxButton } = await server.ssrLoadModule("/src/components/layout/InvitationInboxButton.jsx")
+  const one = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(InvitationInboxButton, { count: 1 })))
+  const none = renderToStaticMarkup(createElement(MemoryRouter, null,
+    createElement(InvitationInboxButton, { count: 0 })))
+
+  assert.match(one, /Invitaciones, 1 pendientes/)
+  assert.match(one, /bg-danger/)
+  assert.match(none, /aria-label="Invitaciones"/)
+  assert.doesNotMatch(none, /bg-danger/)
+})
+
+test("invitation icon sits beside the profile avatar only on home", async (t) => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage")
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: { getItem: () => null, removeItem: () => {} },
+  })
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, "sessionStorage", original)
+    else delete globalThis.sessionStorage
+  })
+
+  const { default: AppLayout } = await server.ssrLoadModule("/src/components/layout/AppLayout.jsx")
+  const home = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ["/inicio"] },
+    createElement(AppLayout)))
+  const project = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ["/proyectos"] },
+    createElement(AppLayout)))
+
+  assert.match(home, /aria-label="Invitaciones"/)
+  assert.match(home, /aria-label="Mi perfil"/)
+  assert.doesNotMatch(project, /aria-label="Invitaciones"/)
+})
+
 test("QA-07: missing coverage never claims the team covers everything", async () => {
   const html = await render("components/team/TeamCoverageChart", { roles: [] })
   assert.doesNotMatch(html, /cubre todo lo necesario/)
