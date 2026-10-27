@@ -71,11 +71,11 @@ export default function TeamPage() {
         </div>
       </Card>
 
-      {project.roles.length > 0 && (
+      {(
         <section aria-labelledby="coverage-title" className="mb-8">
           <h2 id="coverage-title" className="mb-4 text-h2 font-semibold">Cobertura del equipo</h2>
           <Card className="p-5 sm:p-6">
-            <TeamCoverageChart roles={project.roles} />
+            <TeamCoverageChart coverage={team.cobertura_habilidades} />
           </Card>
         </section>
       )}

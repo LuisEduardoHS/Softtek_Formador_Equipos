@@ -31,7 +31,7 @@ export default function ProjectsPage() {
     (p) =>
       (!t || p.titulo.toLowerCase().includes(t) || p.roles.some((r) => r.nombre.toLowerCase().includes(t))) &&
       (tipo === "todos" || p.tipo === tipo) &&
-      (tab === "mios" || !soloAbiertos || p.roles.length === 0 || p.roles.some((r) => !r.cubiertoPor)),
+      (tab === "mios" || !soloAbiertos || p.acepta_participacion),
   )
 
   return (
@@ -59,7 +59,7 @@ export default function ProjectsPage() {
       <div className="my-5 flex flex-col gap-3 md:flex-row md:items-center">
         <SearchBar value={q} onChange={setQ} placeholder="Buscar por título o rol" label="Buscar proyectos" />
         <div className="flex flex-wrap items-center gap-3">
-          <Segmented
+          <div className="max-w-full overflow-x-auto"><Segmented
             label="Tipo"
             value={tipo}
             onChange={setTipo}
@@ -67,8 +67,11 @@ export default function ProjectsPage() {
               ["todos", "Todos"],
               ["academico", "Académicos"],
               ["personal", "Personales"],
+              ["deportivo", "Deportivos"],
+              ["videojuegos", "Videojuegos"],
+              ["general", "Generales"],
             ]}
-          />
+          /></div>
           {tab === "explorar" && (
             <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-ink">
               <input type="checkbox" checked={soloAbiertos} onChange={(e) => setSoloAbiertos(e.target.checked)} className="size-4 accent-primary" />
@@ -97,7 +100,7 @@ export default function ProjectsPage() {
               </Button>
             }
           >
-            Crea uno y te recomendaremos a las personas que lo complementen.
+            Crea uno, revisa sus requisitos e invita a personas desde el directorio.
           </EmptyState>
         ) : (
           <EmptyState icon={SearchX} title="No hay proyectos con esos filtros">

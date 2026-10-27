@@ -1,0 +1,86 @@
+Browser tab: 8, Title: "Complementa · Forma equipos que se complementan", URL: "http://127.0.0.1:5174/proyectos/2".
+1 AXWebArea Complementa · Forma equipos que se complementan, URL: 127.0.0.1:5174/proyectos/2
+	2 container root
+		3 link Description: Saltar al contenido, Value: 127.0.0.1:5174/proyectos/2#contenido
+		4 container
+			5 link Description: Complementa, Value: 127.0.0.1:5174/inicio
+			6 link Description: Crear proyecto, Value: 127.0.0.1:5174/proyectos/nuevo
+			7 container Principal
+				8 content list
+					9 link Description: Inicio, Value: 127.0.0.1:5174/inicio
+					10 link Description: Proyectos, Value: 127.0.0.1:5174/proyectos
+					11 link Description: Estudiantes, Value: 127.0.0.1:5174/estudiantes
+					12 link Description: Mis equipos, Value: 127.0.0.1:5174/equipos
+					13 link Description: Notificaciones, Value: 127.0.0.1:5174/notificaciones
+					14 link Description: Perfil, Value: 127.0.0.1:5174/perfil
+			15 link Description: QA Final Organizador QA Final Organizador Software QA, Value: 127.0.0.1:5174/perfil
+			16 button Cerrar sesión
+		17 container contenido
+			18 link Description: Proyectos, Value: 127.0.0.1:5174/proyectos
+			19 text Académico
+			20 heading QA Final Gestor de tareas, Value: 1
+				21 text QA Final Gestor de tareas
+			22 container QA Final Organizador
+			23 text Creado por ti ·  26 de octubre
+			24 text Queremos crear un gestor de tareas para estudiantes. Buscamos especialista en bases de datos: SQL obligatorio y Git deseable. Buscamos diseñador UX/UI: Figma obligatorio.
+			25 definition list
+				26 container Capacidad total
+					27 text Capacidad total
+				28 container
+					29 text Capacidad:  3  personas
+			30 button Editar proyecto
+			31 container Estado del análisis
+				32 text Análisis listo
+				33 text Los datos revisados y su representación para recomendaciones están actualizados.
+			34 container Mapa de cobertura de roles
+				35 heading Mapa de cobertura de roles, Value: 2, ID: cov-title
+					36 text Mapa de cobertura de roles
+				37 text Roles asignados a participantes reales y vacantes pendientes. La asignación de rol no acredita habilidades.
+				38 image 0 de 2 roles cubiertos
+				39 text 0  cubiertos  ·  2  por cubrir
+				40 content list
+					41 container
+						42 text especialista en bases de datos Pendiente 0  de  1  vacantes ocupadas Pendiente de cubrir: SQL
+					43 container
+						44 text diseñador UX/UI Pendiente 0  de  1  vacantes ocupadas Pendiente de cubrir: Figma
+			45 container Candidatos recomendados
+				46 heading Candidatos recomendados, Value: 2, ID: cand-title
+					47 text Candidatos recomendados
+				48 text Revisa la evidencia y elige un rol disponible antes de invitar.
+				49 text Procesado por el servidor configurado
+				50 heading Persona #6, Value: 3
+					51 text Persona # 6
+				52 container
+					53 text Requiere revisión  ·  Evidencia confirmada
+				54 button Ver perfil
+				55 pop up button (collapsed, settable) Description: Rol para persona 6, Value: especialista en bases de datos, Secondary Actions: Expand
+					56 menu
+						57 (selected) especialista en bases de datos
+						58 diseñador UX/UI
+				59 button Invitar
+				60 text Evidencia confirmada para habilidad obligatoria: SQL.
+				61 text Evidencia confirmada para habilidad deseable: Git.
+				62 text Aporta una capacidad que cubre un requisito o rol aún vacante.
+				63 text Por verificar habilidad obligatoria: Figma.
+				64 text Por verificar rol solicitado: especialista en bases de datos.
+				65 text Por verificar rol solicitado: diseñador UX/UI.
+				66 text Hay requisitos sin evidencia suficiente.
+				67 heading Persona #7, Value: 3
+					68 text Persona # 7
+				69 container
+					70 text Requiere revisión  ·  Evidencia confirmada
+				71 button Ver perfil
+				72 pop up button (collapsed, settable) Description: Rol para persona 7, Value: especialista en bases de datos, Secondary Actions: Expand
+					73 menu
+						74 (selected) especialista en bases de datos
+						75 diseñador UX/UI
+				76 button Invitar
+				77 text Evidencia confirmada para habilidad obligatoria: Figma.
+				78 text Aporta una capacidad que cubre un requisito o rol aún vacante.
+				79 text Por verificar habilidad obligatoria: SQL.
+				80 text Por verificar habilidad deseable: Git.
+				81 text Por verificar rol solicitado: especialista en bases de datos.
+				82 text Por verificar rol solicitado: diseñador UX/UI.
+				83 text Hay requisitos sin evidencia suficiente.
+
+The focused UI element is 1 AXWebArea Complementa · Forma equipos que se complementan, URL: 127.0.0.1:5174/proyectos/2

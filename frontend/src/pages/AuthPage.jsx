@@ -19,7 +19,8 @@ export default function AuthPage({ initialMode = "login" }) {
 
     try {
       const data = await iniciarSesion({ correo: email, password })
-      localStorage.setItem("usuario", JSON.stringify(data.usuario))
+      sessionStorage.setItem("access_token", data.access_token)
+      sessionStorage.setItem("usuario", JSON.stringify(data.usuario))
       navigate("/inicio")
     } catch (error) {
       console.error("Error de conexión:", error)
@@ -43,7 +44,8 @@ export default function AuthPage({ initialMode = "login" }) {
         password,
       })
 
-      localStorage.setItem("usuario", JSON.stringify(data.usuario))
+      sessionStorage.setItem("access_token", data.access_token)
+      sessionStorage.setItem("usuario", JSON.stringify(data.usuario))
       navigate("/profile")
     } catch (error) {
       console.error("Error al registrar usuario:", error)

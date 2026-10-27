@@ -27,12 +27,12 @@ export function AIPanel({ title, children, className = "" }) {
   )
 }
 
-// Indicador de confianza: el análisis ocurre en servidores de la universidad.
+// El análisis se solicita al backend configurado para esta instalación.
 export function LocalProcessing({ className = "" }) {
   return (
     <p className={`inline-flex items-center gap-1.5 text-xs text-ink-2 ${className}`}>
       <ShieldCheck aria-hidden="true" className="size-3.5 text-success-ink" />
-      Procesado de forma local en la universidad
+      Procesado por el servidor configurado
     </p>
   )
 }

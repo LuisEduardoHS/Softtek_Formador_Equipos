@@ -1,33 +1,36 @@
 import { useCallback, useId, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, CalendarDays, CircleCheck, FileQuestion, Hand, Pencil, SearchX, Users } from "lucide-react"
+import { ArrowLeft, CalendarDays, CircleCheck, FileQuestion, Hand, Pencil, Plus, Trash2, Users } from "lucide-react"
 import Avatar from "../components/ui/Avatar"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Modal from "../components/ui/Modal"
-import SkillChip from "../components/ui/SkillChip"
-import { AIPanel, LocalProcessing } from "../components/ui/AIBadge"
+import { Segmented } from "../components/ui/Controls"
+import { LocalProcessing } from "../components/ui/AIBadge"
 import { AILoading, CardSkeleton, EmptyState, ErrorState, Skeleton } from "../components/ui/Feedback"
 import { useToast } from "../components/ui/Toast"
-import RecommendationCard from "../components/recommendation/RecommendationCard"
+import ProjectAIReview from "../components/project/ProjectAIReview"
 import RoleCoverage from "../components/project/RoleCoverage"
 import { TypeBadge } from "../components/project/ProjectCard"
 import { CoverageBar } from "../components/team/TeamSummaryCard"
 import InviteModal from "../components/invite/InviteModal"
 import useAsync from "../hooks/useAsync"
-import { enviarRetroalimentacion, obtenerCandidatos, obtenerProyecto, solicitarUnirse } from "../services/api"
-import { currentUser, invitations, projectSuggestions, studentById, teams } from "../data/mockData"
+import { actualizarProyecto, obtenerCandidatos, obtenerInvitaciones, obtenerProyecto, solicitarUnirse } from "../services/api"
 import { coverage, formatDate } from "../lib/projects"
 import { getSessionUser } from "../lib/session"
+import { availableRoles } from "../lib/contracts"
+import { inputCls } from "../lib/ui"
+import CandidatesEmptyState from "../components/project/CandidatesEmptyState"
 
 /* ------------------------------ Encabezado ------------------------------ */
 
 function ProjectHeader({ project, action }) {
-  const creador = studentById(project.creadorId) ?? {
+  const creador = {
     id: String(project.creadorId),
-    nombre: `Usuario ${project.creadorId}`,
+    nombre: project.creadorNombre || "Creador del evento",
     carrera: "",
   }
+  const nombreCreador = project.creadorNombre || creador.nombre
   const usuarioLocal = getSessionUser()
   const esActual = usuarioLocal.id_usuario !== undefined && String(creador.id) === String(usuarioLocal.id_usuario)
   return (
@@ -40,16 +43,16 @@ function ProjectHeader({ project, action }) {
           </div>
           <h1 className="text-h1 font-bold text-ink">{project.titulo}</h1>
           <div className="mt-3 flex items-center gap-2 text-sm text-ink-2">
-            <Avatar name={creador.nombre} size="xs" />
-            Creado por <span className="font-medium text-ink">{esActual ? "ti" : creador.nombre}</span>
+            <Avatar name={esActual ? usuarioLocal.nombre || nombreCreador : nombreCreador} size="xs" />
+            Creado por <span className="font-medium text-ink">{esActual ? "ti" : nombreCreador}</span>
             · {formatDate(project.creado, { day: "numeric", month: "long" })}
           </div>
           <p className="mt-4 max-w-2xl text-ink">{project.descripcion}</p>
           <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
             <div className="flex items-center gap-1.5">
               <Users aria-hidden="true" className="size-4 text-ink-2" />
-              <dt className="sr-only">Integrantes</dt>
-              <dd>{project.integrantes} integrantes</dd>
+              <dt className="sr-only">Capacidad total</dt>
+              <dd>Capacidad: {project.integrantes} personas</dd>
             </div>
             {project.fechaLimite && (
               <div className="flex items-center gap-1.5">
@@ -73,10 +76,9 @@ function Candidates({ project }) {
   const fetchCandidates = useCallback(() => obtenerCandidatos(project.id), [project.id])
   const cands = useAsync(fetchCandidates)
   const [target, setTarget] = useState(null)
-  const [invited, setInvited] = useState(
-    () => new Set(invitations.filter((i) => i.projectId === project.id && i.tipo === "enviada" && i.estado === "pendiente").map((i) => i.paraId)),
-  )
-  const { pendientes } = coverage(project)
+  const [invited, setInvited] = useState(new Set())
+  const [selectedRoles, setSelectedRoles] = useState({})
+  const pendientes = availableRoles(project)
 
   if (cands.loading) {
     return (
@@ -87,60 +89,34 @@ function Candidates({ project }) {
     )
   }
   if (cands.status === "error") return <ErrorState message="No pudimos cargar los candidatos." onRetry={cands.reload} />
-  if (pendientes.length === 0) {
-    return (
-      <EmptyState icon={CircleCheck} title="¡Todos los roles están cubiertos!">
-        Tu equipo está completo. Ya pueden empezar a trabajar.
-      </EmptyState>
-    )
-  }
-
   return (
-    <div className="space-y-10">
-      {pendientes.map((rol) => {
-        const lista = cands.data.filter((c) => c.rolId === rol.id)
-        return (
-          <section key={rol.id} aria-labelledby={`rol-${rol.id}`}>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h3 id={`rol-${rol.id}`} className="text-h3 font-semibold">
-                Para <span className="text-warn-ink">{rol.nombre}</span>
-              </h3>
-              {rol.indispensable && (
-                <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-xs font-semibold text-ink-2">Indispensable</span>
-              )}
-              <span className="text-sm text-ink-2">
-                · {lista.length} {lista.length === 1 ? "candidato" : "candidatos"}
-              </span>
-            </div>
-            {lista.length === 0 ? (
-              <EmptyState icon={SearchX} title="Aún no encontramos a nadie para este rol" className="py-8">
-                Te avisaremos en cuanto alguien con este perfil esté disponible. Mientras, puedes buscar manualmente desde Inicio.
-              </EmptyState>
-            ) : (
-              <div className="space-y-4">
-                {lista.map((rec) => {
-                  const student = studentById(rec.studentId)
-                  return (
-                    <RecommendationCard
-                      key={rec.id}
-                      variant="expanded"
-                      student={student}
-                      rol={rol}
-                      rec={rec}
-                      project={project}
-                      invited={invited.has(student.id)}
-                      onInvite={() => setTarget({ student, rol })}
-                      onViewProfile={() => navigate(`/perfil/${student.id}`)}
-                      onFeedback={(v) => enviarRetroalimentacion(rec.id, { util: v === "util" })}
-                      onDismiss={(motivo) => enviarRetroalimentacion(rec.id, { util: false, motivo })}
-                    />
-                  )
-                })}
-              </div>
-            )}
-          </section>
-        )
-      })}
+    <div className="space-y-4">
+      {cands.data.length === 0 && <CandidatesEmptyState available={project.acepta_participacion}
+        reason={project.motivo_no_disponible} onRefresh={cands.reload} />}
+      {cands.data.map((rec) => <Card key={rec.candidate_id} className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="font-semibold">Persona #{rec.candidate_id}</h3>
+            <p className="text-xs text-ink-2">{rec.eligibility === "needs_review" ? "Requiere revisión" : "Elegible"} · {rec.evidence_group === "insufficient_evidence" ? "Evidencia insuficiente" : "Evidencia confirmada"}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => navigate(`/perfil/${rec.candidate_id}`)}>Ver perfil</Button>
+            {pendientes.length > 0 && !invited.has(rec.candidate_id) && <>
+              <select aria-label={`Rol para persona ${rec.candidate_id}`}
+                value={selectedRoles[rec.candidate_id] ?? pendientes[0].id}
+                onChange={(event) => setSelectedRoles((prev) => ({ ...prev, [rec.candidate_id]: event.target.value }))}
+                className="rounded-lg border border-line bg-surface px-2 text-sm">
+                {pendientes.map((rol) => <option key={rol.id} value={rol.id}>{rol.nombre}</option>)}
+              </select>
+              <Button onClick={() => setTarget({ student: { id: String(rec.candidate_id), nombre: `Persona ${rec.candidate_id}` },
+                rol: pendientes.find((rol) => String(rol.id) === String(selectedRoles[rec.candidate_id] ?? pendientes[0].id)) })}>Invitar</Button>
+            </>}
+          </div>
+        </div>
+        {rec.explanation.strengths.map((fact, i) => <p key={`s${i}`} className="mt-2 text-sm text-ink">{fact}</p>)}
+        {rec.explanation.gaps.map((fact, i) => <p key={`g${i}`} className="mt-2 text-sm text-warn-ink">{fact}</p>)}
+        {rec.explanation.unknowns.map((fact, i) => <p key={`u${i}`} className="mt-2 text-sm text-ink-2">{fact}</p>)}
+      </Card>)}
 
       <InviteModal
         open={!!target}
@@ -148,7 +124,7 @@ function Candidates({ project }) {
         student={target?.student}
         rol={target?.rol}
         project={project}
-        onSent={(s) => setInvited((prev) => new Set(prev).add(s.id))}
+        onSent={(s) => { setInvited((prev) => new Set(prev).add(Number(s.id))); cands.reload() }}
       />
     </div>
   )
@@ -159,7 +135,7 @@ function Candidates({ project }) {
 function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
   const toast = useToast()
   const msgId = useId()
-  const pendientes = coverage(project).pendientes
+  const pendientes = availableRoles(project)
   const [rolId, setRolId] = useState(defaultRolId ?? pendientes[0]?.id)
   const [mensaje, setMensaje] = useState("")
   const [sending, setSending] = useState(false)
@@ -172,8 +148,8 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
       toast("Solicitud enviada. Te avisaremos cuando respondan.")
       onSent(rolId)
       onClose()
-    } catch {
-      toast("No pudimos enviar tu solicitud. Inténtalo de nuevo.", "error")
+    } catch (error) {
+      toast(error.message || "No pudimos enviar tu solicitud. Inténtalo de nuevo.", "error")
     } finally {
       setSending(false)
     }
@@ -215,7 +191,14 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
                   onChange={() => setRolId(r.id)}
                   className="size-4 accent-primary"
                 />
-                <span className="flex-1 text-sm font-medium">{r.nombre}</span>
+                <span className="flex-1 text-sm font-medium">
+                  <span className="block">{r.nombre}</span>
+                  {r.habilidades.length > 0 && (
+                    <span className="mt-0.5 block text-xs font-normal text-ink-2">
+                      Habilidades: {r.habilidades.join(", ")}
+                    </span>
+                  )}
+                </span>
                 {r.id === defaultRolId && <span className="text-xs font-semibold text-ai-ink">Sugerido para ti</span>}
               </label>
             ))}
@@ -239,20 +222,180 @@ function JoinModal({ open, onClose, project, defaultRolId, onSent }) {
   )
 }
 
-function YourFit({ project, suggestion }) {
-  const rol = project.roles.find((r) => r.id === suggestion.rolId)
-  const mias = new Set(currentUser.fortalezas.map((f) => f.nombre))
+function EditProjectModal({ project, onClose, onSaved }) {
+  const roleIdPrefix = useId()
+  const [tipo, setTipo] = useState(project.tipo)
+  const [integrantes, setIntegrantes] = useState(project.integrantes)
+  const [fechaLimite, setFechaLimite] = useState(project.fechaLimite || "")
+  const [descripcion, setDescripcion] = useState(project.descripcion)
+  const [roles, setRoles] = useState(() => project.roles.map((role) => ({ ...role, habilidades: [...role.habilidades] })))
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState("")
+
+  const updateRole = (roleId, changes) => {
+    setRoles((current) => current.map((role) => (
+      role.id === roleId ? { ...role, ...changes } : role
+    )))
+  }
+
+  const addRole = () => {
+    setRoles((current) => [
+      ...current,
+      {
+        id: `${roleIdPrefix}-${Date.now()}-${current.length}`,
+        nombre: "",
+        habilidades: [],
+        indispensable: false,
+        cubiertoPor: null,
+      },
+    ])
+  }
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (roles.some((role) => !role.nombre.trim())) {
+      setError("Escribe un nombre para cada rol antes de guardar.")
+      return
+    }
+    setSaving(true)
+    setError("")
+    try {
+      const updated = await actualizarProyecto(project.id, {
+        tipo,
+        materia: project.materia,
+        descripcion,
+        fuente_revision: project.fuente_revision,
+        integrantes,
+        fechaLimite,
+        roles,
+      })
+      onSaved(updated)
+    } catch (saveError) {
+      setError(saveError.message || "No pudimos guardar los cambios.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
-    <AIPanel title={`Podrías cubrir «${rol.nombre}»`}>
-      <p>{suggestion.porQue}</p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {rol.habilidades.map((h) => (
-          <SkillChip key={h} variant={mias.has(h) ? "match" : "needed"}>
-            {h}
-          </SkillChip>
-        ))}
-      </div>
-    </AIPanel>
+    <Modal
+      open
+      onClose={onClose}
+      title="Editar proyecto"
+      description={project.titulo}
+      size="lg"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="submit" form="edit-project-form" disabled={saving || roles.length === 0}>
+            {saving ? "Guardando…" : "Guardar cambios"}
+          </Button>
+        </>
+      }
+    >
+      <form id="edit-project-form" onSubmit={submit} className="space-y-6">
+        <p className="rounded-lg bg-ai-soft p-3 text-sm">Al guardar tendrás que revisar y confirmar los requisitos actualizados antes de volver a usar el análisis de IA.</p>
+        <label className="block text-sm font-semibold">Descripción
+          <textarea value={descripcion} onChange={(event) => setDescripcion(event.target.value)} rows={4} className={`${inputCls()} mt-2 w-full`} />
+        </label>
+        <div>
+          <p className="mb-2 text-sm font-semibold">Tipo de proyecto</p>
+          <Segmented
+            label="Tipo de proyecto"
+            value={tipo}
+            onChange={setTipo}
+            options={[
+              ["academico", "Académico"],
+              ["personal", "Personal"],
+              ["deportivo", "Deportivo"],
+              ["videojuegos", "Videojuegos"],
+              ["general", "General"],
+            ]}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="edit-project-members" className="mb-1.5 block text-sm font-semibold">
+              Número de integrantes
+            </label>
+            <input
+              id="edit-project-members"
+              type="number"
+              min="2"
+              max="8"
+              required
+              value={integrantes}
+              onChange={(event) => setIntegrantes(Number(event.target.value))}
+              className={inputCls()}
+            />
+            <p className="mt-1 text-xs text-ink-2">Incluyéndote a ti. De 2 a 8 integrantes.</p>
+          </div>
+          <div>
+            <label htmlFor="edit-project-deadline" className="mb-1.5 block text-sm font-semibold">
+              Fecha límite <span className="font-normal text-ink-2">(opcional)</span>
+            </label>
+            <input
+              id="edit-project-deadline"
+              type="date"
+              value={fechaLimite}
+              onChange={(event) => setFechaLimite(event.target.value)}
+              className={inputCls()}
+            />
+          </div>
+        </div>
+
+        <section aria-labelledby="edit-project-roles" className="space-y-2">
+          <div>
+            <h3 id="edit-project-roles" className="text-sm font-semibold">Roles necesarios</h3>
+            <p className="text-xs text-ink-2">Puedes quitar roles que ya no necesites. Los que tienen integrantes no se pueden eliminar.</p>
+          </div>
+          <ul className="space-y-2">
+            {roles.map((role) => (
+              <li key={role.id} className="flex items-start gap-3 rounded-lg border border-line p-3">
+                <div className="min-w-0 flex-1 space-y-2">
+                  <label className="block">
+                    <span className="sr-only">Nombre del rol</span>
+                    <input
+                      value={role.nombre}
+                      onChange={(event) => updateRole(role.id, { nombre: event.target.value })}
+                      disabled={role.ocupados > 0 || Boolean(role.cubiertoPor)}
+                      placeholder="Nombre del rol"
+                      className={`${inputCls()} disabled:bg-surface-2 disabled:opacity-70`}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="sr-only">Habilidades requeridas, separadas por comas</span>
+                    <input
+                      value={role.habilidades.join(", ")}
+                      onChange={(event) => updateRole(role.id, {
+                        habilidades: event.target.value.split(",").map((item) => item.trim()).filter(Boolean),
+                      })}
+                      placeholder="Habilidades requeridas, separadas por comas"
+                      className={inputCls()}
+                    />
+                  </label>
+                  {role.cubiertoPor && <p className="text-xs text-ink-2">Este rol ya tiene integrante.</p>}
+                </div>
+                <button
+                  type="button"
+                  aria-label={`Quitar rol ${role.nombre}`}
+                  disabled={role.ocupados > 0 || Boolean(role.cubiertoPor) || roles.length === 1}
+                  onClick={() => setRoles((current) => current.filter((item) => item.id !== role.id))}
+                  className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-lg text-ink-2 hover:bg-danger-soft hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Trash2 aria-hidden="true" className="size-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Button type="button" variant="secondary" onClick={addRole}>
+            <Plus aria-hidden="true" className="size-4" /> Agregar rol
+          </Button>
+        </section>
+        {error && <p role="alert" className="rounded-lg border border-danger/30 bg-danger-soft p-3 text-sm text-danger">{error}</p>}
+      </form>
+    </Modal>
   )
 }
 
@@ -267,20 +410,24 @@ export default function ProjectDetailRoute() {
 function ProjectDetailPage({ id }) {
   const fetchProject = useCallback(() => obtenerProyecto(id), [id])
   const { status, data: project, error, reload } = useAsync(fetchProject)
+  const sentInvitations = useAsync(obtenerInvitaciones)
   const [joinOpen, setJoinOpen] = useState(false)
   const [requestedRol, setRequestedRol] = useState(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const toast = useToast()
 
   const invitedByRole = useMemo(() => {
     if (!project) return {}
     const map = {}
-    invitations
-      .filter((i) => i.projectId === project.id && i.tipo === "enviada" && i.estado === "pendiente")
+    const pendingInvitations = sentInvitations.data ?? []
+    pendingInvitations
+      .filter((i) => String(i.projectId) === String(project.id) && i.tipo === "enviada" && i.estado === "pendiente")
       .forEach((i) => {
         const rol = project.roles.find((r) => r.nombre === i.rol)
-        if (rol) map[rol.id] = studentById(i.paraId).nombre
+        if (rol) map[rol.id] = i.destinatario?.nombre ?? `Persona ${i.paraId}`
       })
     return map
-  }, [project])
+  }, [project, sentInvitations.data])
 
   const back = (
     <Link to="/proyectos" className="mb-4 inline-flex min-h-9 items-center gap-1 text-sm font-medium text-ink-2 hover:text-ink">
@@ -328,26 +475,29 @@ function ProjectDetailPage({ id }) {
   const usuarioLocal = getSessionUser()
   const usuarioId = usuarioLocal.id_usuario
   const esDueno = usuarioId !== undefined && String(project.creadorId) === String(usuarioId)
-  const esIntegrante = usuarioId !== undefined && project.roles.some((r) => String(r.cubiertoPor) === String(usuarioId))
-  const team = teams.find((t) => t.projectId === project.id)
-  const suggestion = projectSuggestions.find((s) => s.projectId === project.id)
-  const { cubiertos, total, pendientes } = coverage(project)
+  const esIntegrante = project.soy_integrante
+  const { cubiertos, total } = coverage(project)
 
+  const pendingApplication = (sentInvitations.data ?? []).find((item) =>
+    String(item.projectId) === String(project.id) && item.estado === "pendiente" &&
+    item.tipo === "enviada" && item.tipoSolicitud === "unirse")
   let action
   if (esDueno) {
     action = (
-      <Button variant="secondary">
+      <Button variant="secondary" onClick={() => setEditOpen(true)}>
         <Pencil aria-hidden="true" className="size-4" /> Editar proyecto
       </Button>
     )
   } else if (esIntegrante) {
     action = (
-      <Button as={Link} to={team ? `/equipos/${team.id}` : "/equipos"} variant="secondary">
+      <Button as={Link} to="/equipos" variant="secondary">
         <Users aria-hidden="true" className="size-4" /> Ver mi equipo
       </Button>
     )
-  } else if (pendientes.length > 0) {
-    action = requestedRol ? (
+  } else if (requestedRol || pendingApplication) {
+    action = <Button disabled>Solicitud enviada</Button>
+  } else if (project.puede_solicitar && availableRoles(project).length > 0) {
+    action = requestedRol || pendingApplication ? (
       <Button disabled className="animate-scale-in">
         <CircleCheck aria-hidden="true" className="size-4" /> Solicitud enviada
       </Button>
@@ -356,6 +506,8 @@ function ProjectDetailPage({ id }) {
         <Hand aria-hidden="true" className="size-4" /> Solicitar unirme
       </Button>
     )
+  } else {
+    action = <p role="status" className="text-sm text-ink-2">{project.motivo_no_disponible || "No puedes solicitar participación: revisa tu perfil o tus invitaciones pendientes."}</p>
   }
 
   return (
@@ -363,12 +515,8 @@ function ProjectDetailPage({ id }) {
       {back}
       <div className="space-y-10">
         <ProjectHeader project={project} action={action} />
-
-        {!esDueno && !esIntegrante && suggestion && (
-          <div className="animate-fade-up [animation-delay:80ms]">
-            <YourFit project={project} suggestion={suggestion} />
-          </div>
-        )}
+        {esDueno && <ProjectAIReview key={`${project.id}-${project.fuente_revision}-${project.estado_ia}`} project={project} onSaved={reload} />}
+        {!esDueno && !project.requisitos_confirmados && <p role="status" className="rounded-lg bg-ai-soft p-4 text-sm">El creador está revisando los requisitos actuales. El análisis anterior ya no se utiliza.</p>}
 
         <section aria-labelledby="cov-title" className="animate-fade-up [animation-delay:120ms]">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -376,7 +524,7 @@ function ProjectDetailPage({ id }) {
               <h2 id="cov-title" className="text-h2 font-semibold">
                 Mapa de cobertura de roles
               </h2>
-              <p className="text-sm text-ink-2">Qué aporta ya cada integrante y qué falta cubrir.</p>
+              <p className="text-sm text-ink-2">Roles asignados a participantes reales y vacantes pendientes. La asignación de rol no acredita habilidades.</p>
             </div>
             <div className="w-full sm:w-64">
               <CoverageBar cubiertos={cubiertos} total={total} />
@@ -385,18 +533,18 @@ function ProjectDetailPage({ id }) {
           <RoleCoverage roles={project.roles} invitedByRole={esDueno ? invitedByRole : {}} highlightRolId={requestedRol} />
         </section>
 
-        {esDueno && (
+        {esDueno && project.requisitos_confirmados && (
           <section aria-labelledby="cand-title" className="animate-fade-up [animation-delay:180ms]">
             <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
               <div>
                 <h2 id="cand-title" className="text-h2 font-semibold">
                   Candidatos recomendados
                 </h2>
-                <p className="text-sm text-ink-2">Agrupados por el rol pendiente que cubrirían.</p>
+                <p className="text-sm text-ink-2">Revisa la evidencia y elige un rol disponible antes de invitar.</p>
               </div>
               <LocalProcessing />
             </div>
-            <Candidates project={project} />
+            <Candidates key={`${project.id}-${project.fuente_revision}-${project.estado_ia}`} project={project} />
           </section>
         )}
       </div>
@@ -406,8 +554,19 @@ function ProjectDetailPage({ id }) {
           open
           onClose={() => setJoinOpen(false)}
           project={project}
-          defaultRolId={suggestion?.rolId}
+          defaultRolId={null}
           onSent={setRequestedRol}
+        />
+      )}
+      {editOpen && (
+        <EditProjectModal
+          project={project}
+          onClose={() => setEditOpen(false)}
+          onSaved={() => {
+            setEditOpen(false)
+            toast("Cambios guardados. Revisa y confirma los requisitos actualizados.")
+            reload()
+          }}
         />
       )}
     </div>

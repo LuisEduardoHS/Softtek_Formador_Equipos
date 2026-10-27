@@ -1,0 +1,593 @@
+[
+  {
+    "kind": "http",
+    "request": "bf6a90935bb5431a80629f6f255f4d66",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.225,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "864ac836f75b4d02a7487582068c89e8",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 1.388,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "864ac836f75b4d02a7487582068c89e8",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 1.655,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "772f19de4cb646099fc4437500888f05",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.2,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "2d76c6e9e193438aa74d2793be53a542",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.068,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "2d76c6e9e193438aa74d2793be53a542",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.31,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "e2e7d35e6a3a4029afdd2a1a36695798",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.194,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "ae4375bab3c84737851b7948c4823777",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.015,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "ae4375bab3c84737851b7948c4823777",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.258,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "a7d609e21f39440a86bbc52a714ed56a",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.037,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "a7d609e21f39440a86bbc52a714ed56a",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.282,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "bd7818da75ef45a294be82ce5f6b7476",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.008,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "75feca66b7d34972bd61533fe8d17c29",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/2/candidatos",
+    "status": 200,
+    "seconds": 0.233,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "af1b317b7a704cfeabee96b8434be41e",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/2/candidatos",
+    "status": 200,
+    "seconds": 0.264,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "83666a46c97044de9bd32ce35e2d9d24",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/6/proyectos",
+    "status": 200,
+    "seconds": 0.16,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "a54ca514469043e48d1442135e711a83",
+    "method": "POST",
+    "path": "/invitaciones/",
+    "status": 200,
+    "seconds": 0.016,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "f9f2ec19ec6a4918ae4630be6fda4405",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/2/candidatos",
+    "status": 200,
+    "seconds": 0.199,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "fd9e8b288bb04d90a0323bb81993d938",
+    "method": "PATCH",
+    "path": "/invitaciones/1",
+    "status": 200,
+    "seconds": 0.015,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "4b66ee80af6d47c1b811cf005fee5f10",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/2/candidatos",
+    "status": 200,
+    "seconds": 0.215,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "a8d1966655074a5ea6017307515d7c4c",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/6/proyectos",
+    "status": 200,
+    "seconds": 0.023,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "b87a32424a1e4f8cbb6696a7fc34a49e",
+    "method": "GET",
+    "path": "/equipos/5",
+    "status": 200,
+    "seconds": 0.026,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "585c80f45ed24bfaa08055ece2542e3c",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.192,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "3d0e501e5b82475b9ed2b406271f37e7",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.018,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "3d0e501e5b82475b9ed2b406271f37e7",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.277,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "79506ecac7aa4a98b3746e158a5c7f19",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.194,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "e44c7e8b07e6495d82eade67e1ee247c",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.041,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "e44c7e8b07e6495d82eade67e1ee247c",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.276,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "19545d4144cf4fb7b4f0f67449d8affd",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.193,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "a391de6990e04e23824c1036fc881245",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.022,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "a391de6990e04e23824c1036fc881245",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.238,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "88af03b20fab469eaf2539abf8ec9a81",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.021,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "88af03b20fab469eaf2539abf8ec9a81",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.24,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "f2c974a2c08a496c84abd2f73622ba68",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.006,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "ae0b6f6a3bcd46bfac7afc72a3299e48",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/3/candidatos",
+    "status": 200,
+    "seconds": 0.258,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "f10c07e79b9f49adac20e13a56ddda5d",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/3/candidatos",
+    "status": 200,
+    "seconds": 0.3,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "553c7f277dbb49f38b568a92719ba3dd",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/9/proyectos",
+    "status": 200,
+    "seconds": 0.286,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "cf1605bee8d2481e99833fe1bafabc66",
+    "method": "POST",
+    "path": "/invitaciones/",
+    "status": 200,
+    "seconds": 0.014,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "7a2da4c8a7864123a512bc7e2ba448b0",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/3/candidatos",
+    "status": 200,
+    "seconds": 0.259,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "04cc9b03604a4a8ea7a1993da81c9e47",
+    "method": "PATCH",
+    "path": "/invitaciones/2",
+    "status": 200,
+    "seconds": 0.012,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "9848d5817716416aa00aedc5ef211186",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/3/candidatos",
+    "status": 200,
+    "seconds": 0.215,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "f52785a997c74092a628af003ffdd128",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/9/proyectos",
+    "status": 200,
+    "seconds": 0.217,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "7fc6caa2c1554f16ac8c676084937f47",
+    "method": "GET",
+    "path": "/equipos/8",
+    "status": 200,
+    "seconds": 0.021,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "4d17491adf3446878843f4af82f62f4d",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.206,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "bd6b8e92071d4c6e8f3cfa424f6ec8da",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.042,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "bd6b8e92071d4c6e8f3cfa424f6ec8da",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.27,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "8380e28d77494c018a357bcfd9b8f891",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.189,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "698b234ab8f94128b040d4eb2cbac989",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.015,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "698b234ab8f94128b040d4eb2cbac989",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.264,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "a4c4f7b59f3743feac0c646605a72b2c",
+    "method": "POST",
+    "path": "/auth/registro",
+    "status": 200,
+    "seconds": 0.205,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "6c4189d73fd746ccb597dc444ca684db",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.013,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "6c4189d73fd746ccb597dc444ca684db",
+    "method": "POST",
+    "path": "/perfil/confirmar",
+    "status": 200,
+    "seconds": 0.256,
+    "phase": "fixed"
+  },
+  {
+    "kind": "nomic",
+    "request": "137dfe462a75499e87c0ea1a9bbf1c99",
+    "model": "nomic-embed-text",
+    "status": "OK",
+    "dimensions": [
+      768
+    ],
+    "seconds": 0.024,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "137dfe462a75499e87c0ea1a9bbf1c99",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.271,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "67f01f5e7bea4f1a91c688589c1ed83e",
+    "method": "POST",
+    "path": "/eventos/",
+    "status": 201,
+    "seconds": 0.007,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "2be2c011baee4a318b3110d6063bdb38",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/4/candidatos",
+    "status": 200,
+    "seconds": 0.388,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "3f882854a9c04c90ada050850aaf1e6d",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/4/candidatos",
+    "status": 200,
+    "seconds": 0.354,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "0bdf2d6e18944439b09550d348ae9050",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/12/proyectos",
+    "status": 200,
+    "seconds": 0.362,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "effd58de52494aebbc08c1a4435a7047",
+    "method": "POST",
+    "path": "/invitaciones/",
+    "status": 200,
+    "seconds": 0.012,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "6b57e605046f4c64ad4313316532bb4f",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/4/candidatos",
+    "status": 200,
+    "seconds": 0.327,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "b00f4271b85a4f3a8cb9bf71cb8e56cf",
+    "method": "PATCH",
+    "path": "/invitaciones/3",
+    "status": 200,
+    "seconds": 0.013,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "75315acdf64348b184c6b04f708ed1b4",
+    "method": "GET",
+    "path": "/recomendaciones/eventos/4/candidatos",
+    "status": 200,
+    "seconds": 0.294,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "d600d1937ce54635b8c3d5bde633cfa4",
+    "method": "GET",
+    "path": "/recomendaciones/usuarios/12/proyectos",
+    "status": 200,
+    "seconds": 0.295,
+    "phase": "fixed"
+  },
+  {
+    "kind": "http",
+    "request": "178bc3c5f7b1440987e9e134fbd7973a",
+    "method": "GET",
+    "path": "/equipos/11",
+    "status": 200,
+    "seconds": 0.014,
+    "phase": "fixed"
+  }
+]

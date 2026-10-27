@@ -1,20 +1,48 @@
 /**
  * Capa de servicios conectada a FastAPI (MySQL).
  */
+import { calculateProfileCompletion } from "../lib/profileCompletion"
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000"
+const CATEGORIES = { academico: "Academico", personal: "Personal", deportivo: "Deportivo",
+  videojuegos: "Videojuegos", general: "General" }
+const toCategory = (tipo) => CATEGORIES[tipo] ?? "General"
+
+// StrictMode can subscribe twice to an effect. Share only the active request,
+// scoped to its authenticated session and exact input; never cache its result.
+const activeInterpretations = new Map()
+function interpretOnce(path, body) {
+  const key = JSON.stringify([sessionStorage.getItem("access_token"), path, body])
+  if (activeInterpretations.has(key)) return activeInterpretations.get(key)
+  const pending = request(path, { method: "POST", body })
+  activeInterpretations.set(key, pending)
+  pending.finally(() => {
+    if (activeInterpretations.get(key) === pending) activeInterpretations.delete(key)
+  }).catch(() => {})
+  return pending
+}
 
 // Cliente HTTP conectado a tu backend local
-async function request(path, { method = "GET", body } = {}) {
+async function request(path, { method = "GET", body, idempotencyKey } = {}) {
+  const token = sessionStorage.getItem("access_token")
   const res = await fetch(`${API_URL}${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   })
   
   if (!res.ok) {
+    if (res.status === 401 && !path.startsWith("/auth/")) {
+      sessionStorage.removeItem("access_token")
+      sessionStorage.removeItem("usuario")
+      window.dispatchEvent(new Event("session-expired"))
+    }
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Error ${res.status} en ${path}`);
+    const detail = Array.isArray(errorData.detail) ? errorData.detail.map((item) => item.msg).join(". ") : errorData.detail
+    const error = new Error(typeof detail === "string" ? detail : `Error ${res.status} en ${path}`)
+    error.status = res.status
+    throw error
   }
   return res.json();
 }
@@ -46,10 +74,14 @@ export function iniciarSesion({ correo, password }) {
   })
 }
 
+export function verificarSesion() {
+  return request("/auth/me")
+}
+
 /* ---------------------------- Perfil ---------------------------- */
 
 export async function obtenerPerfil() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}");
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.");
   }
@@ -62,11 +94,11 @@ function mapPerfil(perfil) {
   const fortalezas = Array.isArray(datos.fortalezas)
     ? datos.fortalezas
       .map((fortaleza) =>
-        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: "intermedio" } : fortaleza,
+        typeof fortaleza === "string" ? { nombre: fortaleza, nivel: null } : fortaleza,
       )
       .filter((fortaleza) => fortaleza && typeof fortaleza.nombre === "string")
     : Array.isArray(datos.habilidades)
-      ? datos.habilidades.map((nombre) => ({ nombre, nivel: "intermedio" }))
+      ? datos.habilidades.map((nombre) => ({ nombre, nivel: null }))
       : []
 
   return {
@@ -78,10 +110,20 @@ function mapPerfil(perfil) {
     carrera: perfil.carrera,
     estado_geografico: perfil.estado_geografico ?? "",
     municipio: perfil.municipio ?? "",
+    perfil_estado_ia: perfil.perfil_estado_ia ?? "pendiente_revision",
+    perfilCompleto: calculateProfileCompletion({
+      ...datos,
+      nombre: perfil.nombre,
+      correo: perfil.correo,
+      carrera: perfil.carrera,
+    }),
     semestre: Number(datos.semestre) || 1,
     fortalezas,
     reforzar: Array.isArray(datos.reforzar) ? datos.reforzar : [],
     intereses: Array.isArray(datos.intereses) ? datos.intereses : [],
+    experiencia: Array.isArray(perfil.perfil_estructurado_ia?.experiencia) ? perfil.perfil_estructurado_ia.experiencia : [],
+    resumen_publico: perfil.perfil_estructurado_ia?.resumen_publico ?? datos.bio ?? "",
+    consentimiento_recomendaciones: datos.consentimiento_recomendaciones === true,
     disponibilidad: Array.isArray(datos.disponibilidad) ? datos.disponibilidad : [],
     visibilidad: {
       fortalezas: true,
@@ -101,14 +143,14 @@ export async function obtenerPerfilUsuario(id) {
 }
 
 export async function guardarPerfil(perfil) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
 
   const datos_crudos = Object.fromEntries(
     Object.entries(perfil).filter(([key]) =>
-      !["id", "usuario_id", "correo", "estado_geografico", "municipio"].includes(key),
+      !["id", "usuario_id", "correo", "estado_geografico", "municipio", "perfilCompleto", "perfil_estructurado_ia", "perfil_estado_ia"].includes(key),
     ),
   )
   const actualizado = await request(`/perfil/${usuarioLocal.id_usuario}`, {
@@ -122,10 +164,32 @@ export async function guardarPerfil(perfil) {
   return mapPerfil(actualizado)
 }
 
-export async function obtenerEstudiantes({ q = "", excludeId, limit = 100 } = {}) {
+export async function confirmarPerfil(perfil) {
+  const confirmado = await request("/perfil/confirmar", { method: "POST", body: perfil })
+  return mapPerfil(confirmado)
+}
+
+export async function activarRecomendaciones() {
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) throw new Error("No hay usuario autenticado.")
+  const actualizado = await request(`/perfil/${encodeURIComponent(usuarioLocal.id_usuario)}`, {
+    method: "PUT",
+    body: { datos_crudos: { consentimiento_recomendaciones: true } },
+  })
+  return mapPerfil(actualizado)
+}
+
+export async function reintentarEmbeddingPerfil() {
+  return mapPerfil(await request("/perfil/embedding/reintentar", { method: "POST" }))
+}
+
+export async function obtenerEstudiantes({ q = "", excludeId, limit = 100, carrera, habilidad, disponibilidad, semestre } = {}) {
   const params = new URLSearchParams({ limit: String(limit) })
   if (q.trim()) params.set("q", q.trim())
   if (excludeId) params.set("exclude_id", String(excludeId))
+  for (const [key, value] of Object.entries({ carrera, habilidad, disponibilidad, semestre })) {
+    if (value) params.set(key, String(value))
+  }
   const perfiles = await request(`/perfil/estudiantes/?${params.toString()}`)
   return perfiles.map(mapPerfil)
 }
@@ -139,26 +203,47 @@ function mapEventoAProyecto(evento) {
     ? detalles.roles
     : Array.isArray(requisitos.roles)
       ? requisitos.roles
-      : []
+      : Array.isArray(requisitos.roles_buscados)
+        ? requisitos.roles_buscados.map((nombre) => ({ nombre, habilidades: [], indispensable: false }))
+        : []
 
   return {
     id: String(evento.id_evento),
     titulo: evento.titulo,
     descripcion: evento.descripcion_libre ?? "",
-    tipo: detalles.tipo === "personal" || evento.categoria_principal?.toLowerCase() === "personal" ? "personal" : "academico",
+    tipo: detalles.tipo || evento.categoria_principal?.toLowerCase() || "academico",
     materia: detalles.materia ?? "",
     creadorId: String(evento.creador_id),
-    integrantes: Number(detalles.integrantes) || 1,
+    creadorNombre: evento.creador_nombre ?? null,
+    integrantes: Number(detalles.integrantes) || 8,
     fechaLimite: detalles.fechaLimite || null,
     creado: evento.fecha_creacion?.slice(0, 10) ?? "",
     estado: evento.estado,
-    roles: rolesEvento.map((rol, index) => ({
-      id: String(rol.id ?? index),
-      nombre: typeof rol.nombre === "string" ? rol.nombre : "Rol sin nombre",
-      habilidades: Array.isArray(rol.habilidades) ? rol.habilidades : [],
-      indispensable: Boolean(rol.indispensable),
-      cubiertoPor: rol.cubiertoPor ?? null,
-    })),
+    estado_ia: evento.estado_ia,
+    requisitos_confirmados: evento.requisitos_confirmados === true,
+    requirements: evento.requisitos_confirmados ? requisitos : null,
+    fuente_revision: evento.fuente_revision,
+    soy_integrante: evento.soy_integrante === true,
+    cupos_disponibles: evento.cupos_disponibles ?? 0,
+    acepta_participacion: evento.acepta_participacion === true,
+    puede_solicitar: evento.puede_solicitar === true,
+    motivo_no_disponible: evento.motivo_no_disponible,
+    roles_disponibles: Array.isArray(evento.roles_disponibles) ? evento.roles_disponibles.map((role) => ({ ...role, id: String(role.id) })) : [],
+    roles: rolesEvento.filter((rol) => rol && typeof rol === "object" && !Array.isArray(rol)).map((rol, index) => {
+      const habilidades = Array.isArray(rol.habilidades)
+        ? rol.habilidades.filter((skill) => typeof skill === "string" && skill.trim()) : []
+      const nombre = typeof rol.nombre === "string" ? rol.nombre.trim() : ""
+      return {
+        id: String(rol.id ?? index),
+        nombre: nombre || (habilidades.length ? `Rol para ${habilidades.slice(0, 3).join(", ")}` : "Rol sin nombre"),
+        habilidades,
+        indispensable: Boolean(rol.indispensable),
+        cubiertoPor: rol.cubiertoPor ?? null,
+        vacantes: rol.vacantes ?? 1,
+        ocupados: rol.ocupados ?? 0,
+        integrantesIds: rol.integrantesIds ?? [],
+      }
+    }),
   }
 }
 
@@ -166,19 +251,26 @@ export function obtenerProyectos() {
   return request("/eventos/").then((eventos) => eventos.map(mapEventoAProyecto))
 }
 
-export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes, fechaLimite, roles, requirements, idempotencyKey }) {
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   const creadorId = Number(usuarioLocal.id_usuario)
   if (!Number.isInteger(creadorId) || creadorId <= 0) {
     throw new Error("Inicia sesión para poder publicar un proyecto.")
   }
+  const required = [...new Set([...(requirements?.habilidades_obligatorias ?? []),
+    ...roles.filter((role) => role.indispensable).flatMap((role) => role.habilidades)])]
+  const requiredNames = new Set(required.map((skill) => skill.trim().toLowerCase()))
+  const preferred = [...new Set([...(requirements?.habilidades_deseables ?? []),
+    ...roles.filter((role) => !role.indispensable).flatMap((role) => role.habilidades)])]
+    .filter((skill) => !requiredNames.has(skill.trim().toLowerCase()))
 
   return request("/eventos/", {
     method: "POST",
+    idempotencyKey,
     body: {
       creador_id: creadorId,
       titulo,
-      categoria_principal: tipo === "personal" ? "Personal" : "Academico",
+      categoria_principal: toCategory(tipo),
       descripcion_libre: descripcion,
       detalles_especificos: {
         tipo,
@@ -187,7 +279,14 @@ export function crearProyecto({ titulo, descripcion, tipo, materia, integrantes,
         fechaLimite: fechaLimite || null,
         roles,
       },
-      requisitos_ia: { roles },
+      requisitos_confirmados: requirements ? {
+        ...requirements,
+        categoria: toCategory(tipo),
+        roles_buscados: roles.map((r) => r.nombre.trim()).filter(Boolean),
+        habilidades_obligatorias: required,
+        habilidades_deseables: preferred,
+      } : null,
+      confirmado_por_creador: Boolean(requirements),
     },
   }).then(mapEventoAProyecto)
 }
@@ -196,43 +295,91 @@ export async function obtenerProyecto(id) {
   return request(`/eventos/${id}`).then(mapEventoAProyecto)
 }
 
+export function actualizarProyecto(id, { tipo, materia, descripcion, integrantes, fechaLimite, roles, fuente_revision }) {
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
+  const usuarioId = Number(usuarioLocal.id_usuario)
+  if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+    throw new Error("Inicia sesión para editar este proyecto.")
+  }
+
+  const categoria = toCategory(tipo)
+  const params = new URLSearchParams({ usuario_id: String(usuarioId) })
+  return request(`/eventos/${encodeURIComponent(id)}?${params.toString()}`, {
+    method: "PUT",
+    body: {
+      categoria_principal: categoria,
+      descripcion_libre: descripcion,
+      integrantes: Number(integrantes),
+      detalles_especificos: {
+        tipo,
+        materia: tipo === "personal" ? "" : materia,
+        integrantes: Number(integrantes),
+        fechaLimite: fechaLimite || null,
+        roles,
+      },
+      requisitos_ia: { roles },
+      fuente_revision,
+    },
+  }).then(mapEventoAProyecto)
+}
+
+export function confirmarProyecto(project, requirements) {
+  if (!project.fuente_revision) throw new Error("Recarga el proyecto y revisa su versión actual antes de confirmar.")
+  return request(`/eventos/${encodeURIComponent(project.id)}/confirmar`, {
+    method: "POST",
+    body: { requirements: { ...requirements, categoria: toCategory(project.tipo) },
+      confirmado_por_creador: true, fuente_revision: project.fuente_revision },
+  }).then(mapEventoAProyecto)
+}
+
+export function reintentarEmbeddingProyecto(id) {
+  return request(`/eventos/${encodeURIComponent(id)}/embedding/reintentar`, { method: "POST" }).then(mapEventoAProyecto)
+}
+
 // ============================================================================
-// RUTAS PENDIENTES DE DESARROLLAR EN FASTAPI
-// (Mantenemos retornos vacíos o estructurados para que no truene React)
+// Flujos de IA y recomendaciones conectados a FastAPI
 // ============================================================================
 
 export function interpretarPerfil(textos) {
-  // TODO(backend): POST /ia/interpretar-perfil
-  return Promise.resolve({ fortalezas: [], reforzar: [], intereses: [] });
+  return interpretOnce("/perfil/interpretar", {
+    fortalezas: textos.fortalezas, reforzar: textos.reforzar, intereses: textos.intereses,
+  })
 }
 
 export function solicitarUnirse(projectId, { rolId, mensaje }) {
-  // TODO(backend): POST /proyectos/{id}/solicitudes
-  return Promise.resolve({ id: `s${Date.now()}`, estado: "pendiente" });
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) {
+    throw new Error("Inicia sesión para solicitar unirte a un evento.")
+  }
+  const params = new URLSearchParams({ solicitante_id: String(usuarioLocal.id_usuario) })
+  return request(`/eventos/${encodeURIComponent(projectId)}/solicitudes?${params.toString()}`, {
+    method: "POST",
+    body: { rol_esperado: String(rolId), mensaje_explicacion: mensaje },
+  })
 }
 
 export function interpretarProyecto(proyecto) {
-  // TODO(backend): POST /ia/interpretar-proyecto
-  return Promise.resolve({ roles: [] });
+  return interpretOnce("/eventos/interpretar", {
+    descripcion_libre: proyecto.descripcion,
+    categoria_principal: toCategory(proyecto.tipo),
+    detalles_especificos: { titulo: proyecto.titulo, materia: proyecto.materia,
+      integrantes: proyecto.integrantes, fechaLimite: proyecto.fechaLimite || null },
+  })
 }
 
-export function obtenerRecomendaciones() {
-  // TODO(backend): GET /recomendaciones (Requiere FastAPI + Ollama)
-  return Promise.resolve({ companeros: [], proyectos: [] });
+export async function obtenerRecomendaciones(topN = 10) {
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
+  if (!usuarioLocal.id_usuario) throw new Error("No hay usuario autenticado.")
+  const proyectos = await request(`/recomendaciones/usuarios/${encodeURIComponent(usuarioLocal.id_usuario)}/proyectos?top_n=${topN}`)
+  return { proyectos }
 }
 
-export function obtenerCandidatos(projectId) {
-  // TODO(backend): GET /proyectos/{id}/candidatos
-  return Promise.resolve([]);
-}
-
-export function enviarRetroalimentacion(recomendacionId, datos) {
-  // TODO(backend): POST /recomendaciones/{id}/retroalimentacion
-  return Promise.resolve({ ok: true });
+export function obtenerCandidatos(projectId, topN = 10) {
+  return request(`/recomendaciones/eventos/${encodeURIComponent(projectId)}/candidatos?top_n=${topN}`)
 }
 
 export function obtenerInvitaciones() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -240,7 +387,7 @@ export function obtenerInvitaciones() {
 }
 
 export function obtenerNotificaciones() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -248,13 +395,14 @@ export function obtenerNotificaciones() {
 }
 
 export function enviarInvitacion({ paraId, projectId, rol, mensaje }) {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
   const body = {
     id_destinatario: Number(paraId),
     id_evento: Number(projectId),
+    rol_esperado: rol || "Participante",
     mensaje_explicacion: `${mensaje}${rol ? `\n\nRol propuesto: ${rol}` : ""}`,
   }
   return request(`/invitaciones/?de_id=${encodeURIComponent(usuarioLocal.id_usuario)}`, {
@@ -271,7 +419,7 @@ export function responderInvitacion(id, estado) {
 }
 
 export function obtenerEquipos() {
-  const usuarioLocal = JSON.parse(localStorage.getItem("usuario") || "{}")
+  const usuarioLocal = JSON.parse(sessionStorage.getItem("usuario") || "{}")
   if (!usuarioLocal.id_usuario) {
     throw new Error("No hay usuario autenticado.")
   }
@@ -298,12 +446,5 @@ export async function obtenerEquipo(id) {
 }
 
 export function buscarEstudiantes({ q = "", carrera, habilidad, disponibilidad, semestre } = {}) {
-  return obtenerEstudiantes({ q }).then((estudiantes) =>
-    estudiantes.filter((estudiante) =>
-      (!carrera || estudiante.carrera === carrera) &&
-      (!habilidad || estudiante.fortalezas.some((fortaleza) => fortaleza.nombre === habilidad)) &&
-      (!disponibilidad || estudiante.disponibilidad.includes(disponibilidad)) &&
-      (!semestre || estudiante.semestre === Number(semestre)),
-    ),
-  )
+  return obtenerEstudiantes({ q, carrera, habilidad, disponibilidad, semestre })
 }

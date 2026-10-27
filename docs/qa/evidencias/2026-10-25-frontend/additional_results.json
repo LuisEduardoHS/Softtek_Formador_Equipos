@@ -1,0 +1,81 @@
+[
+  {
+    "id": "real-availability-filter-tarde",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "ids": [
+        3
+      ]
+    }
+  },
+  {
+    "id": "real-availability-filter-manana",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "ids": [
+        3
+      ]
+    }
+  },
+  {
+    "id": "real-availability-filter-noche",
+    "status": "PASS",
+    "evidence": {
+      "http": 200,
+      "ids": []
+    }
+  },
+  {
+    "id": "combined-server-filters-before-limit",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "private-member-does-not-accredit-sql",
+    "status": "PASS",
+    "evidence": {
+      "coverage": {
+        "estado": "desconocida",
+        "total": 2,
+        "cubiertas": [
+          "Python"
+        ],
+        "por_acreditar": [
+          "SQL"
+        ]
+      }
+    }
+  },
+  {
+    "id": "visual-application-persisted",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "visual-edit-reconfirmation-persisted",
+    "status": "PASS",
+    "evidence": {
+      "state": "listo",
+      "dimensions": 768
+    }
+  },
+  {
+    "id": "visual-biography-confirmed-and-embedded",
+    "status": "PASS",
+    "evidence": {
+      "dimensions": 768
+    }
+  },
+  {
+    "id": "profile-public-biography-real",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "membership-survives-new-session",
+    "status": "PASS",
+    "evidence": {}
+  }
+]

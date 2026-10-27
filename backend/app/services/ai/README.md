@@ -1,3 +1,5 @@
+> Este documento describe el módulo y su entrega original. La aplicación ya integra IA, JWT, MySQL y React; consulta la [operación actual](../../../../docs/operacion/ia-perfiles-proyectos.md) para el flujo completo y sus permisos.
+
 # Análisis de perfiles y eventos
 
 Este módulo transforma descripciones en objetos Pydantic y vectores semánticos. No escribe en la base de datos ni decide compatibilidad entre personas y eventos.

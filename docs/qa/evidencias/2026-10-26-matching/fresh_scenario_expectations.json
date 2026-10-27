@@ -1,0 +1,80 @@
+[
+  {
+    "id": "web",
+    "category": "Academico",
+    "owner": [
+      "Python",
+      "FastAPI"
+    ],
+    "required": [
+      "SQL",
+      "Figma"
+    ],
+    "preferred": [
+      "Git"
+    ],
+    "roles": [
+      "especialista en bases de datos",
+      "dise\u00f1ador UX/UI"
+    ],
+    "candidates": [
+      [
+        "SQL",
+        "Git"
+      ],
+      [
+        "UX/UI",
+        "Figma"
+      ]
+    ]
+  },
+  {
+    "id": "videojuegos",
+    "category": "Videojuegos",
+    "owner": [
+      "Unreal Engine 5"
+    ],
+    "required": [
+      "Blender",
+      "dise\u00f1o de niveles"
+    ],
+    "preferred": [],
+    "roles": [
+      "artista 3D",
+      "dise\u00f1ador de niveles"
+    ],
+    "candidates": [
+      [
+        "Blender"
+      ],
+      [
+        "dise\u00f1o de niveles"
+      ]
+    ]
+  },
+  {
+    "id": "futbol",
+    "category": "Deportivo",
+    "owner": [
+      "delantero"
+    ],
+    "required": [
+      "portero"
+    ],
+    "preferred": [
+      "defensa"
+    ],
+    "roles": [
+      "portero",
+      "defensa"
+    ],
+    "candidates": [
+      [
+        "portero"
+      ],
+      [
+        "defensa"
+      ]
+    ]
+  }
+]

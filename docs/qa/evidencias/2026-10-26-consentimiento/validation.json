@@ -1,0 +1,428 @@
+{
+  "qa_database": "softtek_formador_equipos_qa_consent_20261026_cc5be6",
+  "counts": {
+    "usuarios": 5,
+    "perfiles_usuarios": 5,
+    "eventos": 1,
+    "solicitudes_equipo": 0,
+    "participantes_evento": 0
+  },
+  "checks": [
+    {
+      "id": "owner-login",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "sql-login",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "design-login",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "off-login",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "on-login",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "owner-persisted-choice",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "sql-persisted-choice",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "design-persisted-choice",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "off-persisted-choice",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "on-persisted-choice",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "three-opted-in-only",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "opted-out-profile-not-in-directory",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "cannot-opt-in-another-account",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "pause-still-excludes",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "consent-shortcut-does-not-remove-pause",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "pause-restored",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "recommendations-restored",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "owner-valid-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "owner-confirmation-preserved",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "sql-valid-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "sql-confirmation-preserved",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "design-valid-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "design-confirmation-preserved",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "off-valid-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "onboarding-off-keeps-real-skills",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "on-valid-current-vector",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "onboarding-no-negated-or-learning-strengths",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "two-real-llama-interpretations",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "id": "no-embedding-regenerated-on-opt-in",
+      "status": "PASS",
+      "evidence": {}
+    }
+  ],
+  "profiles": [
+    {
+      "id": 10,
+      "account": "owner",
+      "consent": false,
+      "paused": false,
+      "state": "listo",
+      "dimensions": 768,
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n"
+        ],
+        "experiencia": [],
+        "habilidades": [
+          "Python",
+          "FastAPI",
+          "Git"
+        ],
+        "areas_mejora": [],
+        "resumen_publico": "Perfil ficticio confirmado para QA de consentimiento."
+      }
+    },
+    {
+      "id": 11,
+      "account": "sql",
+      "consent": true,
+      "paused": false,
+      "state": "listo",
+      "dimensions": 768,
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n"
+        ],
+        "experiencia": [],
+        "habilidades": [
+          "SQL",
+          "Git"
+        ],
+        "areas_mejora": [],
+        "resumen_publico": "Perfil ficticio confirmado para QA de consentimiento."
+      }
+    },
+    {
+      "id": 12,
+      "account": "design",
+      "consent": true,
+      "paused": false,
+      "state": "listo",
+      "dimensions": 768,
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n"
+        ],
+        "experiencia": [],
+        "habilidades": [
+          "UX/UI",
+          "Figma",
+          "prototipado"
+        ],
+        "areas_mejora": [],
+        "resumen_publico": "Perfil ficticio confirmado para QA de consentimiento."
+      }
+    },
+    {
+      "id": 13,
+      "account": "off",
+      "consent": false,
+      "paused": false,
+      "state": "listo",
+      "dimensions": 768,
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n"
+        ],
+        "experiencia": [],
+        "habilidades": [
+          "SQL",
+          "Git"
+        ],
+        "areas_mejora": [
+          "Docker"
+        ],
+        "resumen_publico": "Habilidades declaradas: SQL, Git. Intereses: educaci\u00f3n"
+      }
+    },
+    {
+      "id": 14,
+      "account": "on",
+      "consent": true,
+      "paused": false,
+      "state": "listo",
+      "dimensions": 768,
+      "structured": {
+        "intereses": [
+          "educaci\u00f3n"
+        ],
+        "experiencia": [
+          "Figma",
+          "UX/UI"
+        ],
+        "habilidades": [
+          "Figma",
+          "UX/UI"
+        ],
+        "areas_mejora": [
+          "Blender"
+        ],
+        "resumen_publico": "Habilidades declaradas: Figma, UX/UI. Intereses: educaci\u00f3n. Experiencia: Figma, UX/UI"
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "event_id": 3,
+      "candidate_id": 11,
+      "eligibility": "needs_review",
+      "evidence_group": "sufficient_evidence",
+      "evidence_coverage": {
+        "known": 2,
+        "unknown": 6,
+        "not_applicable": 0
+      },
+      "explanation": {
+        "strengths": [
+          "Evidencia confirmada para habilidad obligatoria: SQL.",
+          "Evidencia confirmada para habilidad deseable: Git."
+        ],
+        "gaps": [],
+        "unknowns": [
+          "Por verificar habilidad obligatoria: Figma.",
+          "Por verificar rol solicitado: especialista en bases de datos.",
+          "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+          "Por verificar condici\u00f3n expl\u00edcita: integrantes: 3.",
+          "Por verificar condici\u00f3n expl\u00edcita: materia: Ingenier\u00eda de Software.",
+          "Por verificar condici\u00f3n expl\u00edcita: titulo: QA Consent Gestor de tareas.",
+          "No hay datos suficientes para evaluar la complementariedad del equipo.",
+          "Hay requisitos sin evidencia suficiente."
+        ]
+      },
+      "policy_version": "2026-10-21.v1"
+    },
+    {
+      "event_id": 3,
+      "candidate_id": 14,
+      "eligibility": "needs_review",
+      "evidence_group": "sufficient_evidence",
+      "evidence_coverage": {
+        "known": 1,
+        "unknown": 7,
+        "not_applicable": 0
+      },
+      "explanation": {
+        "strengths": [
+          "Evidencia confirmada para habilidad obligatoria: Figma."
+        ],
+        "gaps": [],
+        "unknowns": [
+          "Por verificar habilidad obligatoria: SQL.",
+          "Por verificar habilidad deseable: Git.",
+          "Por verificar rol solicitado: especialista en bases de datos.",
+          "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+          "Por verificar condici\u00f3n expl\u00edcita: integrantes: 3.",
+          "Por verificar condici\u00f3n expl\u00edcita: materia: Ingenier\u00eda de Software.",
+          "Por verificar condici\u00f3n expl\u00edcita: titulo: QA Consent Gestor de tareas.",
+          "No hay datos suficientes para evaluar la complementariedad del equipo.",
+          "Hay requisitos sin evidencia suficiente."
+        ]
+      },
+      "policy_version": "2026-10-21.v1"
+    },
+    {
+      "event_id": 3,
+      "candidate_id": 12,
+      "eligibility": "needs_review",
+      "evidence_group": "sufficient_evidence",
+      "evidence_coverage": {
+        "known": 1,
+        "unknown": 7,
+        "not_applicable": 0
+      },
+      "explanation": {
+        "strengths": [
+          "Evidencia confirmada para habilidad obligatoria: Figma."
+        ],
+        "gaps": [],
+        "unknowns": [
+          "Por verificar habilidad obligatoria: SQL.",
+          "Por verificar habilidad deseable: Git.",
+          "Por verificar rol solicitado: especialista en bases de datos.",
+          "Por verificar rol solicitado: dise\u00f1ador UX/UI.",
+          "Por verificar condici\u00f3n expl\u00edcita: integrantes: 3.",
+          "Por verificar condici\u00f3n expl\u00edcita: materia: Ingenier\u00eda de Software.",
+          "Por verificar condici\u00f3n expl\u00edcita: titulo: QA Consent Gestor de tareas.",
+          "No hay datos suficientes para evaluar la complementariedad del equipo.",
+          "Hay requisitos sin evidencia suficiente."
+        ]
+      },
+      "policy_version": "2026-10-21.v1"
+    }
+  ],
+  "initial_candidates": [],
+  "activation_transition": [
+    {
+      "id": 10,
+      "consent": false,
+      "source_unchanged": true,
+      "vector_unchanged": true,
+      "state": "listo"
+    },
+    {
+      "id": 11,
+      "consent": true,
+      "source_unchanged": true,
+      "vector_unchanged": true,
+      "state": "listo"
+    },
+    {
+      "id": 12,
+      "consent": true,
+      "source_unchanged": true,
+      "vector_unchanged": true,
+      "state": "listo"
+    }
+  ],
+  "principal_before": {
+    "counts": {
+      "usuarios": 9,
+      "perfiles_usuarios": 9,
+      "eventos": 2,
+      "solicitudes_equipo": 1,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 1400770067,
+      "perfiles_usuarios": 3656649786,
+      "eventos": 1978453380,
+      "solicitudes_equipo": 813970897,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "d8f2ccf2c1b2e8f4f8a012181333aeb9993f79f20d0190acf8702534068eedf8",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_after": {
+    "counts": {
+      "usuarios": 9,
+      "perfiles_usuarios": 9,
+      "eventos": 2,
+      "solicitudes_equipo": 1,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 1400770067,
+      "perfiles_usuarios": 3656649786,
+      "eventos": 1978453380,
+      "solicitudes_equipo": 813970897,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "d8f2ccf2c1b2e8f4f8a012181333aeb9993f79f20d0190acf8702534068eedf8",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_snapshot_unchanged": true,
+  "principal_sql_allowlist_read_only": true,
+  "model_seconds": [
+    1.38,
+    1.498
+  ],
+  "nomic_calls": 6
+}

@@ -4,6 +4,7 @@ import { Check, CircleDashed, Lock, X } from "lucide-react"
 const VARIANTS = {
   neutral: { cls: "border-line bg-surface-2 text-ink", Icon: null, sr: "" },
   match: { cls: "border-success-line bg-success-soft text-success-ink", Icon: Check, sr: "Coincide con el proyecto: " },
+  shared: { cls: "border-success-line bg-success-soft text-success-ink", Icon: Check, sr: "Interés en común: " },
   needed: { cls: "border-warn-line bg-warn-soft text-warn-ink", Icon: CircleDashed, sr: "Pendiente de cubrir: " },
   private: { cls: "border-line bg-surface text-ink-2 border-dashed", Icon: Lock, sr: "Privado: " },
 }

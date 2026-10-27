@@ -30,11 +30,11 @@ def ai():
 
 def test_structured_call_and_profile(ai):
     ai.client.chat.return_value.message.content = profile_json()
-    profile = ProfileParser(ai).parse_profile("Sé Python; debo aprender electrónica.")
+    profile = ProfileParser(ai).parse_profile("Sé Python y C++; debo aprender electrónica.")
     assert profile.habilidades == ["Python", "C++"]
     kwargs = ai.client.chat.call_args.kwargs
     assert kwargs["format"] == StructuredProfile.model_json_schema()
-    assert kwargs["options"] == {"temperature": 0}
+    assert kwargs["options"] == {"temperature": 0, "num_predict": 1024}
     assert [m["role"] for m in kwargs["messages"]] == ["system", "user"]
     assert "electrónica" not in build_profile_embedding_text(profile)
 
@@ -89,6 +89,33 @@ def test_profile_summary_fallback_uses_only_extracted_facts(ai):
     }))
     profile = ProfileParser(ai).parse_profile("Sé Python; debo aprender electrónica")
     assert profile.resumen_publico == "Habilidades declaradas: Python"
+
+
+def test_negated_professional_experience_is_not_a_learning_goal(ai):
+    ai.generate_structured = MagicMock(return_value=json.dumps({
+        "habilidades": ["portero"],
+        "experiencia": ["torneos amateurs"],
+        "areas_mejora": ["Experiencia profesional"],
+        "resumen_publico": "",
+    }))
+    profile = ProfileParser(ai).parse_profile(
+        "Juego fútbol como portero, he participado en torneos amateurs. "
+        "No tengo experiencia profesional."
+    )
+    assert profile.habilidades == ["portero"]
+    assert profile.areas_mejora == []
+    assert "experiencia profesional" not in profile.resumen_publico.lower()
+    assert "negación o falta de experiencia no implica" in ai.generate_structured.call_args.kwargs["prompt"]
+
+
+def test_explicit_goal_is_preserved_despite_negation(ai):
+    ai.generate_structured = MagicMock(return_value=json.dumps({
+        "areas_mejora": ["Experiencia profesional"], "resumen_publico": "",
+    }))
+    profile = ProfileParser(ai).parse_profile(
+        "No tengo experiencia profesional, pero quiero adquirir experiencia profesional."
+    )
+    assert profile.areas_mejora == ["Experiencia profesional"]
 
 
 @pytest.mark.parametrize("vector", [[], [float("nan")] * 768, [0.1] * 3])

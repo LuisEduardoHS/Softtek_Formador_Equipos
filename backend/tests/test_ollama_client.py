@@ -2,6 +2,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+import httpx
 
 from app.services.ai.ollama_client import OllamaClient, OllamaServiceError
 from ollama import ResponseError, RequestError
@@ -79,3 +80,12 @@ def test_ollama_model_not_found(ai_client):
         match="Error al generar embedding"
     ):
         ai_client.generate_embedding("Programador Python")
+
+
+def test_httpx_timeout_is_recoverable(ai_client):
+    ai_client.client.chat.side_effect = httpx.ReadTimeout("timed out")
+    with pytest.raises(OllamaServiceError):
+        ai_client.generate_structured("Perfil sintético", {"type": "object"})
+    ai_client.client.embed.side_effect = httpx.ReadTimeout("timed out")
+    with pytest.raises(OllamaServiceError):
+        ai_client.generate_embedding("Python")

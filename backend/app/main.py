@@ -1,21 +1,29 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import Response
+import json
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.auth import router as auth_router
 from app.api.routes.perfiles import router as perfil_router
 from app.api.routes.eventos import router as eventos_router
-from app.db.database import engine, Base
-from app.models import usuario, evento
 from app.api.routes import solicitudes
 from app.api.routes import notificaciones
-
-# Crear las tablas en MySQL automáticamente si no existen
-Base.metadata.create_all(bind=engine)
+from app.api.routes import recomendaciones
 
 app = FastAPI(
     title="API Universitaria - Equipos e Inteligencia Artificial",
     description="Backend para autenticación, perfiles de usuario, convocatorias y formación de equipos.",
     version="1.0.0"
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request, error):
+    # Do not echo credentials/private input. Escaping also handles invalid Unicode
+    # submitted as JSON escapes without turning a validation failure into a 500.
+    details = [{k: item[k] for k in ("loc", "msg", "type")} for item in error.errors()]
+    return Response(json.dumps({"detail": details}, ensure_ascii=True), status_code=422,
+                    media_type="application/json")
 
 # Configuración de CORS incluyendo el puerto 5174
 app.add_middleware(
@@ -38,6 +46,7 @@ app.include_router(perfil_router)
 app.include_router(eventos_router)
 app.include_router(solicitudes.router,tags=["Invitaciones y Equipos"])
 app.include_router(notificaciones.router)
+app.include_router(recomendaciones.router)
 
 @app.get("/")
 def read_root():

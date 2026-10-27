@@ -1,7 +1,11 @@
 import json
 import math
+import httpx
 
 from ollama import Client, ResponseError, RequestError
+
+# ollama 0.6.x wraps httpx connection failures in Python's ConnectionError.
+TRANSPORT_ERRORS = (ResponseError, RequestError, httpx.HTTPError, ConnectionError, TimeoutError)
 
 from app.services.ai.config import (
     OLLAMA_HOST,
@@ -15,10 +19,10 @@ class OllamaServiceError(Exception):
 
 
 class OllamaClient:
-    def __init__(self):
+    def __init__(self, timeout: float = 120.0):
         self.client = Client(
             host=OLLAMA_HOST,
-            timeout=120.0,
+            timeout=timeout,
         )
 
     def generate_text(self, prompt: str) -> str:
@@ -52,9 +56,9 @@ class OllamaClient:
 
             return content
 
-        except (ResponseError, RequestError) as error:
+        except TRANSPORT_ERRORS as error:
             raise OllamaServiceError(
-                f"Error comunicarse con llama: {error}"
+                "Error comunicarse con llama. Servicio no disponible."
             ) from error
 
     def generate_structured(self, prompt: str, schema: dict) -> str:
@@ -75,10 +79,10 @@ class OllamaClient:
                     {"role": "user", "content": prompt},
                 ],
                 format=schema,
-                options={"temperature": 0},
+                options={"temperature": 0, "num_predict": 1024},
             )
-        except (ResponseError, RequestError) as error:
-            raise OllamaServiceError(f"Error al consultar Ollama: {error}") from error
+        except TRANSPORT_ERRORS as error:
+            raise OllamaServiceError("Error al consultar Ollama. Servicio no disponible.") from error
         content = response.message.content
         if not isinstance(content, str) or not content.strip():
             raise OllamaServiceError("La respuesta estructurada del modelo está vacía.")
@@ -114,7 +118,7 @@ class OllamaClient:
                 raise OllamaServiceError("Nomic devolvió un embedding de dimensión incorrecta.")
             return [float(value) for value in vector]
 
-        except (ResponseError, RequestError) as error:
+        except TRANSPORT_ERRORS as error:
             raise OllamaServiceError(
-                f"Error al generar embedding: {error}"
+                "Error al generar embedding. Servicio no disponible."
             ) from error

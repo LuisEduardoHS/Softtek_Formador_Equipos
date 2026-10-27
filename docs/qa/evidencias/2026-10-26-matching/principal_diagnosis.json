@@ -1,0 +1,114 @@
+{
+  "matching_projects": 1,
+  "read_only_enforced": true,
+  "projects": [
+    {
+      "title": "Gestor de tareas inteligente",
+      "owner_active": true,
+      "state": "Abierto",
+      "confirmed": true,
+      "ai_state": "listo",
+      "availability": {
+        "acepta_participacion": true,
+        "roles_disponibles": [
+          {
+            "id": "n0",
+            "nombre": "especialista en bases de datos",
+            "habilidades": [],
+            "indispensable": false,
+            "vacantes": 1,
+            "vacantes_disponibles": 1
+          },
+          {
+            "id": "n1",
+            "nombre": "dise\u00f1ador UX/UI",
+            "habilidades": [],
+            "indispensable": false,
+            "vacantes": 1,
+            "vacantes_disponibles": 1
+          }
+        ],
+        "motivo_no_disponible": null
+      },
+      "members": 0,
+      "pending": 0,
+      "profile_count": 4,
+      "profiles": [
+        {
+          "account": "anonymous-1",
+          "creator": false,
+          "confirmed": true,
+          "ai_state": "listo",
+          "consent": false,
+          "paused": false,
+          "permitted_skill_count": 0,
+          "exclusions": [
+            "no_consent",
+            "not_discoverable"
+          ]
+        },
+        {
+          "account": "anonymous-2",
+          "creator": true,
+          "confirmed": true,
+          "ai_state": "listo",
+          "consent": false,
+          "paused": false,
+          "permitted_skill_count": 0,
+          "exclusions": [
+            "creator",
+            "no_consent",
+            "not_discoverable"
+          ]
+        },
+        {
+          "account": "anonymous-3",
+          "creator": false,
+          "confirmed": true,
+          "ai_state": "listo",
+          "consent": false,
+          "paused": false,
+          "permitted_skill_count": 0,
+          "exclusions": [
+            "no_consent",
+            "not_discoverable"
+          ]
+        },
+        {
+          "account": "anonymous-4",
+          "creator": false,
+          "confirmed": true,
+          "ai_state": "listo",
+          "consent": false,
+          "paused": false,
+          "permitted_skill_count": 0,
+          "exclusions": [
+            "no_consent",
+            "not_discoverable"
+          ]
+        }
+      ],
+      "reason_counts": {
+        "no_consent": 4,
+        "not_discoverable": 4,
+        "creator": 1
+      },
+      "orm_recommendations": 0,
+      "requirements_counts": {
+        "roles_buscados": 2,
+        "habilidades_deseables": 1,
+        "intereses_relacionados": 0,
+        "habilidades_obligatorias": 2,
+        "restricciones_explicitas": 1
+      }
+    }
+  ],
+  "get_only_http": {
+    "identity_http": 200,
+    "owner_identity_matches": true,
+    "candidates_http": 200,
+    "returned_candidates": 0,
+    "detail_http": 200,
+    "confirmed": true
+  }
+}

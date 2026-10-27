@@ -1,0 +1,48 @@
+[
+  {
+    "id": "visual-request-real-and-unique",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "actual-capacity-preserved",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "fresh-session-request-disabled",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "fresh-session-recommendations-exclude-pending",
+    "status": "PASS",
+    "evidence": {}
+  },
+  {
+    "id": "principal-unchanged",
+    "status": "PASS",
+    "evidence": {
+      "principal_after": {
+        "counts": {
+          "usuarios": 1,
+          "perfiles_usuarios": 1,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "checksums": {
+          "usuarios": 101962764,
+          "perfiles_usuarios": 2746401420,
+          "eventos": 0,
+          "solicitudes_equipo": 0,
+          "participantes_evento": 0
+        },
+        "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+        "alembic": [
+          "20261022_6a"
+        ]
+      }
+    }
+  }
+]

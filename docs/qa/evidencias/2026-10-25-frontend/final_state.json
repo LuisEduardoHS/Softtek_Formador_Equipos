@@ -1,0 +1,51 @@
+{
+  "qa_database": "softtek_formador_equipos_qa_frontend_20261025_979b6c",
+  "qa_counts": {
+    "usuarios": 7,
+    "perfiles_usuarios": 7,
+    "eventos": 3,
+    "solicitudes_equipo": 3,
+    "participantes_evento": 2
+  },
+  "principal_before": {
+    "counts": {
+      "usuarios": 1,
+      "perfiles_usuarios": 1,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 101962764,
+      "perfiles_usuarios": 2746401420,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_after": {
+    "counts": {
+      "usuarios": 1,
+      "perfiles_usuarios": 1,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "checksums": {
+      "usuarios": 101962764,
+      "perfiles_usuarios": 2746401420,
+      "eventos": 0,
+      "solicitudes_equipo": 0,
+      "participantes_evento": 0
+    },
+    "ddl_hash": "000c70b44ca454ac24551c35ee36780ad1d729221e175bdbb51f581cd9fa8dbe",
+    "alembic": [
+      "20261022_6a"
+    ]
+  },
+  "principal_unchanged": true
+}

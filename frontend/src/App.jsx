@@ -16,6 +16,7 @@ import InvitationsPage from "./pages/InvitationsPage"
 import NotificationsPage from "./pages/NotificationsPage"
 import ProfilePage from "./pages/ProfilePage"
 import StudentsPage from "./pages/StudentsPage"
+import RequireSession from "./components/auth/RequireSession"
 
 function App() {
   return (
@@ -24,7 +25,6 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/registro" element={<AuthPage initialMode="signup" />} />
-      <Route path="/profile" element={<ProfileSetupPage />} />
       <Route path="/sistema-diseno" element={<DesignSystemPage />} />
 
       {/* Alias */}
@@ -32,6 +32,8 @@ function App() {
       <Route path="/bienvenida" element={<Navigate to="/profile" replace />} />
 
       {/* App autenticada */}
+      <Route element={<RequireSession />}>
+        <Route path="/profile" element={<ProfileSetupPage />} />
       <Route element={<AppLayout />}>
         <Route path="/inicio" element={<HomePage />} />
         <Route path="/match" element={<MatchPage />} />
@@ -46,6 +48,7 @@ function App() {
         <Route path="/notificaciones" element={<NotificationsPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/perfil/:id" element={<ProfilePage />} />
+      </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
