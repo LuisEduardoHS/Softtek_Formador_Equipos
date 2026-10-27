@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { Bell, FolderKanban, Home, LogOut, Menu, Plus, UserRound, Users, UsersRound, X } from "lucide-react"
 import Avatar from "../ui/Avatar"
 import Button from "../ui/Button"
 import { getSessionUser } from "../../lib/session"
+import HomeInvitationInbox from "./InvitationInboxButton"
 
 const NAV = [
   { to: "/inicio", label: "Inicio", icon: Home },
@@ -30,6 +31,7 @@ export function Logo({ to = "/inicio", className = "" }) {
 }
 
 export default function AppLayout() {
+  const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const usuario = getSessionUser()
@@ -72,9 +74,12 @@ export default function AppLayout() {
           </Button>
           <Logo />
         </div>
-        <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
-          <Avatar name={nombre} size="sm" />
-        </Link>
+        <div className="flex items-center gap-2">
+          {location.pathname === "/inicio" && <HomeInvitationInbox />}
+          <Link to="/perfil" aria-label="Mi perfil" className="rounded-full">
+            <Avatar name={nombre} size="sm" />
+          </Link>
+        </div>
       </header>
 
       {menuOpen && (
