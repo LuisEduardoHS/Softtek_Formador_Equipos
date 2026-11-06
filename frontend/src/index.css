@@ -9,21 +9,24 @@
    oscuro solo tenga que redefinir los valores en .dark.
 ------------------------------------------------------------------- */
 :root {
-  --canvas: #f8fafc;        /* 60 % fondo general */
+  --canvas: #f6faf9;        /* 60 % fondo general (gris con matiz verde azulado) */
   --surface: #ffffff;       /* tarjetas */
-  --surface-2: #f1f5f9;     /* rellenos sutiles */
-  --ink: #0f172a;           /* 30 % estructura y texto */
-  --ink-2: #64748b;         /* texto secundario */
-  --line: #e2e8f0;          /* bordes */
+  --surface-2: #eef5f4;     /* rellenos sutiles */
+  --ink: #0f1f1d;           /* 30 % estructura y texto */
+  --ink-2: #5b6f6c;         /* texto secundario */
+  --line: #dde8e6;          /* bordes */
 
-  --primary: #2563eb;       /* 10 % acento y CTA */
-  --primary-hover: #1d4ed8;
-  --primary-soft: #eff6ff;
+  --primary: #0f766e;       /* 10 % acento y CTA (teal 700: contraste AA con blanco) */
+  --primary-hover: #115e59;
+  --primary-soft: #f0fdfa;
 
-  --success: #10b981;
-  --success-ink: #047857;
-  --success-soft: #ecfdf5;
-  --success-line: #a7f3d0;
+  --accent: #14b8a6;        /* teal brillante: degradados y brillos decorativos */
+  --accent-2: #6366f1;      /* índigo: segundo color de los degradados */
+
+  --success: #22c55e;
+  --success-ink: #15803d;
+  --success-soft: #f0fdf4;
+  --success-line: #bbf7d0;
 
   --warn: #f59e0b;
   --warn-ink: #b45309;
@@ -33,28 +36,31 @@
   --danger: #dc2626;
   --danger-soft: #fef2f2;
 
-  --ai-soft: #eff6ff;
-  --ai-line: #bfdbfe;
-  --ai-ink: #1d4ed8;
+  --ai-soft: #eef2ff;
+  --ai-line: #c7d2fe;
+  --ai-ink: #4338ca;
 
   color-scheme: light;
 }
 
 .dark {
-  --canvas: #0f172a;
-  --surface: #1e293b;
-  --surface-2: #273449;
-  --ink: #f1f5f9;
-  --ink-2: #94a3b8;
-  --line: #334155;
+  --canvas: #081312;
+  --surface: #10201e;
+  --surface-2: #182d2a;
+  --ink: #ecf7f5;
+  --ink-2: #93aca8;
+  --line: #24403c;
 
-  --primary: #2563eb;
-  --primary-hover: #3b82f6;
-  --primary-soft: #1e3a8a33;
+  --primary: #0d9488;
+  --primary-hover: #14b8a6;
+  --primary-soft: #134e4a55;
 
-  --success-ink: #34d399;
-  --success-soft: #064e3b55;
-  --success-line: #065f46;
+  --accent: #2dd4bf;
+  --accent-2: #818cf8;
+
+  --success-ink: #4ade80;
+  --success-soft: #14532d55;
+  --success-line: #166534;
 
   --warn-ink: #fbbf24;
   --warn-soft: #78350f44;
@@ -62,9 +68,9 @@
 
   --danger-soft: #7f1d1d44;
 
-  --ai-soft: #17255488;
-  --ai-line: #1e40af;
-  --ai-ink: #93c5fd;
+  --ai-soft: #1e1b4b88;
+  --ai-line: #3730a3;
+  --ai-ink: #a5b4fc;
 
   color-scheme: dark;
 }
@@ -82,6 +88,9 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
+
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
 
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
@@ -127,6 +136,12 @@
   --animate-fade-in: fade-in 0.2s ease-out both;
   --animate-scale-in: scale-in 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-pop: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-blob: blob 14s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-bounce-in: bounce-in 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  --animate-spin-slow: spin 12s linear infinite;
+  --animate-slide-in: slide-in 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 
   @keyframes fade-up {
     from { opacity: 0; transform: translateY(8px); }
@@ -144,6 +159,60 @@
     0% { transform: scale(1); }
     40% { transform: scale(1.15); }
     100% { transform: scale(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.1); }
+    66% { transform: translate(-25px, 20px) scale(0.92); }
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+  @keyframes bounce-in {
+    0% { opacity: 0; transform: scale(0.6); }
+    60% { opacity: 1; transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  @keyframes slide-in {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+}
+
+/* Texto con degradado (teal → índigo). Reservado para el titular del hero. */
+@utility text-gradient {
+  background-image: linear-gradient(90deg, var(--primary), var(--accent) 55%, var(--accent-2));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Brillo que recorre los skeletons */
+@utility shimmer {
+  background-image: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+}
+
+/* Aparición al hacer scroll (la controla el componente <Reveal>) */
+@layer components {
+  .reveal {
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+      translate 0.3s ease, scale 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal[data-from="up"] { transform: translateY(32px); }
+  .reveal[data-from="left"] { transform: translateX(-40px); }
+  .reveal[data-from="right"] { transform: translateX(40px); }
+  .reveal[data-from="zoom"] { transform: scale(0.9); }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -164,6 +233,11 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none !important;
   }
 }

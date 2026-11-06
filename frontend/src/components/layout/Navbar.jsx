@@ -7,7 +7,7 @@ const LINKS = [
   ["#como-funciona", "Cómo funciona"],
   ["#estudiantes", "Estudiantes"],
   ["#por-que", "Por qué complementar"],
-  ["#testimonios", "Testimonios"],
+  ["#para-quien", "Para quién es"],
 ]
 
 /** Barra superior de la landing. En móvil, el menú de dos líneas abre los enlaces. */
@@ -15,20 +15,20 @@ export default function Navbar({ onGetStarted }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-canvas/85 backdrop-blur">
+    <header className="sticky top-0 z-30 animate-fade-in border-b border-line/70 bg-canvas/75 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-8">
         <Logo to="/" />
 
         <nav aria-label="Secciones" className="hidden items-center gap-6 text-sm font-medium text-ink-2 lg:flex">
           {LINKS.map(([href, label]) => (
-            <a key={href} href={href} className="transition-colors hover:text-ink">
+            <a key={href} href={href} className="relative py-1 transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-linear-to-r after:from-primary after:to-accent after:transition-transform after:duration-300 hover:text-ink hover:after:scale-x-100">
               {label}
             </a>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" as={Link} to="/auth" className="hidden sm:inline-flex">
+          <Button variant="ghost" as={Link} to="/auth" className="max-sm:hidden">
             Iniciar sesión
           </Button>
           <Button onClick={onGetStarted}>Crear mi perfil</Button>

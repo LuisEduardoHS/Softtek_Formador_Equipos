@@ -2,7 +2,7 @@ import { CircleAlert, Cpu, RotateCw } from "lucide-react"
 import Button from "./Button"
 
 export function Skeleton({ className = "" }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-lg bg-surface-2 ${className}`} />
+  return <div aria-hidden="true" className={`shimmer animate-shimmer rounded-lg ${className}`} />
 }
 
 // Esqueleto de una tarjeta de recomendación compacta
@@ -44,7 +44,7 @@ export function EmptyState({ icon: Icon, title, children, actions, className = "
   return (
     <div className={`flex animate-fade-up flex-col items-center rounded-2xl border border-dashed border-line px-6 py-10 text-center ${className}`}>
       {Icon && (
-        <span className="mb-4 grid size-12 place-items-center rounded-full bg-surface-2 text-ink-2">
+        <span className="mb-4 grid size-12 animate-bounce-in place-items-center rounded-full bg-primary-soft text-primary">
           <Icon aria-hidden="true" className="size-6" />
         </span>
       )}

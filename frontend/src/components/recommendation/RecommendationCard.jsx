@@ -94,7 +94,7 @@ export default function RecommendationCard({
 
   return (
     <article
-      className={`flex flex-col rounded-2xl border border-line bg-surface shadow-card transition-all duration-200 hover:shadow-pop ${
+      className={`flex flex-col rounded-2xl border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-pop hover:shadow-primary/10 ${
         expanded ? "gap-5 p-6" : "gap-4 p-5"
       } ${className}`}
     >

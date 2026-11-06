@@ -17,8 +17,8 @@ const NAV = [
 
 export function Logo({ to = "/inicio", className = "" }) {
   return (
-    <Link to={to} className={`flex items-center gap-2 font-bold text-ink ${className}`}>
-      <span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-ink text-canvas">
+    <Link to={to} className={`group flex items-center gap-2 font-bold text-ink ${className}`}>
+      <span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-linear-to-br from-primary to-accent text-white shadow-sm shadow-primary/30 transition-transform duration-200 group-hover:scale-105">
         {/* Dos piezas distintas que encajan: la idea de complementariedad */}
         <svg viewBox="0 0 20 20" className="size-4" fill="currentColor">
           <path d="M3 3h7v7H3z" opacity=".55" />
@@ -88,12 +88,12 @@ export default function AppLayout() {
             type="button"
             aria-label="Cerrar menú"
             onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 z-40 cursor-default bg-ink/40"
+            className="fixed inset-0 z-40 animate-fade-in cursor-default bg-ink/40 backdrop-blur-[2px]"
           />
           <aside
             id="navigation-drawer"
             aria-label="Menú principal"
-            className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-6 overflow-y-auto border-r border-line bg-surface px-4 py-6 pb-24 shadow-pop"
+            className="fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] animate-slide-in flex-col gap-6 overflow-y-auto border-r border-line bg-surface px-4 py-6 pb-24 shadow-pop"
           >
             <div className="flex items-center justify-between px-2">
               <Logo />
@@ -104,7 +104,7 @@ export default function AppLayout() {
             <Link
               to="/proyectos/nuevo"
               onClick={() => setMenuOpen(false)}
-              className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-card transition-all hover:bg-primary-hover active:scale-[0.98]"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-linear-to-r from-primary to-accent px-4 text-sm font-semibold text-white shadow-md shadow-primary/25 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/35 active:scale-[0.98]"
             >
               <Plus aria-hidden="true" className="size-4" /> Crear proyecto
             </Link>
@@ -116,14 +116,14 @@ export default function AppLayout() {
                       to={to}
                       onClick={() => setMenuOpen(false)}
                       className={({ isActive }) =>
-                        `flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
-                          isActive ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2/70 hover:text-ink"
+                        `group flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
+                          isActive ? "bg-primary-soft text-ink" : "text-ink-2 hover:bg-surface-2/70 hover:text-ink"
                         }`
                       }
                     >
                       {({ isActive }) => (
                         <>
-                          <Icon aria-hidden="true" className={`size-5 ${isActive ? "text-primary" : ""}`} />
+                          <Icon aria-hidden="true" className={`size-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : ""}`} />
                           <span className="flex-1">{label}</span>
                         </>
                       )}
@@ -152,7 +152,9 @@ export default function AppLayout() {
       )}
 
       <main id="contenido" className="min-w-0 pb-28 lg:pb-0">
-        <Outlet />
+        <div key={location.pathname} className="animate-fade-up">
+          <Outlet />
+        </div>
       </main>
 
       {/* Barra inferior (móvil) */}
