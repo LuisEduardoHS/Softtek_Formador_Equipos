@@ -150,7 +150,7 @@ function EditProfile({ perfil, setPerfil, dirty, aiDirty, onSave, onDiscard, sav
       </Section>
 
       {dirty && (
-        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 animate-fade-up border-t border-line bg-surface/95 backdrop-blur lg:bottom-0 lg:left-[260px]">
+        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 animate-fade-up border-t border-line bg-surface/95 backdrop-blur lg:bottom-0 lg:left-65">
           <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
             <p className="text-sm text-ink-2">Tienes cambios sin guardar</p>
             <div className="flex gap-2">

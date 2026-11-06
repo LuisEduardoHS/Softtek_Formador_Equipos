@@ -405,7 +405,7 @@ export default function CreateProjectPage() {
       </div>
 
       {/* Acciones fijas (sobre la barra inferior en móvil) */}
-      <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 border-t border-line bg-surface/95 backdrop-blur lg:bottom-0 lg:left-[260px]">
+      <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-20 border-t border-line bg-surface/95 backdrop-blur lg:bottom-0 lg:left-65">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
           {step === 0 ? (
             <Button variant="ghost" as={Link} to="/proyectos">

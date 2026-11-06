@@ -249,7 +249,7 @@ export default function DesignSystemPage() {
           </Card>
 
           {/* Vista previa barra inferior móvil */}
-          <div className="mx-auto w-full max-w-[320px]">
+          <div className="mx-auto w-full max-w-80">
             <div className="overflow-hidden rounded-[28px] border-4 border-ink/80 bg-canvas shadow-pop">
               <div className="h-56 space-y-2 p-4">
                 <div className="h-4 w-2/3 rounded bg-surface-2" />

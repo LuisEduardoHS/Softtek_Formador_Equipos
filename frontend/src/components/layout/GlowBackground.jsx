@@ -17,7 +17,7 @@ export default function GlowBackground({ children, className = "" }) {
         {GLOWS.map((pos) => (
           <span
             key={pos}
-            className={`absolute size-[26rem] rounded-full bg-primary/10 blur-[110px] dark:bg-primary/30 ${pos}`}
+            className={`absolute size-104 rounded-full bg-primary/10 blur-[110px] dark:bg-primary/30 ${pos}`}
           />
         ))}
       </div>
